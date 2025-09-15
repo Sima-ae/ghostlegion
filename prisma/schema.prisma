@@ -1,0 +1,319 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(USER)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  personnel Personnel?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum UserRole {
+  ADMIN
+  COMMANDER
+  OFFICER
+  MEDICAL
+  LOGISTICS
+  COMMUNICATION
+  SECURITY
+  VOLUNTEER
+  USER
+}
+
+model Location {
+  id          String       @id @default(cuid())
+  name        String
+  type        LocationType
+  coordinates Json         // [latitude, longitude]
+  description String
+  capacity    Int?
+  status      LocationStatus @default(ACTIVE)
+  facilities  String[]
+  contact     String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+enum LocationType {
+  BUNKER
+  FORTRESS
+  HIDING_PLACE
+  EVACUATION_CENTER
+  MEDICAL_FACILITY
+  COMMAND_CENTER
+  SUPPLY_DEPOT
+}
+
+enum LocationStatus {
+  ACTIVE
+  INACTIVE
+  DAMAGED
+  UNDER_CONSTRUCTION
+}
+
+model Personnel {
+  id            String         @id @default(cuid())
+  name          String
+  role          PersonnelRole
+  department    PersonnelDepartment
+  status        PersonnelStatus @default(ACTIVE)
+  location      String?
+  skills        String[]
+  contact       String
+  clearanceLevel ClearanceLevel @default(PUBLIC)
+  userId        String?        @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+enum PersonnelRole {
+  SOLDIER
+  COMMANDER
+  INTELLIGENCE_ANALYST
+  EOD_SPECIALIST
+  SNIPER
+  TANK_CREW
+  PILOT
+  NAVAL_FORCE
+  MILITARY_MEDIC
+  LOGISTICS_MANAGER
+  CYBERSECURITY_EXPERT
+  MILITARY_POLICE
+  PSYOPS_SPECIALIST
+  WEAPONS_ENGINEER
+  GOVERNMENT_LEADER
+  EMERGENCY_COORDINATOR
+  CIVIL_DEFENSE
+  EVACUATION_PLANNER
+  DIPLOMATIC_PERSONNEL
+  UN_PERSONNEL
+  RED_CROSS_WORKER
+  NGO_STAFF
+  REFUGEE_COORDINATOR
+  FIELD_MEDIC
+  TRAUMA_COUNSELOR
+  VOLUNTEER
+  TRANSLATOR
+  SOCIAL_WORKER
+  CHILD_PROTECTION
+  DOCTOR
+  SURGEON
+  PARAMEDIC
+  NURSE
+  PHARMACIST
+  MENTAL_HEALTH_PROFESSIONAL
+  TRUCK_DRIVER
+  PILOT_CIVILIAN
+  WAREHOUSE_MANAGER
+  CONSTRUCTION_WORKER
+  JOURNALIST
+  IT_SPECIALIST
+  COMMUNICATION_OPERATOR
+  LIBRARIAN
+  POLICE_OFFICER
+  SECURITY_GUARD
+  BORDER_GUARD
+  COUNTERINTELLIGENCE
+  TEACHER
+  RELIGIOUS_LEADER
+  BUSINESS_OWNER
+  DEVELOPER
+  FARMER
+}
+
+enum PersonnelDepartment {
+  MILITARY
+  GOVERNMENT
+  HUMANITARIAN
+  MEDICAL
+  LOGISTICS
+  COMMUNICATION
+  LAW_ENFORCEMENT
+  CIVILIAN
+  VOLUNTEER
+}
+
+enum PersonnelStatus {
+  ACTIVE
+  INACTIVE
+  DEPLOYED
+  INJURED
+  MISSING
+}
+
+enum ClearanceLevel {
+  PUBLIC
+  RESTRICTED
+  CONFIDENTIAL
+  SECRET
+  TOP_SECRET
+}
+
+model EvacuationRoute {
+  id            String        @id @default(cuid())
+  name          String
+  startLocation String
+  endLocation   String
+  waypoints     Json          // Array of [latitude, longitude]
+  estimatedTime Int           // in minutes
+  capacity      Int
+  status        RouteStatus   @default(OPEN)
+  transportType TransportType
+  priority      Priority      @default(MEDIUM)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum RouteStatus {
+  OPEN
+  CLOSED
+  CONGESTED
+  DANGEROUS
+}
+
+enum TransportType {
+  FOOT
+  VEHICLE
+  PUBLIC_TRANSPORT
+  MILITARY_VEHICLE
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model Resource {
+  id          String        @id @default(cuid())
+  name        String
+  type        ResourceType
+  quantity    Int
+  unit        String
+  location    String
+  status      ResourceStatus @default(AVAILABLE)
+  expiryDate  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum ResourceType {
+  FOOD
+  WATER
+  MEDICAL
+  FUEL
+  AMMUNITION
+  EQUIPMENT
+  TRANSPORT
+}
+
+enum ResourceStatus {
+  AVAILABLE
+  LOW_STOCK
+  OUT_OF_STOCK
+  DAMAGED
+}
+
+model Alert {
+  id            String      @id @default(cuid())
+  title         String
+  message       String
+  severity      Severity
+  type          AlertType
+  location      String?
+  expiresAt     DateTime?
+  acknowledgedBy String[]   // Array of user IDs
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertType {
+  SECURITY
+  EVACUATION
+  MEDICAL
+  LOGISTICS
+  GENERAL
+}
+
+model MapElement {
+  id          String        @id @default(cuid())
+  type        MapElementType
+  coordinates Json          // Array of [latitude, longitude] or single [lat, lng]
+  color       String
+  size        Int?          // Line width or circle radius
+  label       String?
+  description String?
+  createdBy   String?       // User ID who created the element
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+enum MapElementType {
+  POLYGON
+  POLYLINE
+  CIRCLE
+  MARKER
+}
