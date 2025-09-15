@@ -41,6 +41,8 @@ interface MapElement {
   size?: number;
   label?: string;
   description?: string;
+  risk?: 'High' | 'Medium' | 'Low';
+  category?: string;
   createdBy?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -89,6 +91,7 @@ export default function AdminMapEditor({
     status: 'active' as const,
     facilities: [] as string[],
     contact: '',
+    lastUpdated: new Date().toISOString(),
   });
   const [editingElement, setEditingElement] = useState<MapElement | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -101,13 +104,22 @@ export default function AdminMapEditor({
   // Load map elements from database
   const loadMapElements = async () => {
     try {
+      console.log('AdminMapEditor: Loading map elements...');
       const response = await fetch('/api/map-elements');
       if (response.ok) {
         const elements = await response.json();
-        setMapElements(elements);
+        console.log('AdminMapEditor: Loaded map elements:', elements);
+        // Convert risk values from uppercase to mixed case for display
+        const convertedElements = elements.map((element: any) => ({
+          ...element,
+          risk: element.risk ? element.risk.charAt(0) + element.risk.slice(1).toLowerCase() : 'Low'
+        }));
+        setMapElements(convertedElements);
+      } else {
+        console.error('AdminMapEditor: Failed to load map elements:', response.status);
       }
     } catch (error) {
-      console.error('Error loading map elements:', error);
+      console.error('AdminMapEditor: Error loading map elements:', error);
     }
   };
 
@@ -206,12 +218,22 @@ export default function AdminMapEditor({
         setCurrentPath(prev => [...prev, [lat, lng]]);
       }
     } else if (activeTool === 'circle') {
+      const label = prompt('Enter a label for this circle:', `Circle ${mapElements.length + 1}`);
+      if (label === null) return;
+      
+      const description = prompt('Enter a description for this circle:', '');
+      const risk = prompt('Enter risk level (High/Medium/Low):', 'Low');
+      const category = prompt('Enter category:', '');
+      
       const element = {
-        type: 'circle',
-        coordinates: [lat, lng],
+        type: 'circle' as const,
+        coordinates: [lat, lng] as [number, number],
         color: drawingColor,
         size: drawingSize * 1000, // Convert to meters
-        label: `Circle ${mapElements.length + 1}`,
+        label: label,
+        description: description || undefined,
+        risk: (risk === 'High' || risk === 'Medium' || risk === 'Low') ? risk : 'Low' as 'High' | 'Medium' | 'Low',
+        category: category || undefined,
       };
       await saveMapElement(element);
     }
@@ -220,12 +242,26 @@ export default function AdminMapEditor({
   const handleMapRightClick = async (lat: number, lng: number) => {
     if (isDrawing && (activeTool === 'polygon' || activeTool === 'polyline')) {
       // Finish drawing
+      const label = prompt(`Enter a label for this ${activeTool}:`, `${activeTool} ${mapElements.length + 1}`);
+      if (label === null) {
+        setIsDrawing(false);
+        setCurrentPath([]);
+        return;
+      }
+      
+      const description = prompt(`Enter a description for this ${activeTool}:`, '');
+      const risk = prompt(`Enter risk level (High/Medium/Low):`, 'Low');
+      const category = prompt(`Enter category:`, '');
+      
       const element = {
-        type: activeTool,
-        coordinates: currentPath,
+        type: activeTool as 'polygon' | 'polyline',
+        coordinates: currentPath as [number, number][],
         color: drawingColor,
         size: drawingSize,
-        label: `${activeTool} ${mapElements.length + 1}`,
+        label: label,
+        description: description || undefined,
+        risk: (risk === 'High' || risk === 'Medium' || risk === 'Low') ? risk : 'Low' as 'High' | 'Medium' | 'Low',
+        category: category || undefined,
       };
       await saveMapElement(element);
       setIsDrawing(false);
@@ -245,6 +281,7 @@ export default function AdminMapEditor({
       status: 'active',
       facilities: [],
       contact: '',
+      lastUpdated: new Date().toISOString(),
     });
   };
 
@@ -258,7 +295,18 @@ export default function AdminMapEditor({
 
   const handleSaveElement = async () => {
     if (editingElement) {
-      await updateMapElement(editingElement.id, editingElement);
+      // Convert risk value to uppercase for database storage
+      const elementToSave = {
+        ...editingElement,
+        risk: editingElement.risk ? editingElement.risk.toUpperCase() : 'LOW'
+      };
+      // Remove the risk field from the MapElement type and pass it separately
+      const { risk, ...restElement } = elementToSave;
+      const apiData = {
+        ...restElement,
+        risk: risk as 'HIGH' | 'MEDIUM' | 'LOW'
+      };
+      await updateMapElement(editingElement.id, apiData as any);
       setEditingElement(null);
     }
   };
@@ -401,7 +449,8 @@ export default function AdminMapEditor({
 
           {/* Drawing Elements */}
           {mapElements.map((element) => {
-            if (element.type === 'polygon') {
+            const elementType = element.type.toLowerCase();
+            if (elementType === 'polygon') {
               return (
                 <Polygon
                   key={element.id}
@@ -410,18 +459,122 @@ export default function AdminMapEditor({
                   weight={element.size}
                   fillColor={element.color}
                   fillOpacity={0.3}
-                />
+                  eventHandlers={{
+                    click: () => handleEditElement(element),
+                  }}
+                >
+                  <Popup>
+                    <div className="p-2 min-w-[200px]">
+                      <div className="flex items-center mb-2">
+                        <div
+                          className="w-4 h-4 rounded mr-2"
+                          style={{ backgroundColor: element.color }}
+                        />
+                        <h3 className="font-bold text-sm">{element.label || 'Polygon'}</h3>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-2">{element.description || 'No description provided'}</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Risk:</span>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            element.risk === 'High' ? 'bg-red-100 text-red-800' :
+                            element.risk === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {element.risk || 'Low'}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Category:</span>
+                          <span className="text-xs">{element.category || 'Uncategorized'}</span>
+                        </div>
+                        {element.createdAt && (
+                          <div className="flex items-center">
+                            <span className="text-xs font-medium mr-2">Created:</span>
+                            <span className="text-xs">{new Date(element.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex space-x-1">
+                        <button
+                          onClick={() => handleEditElement(element)}
+                          className="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 bg-blue-100 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteElement(element.id)}
+                          className="text-red-600 hover:text-red-800 text-xs px-2 py-1 bg-red-100 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </Popup>
+                </Polygon>
               );
-            } else if (element.type === 'polyline') {
+            } else if (elementType === 'polyline') {
               return (
                 <Polyline
                   key={element.id}
                   positions={element.coordinates as [number, number][]}
                   color={element.color}
                   weight={element.size}
-                />
+                  eventHandlers={{
+                    click: () => handleEditElement(element),
+                  }}
+                >
+                  <Popup>
+                    <div className="p-2 min-w-[200px]">
+                      <div className="flex items-center mb-2">
+                        <div
+                          className="w-4 h-4 rounded mr-2"
+                          style={{ backgroundColor: element.color }}
+                        />
+                        <h3 className="font-bold text-sm">{element.label || 'Polyline'}</h3>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-2">{element.description || 'No description provided'}</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Risk:</span>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            element.risk === 'High' ? 'bg-red-100 text-red-800' :
+                            element.risk === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {element.risk || 'Low'}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Category:</span>
+                          <span className="text-xs">{element.category || 'Uncategorized'}</span>
+                        </div>
+                        {element.createdAt && (
+                          <div className="flex items-center">
+                            <span className="text-xs font-medium mr-2">Created:</span>
+                            <span className="text-xs">{new Date(element.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex space-x-1">
+                        <button
+                          onClick={() => handleEditElement(element)}
+                          className="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 bg-blue-100 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteElement(element.id)}
+                          className="text-red-600 hover:text-red-800 text-xs px-2 py-1 bg-red-100 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </Popup>
+                </Polyline>
               );
-            } else if (element.type === 'circle') {
+            } else if (elementType === 'circle') {
               return (
                 <Circle
                   key={element.id}
@@ -431,7 +584,59 @@ export default function AdminMapEditor({
                   weight={element.size || 3}
                   fillColor={element.color}
                   fillOpacity={0.3}
-                />
+                  eventHandlers={{
+                    click: () => handleEditElement(element),
+                  }}
+                >
+                  <Popup>
+                    <div className="p-2 min-w-[200px]">
+                      <div className="flex items-center mb-2">
+                        <div
+                          className="w-4 h-4 rounded mr-2"
+                          style={{ backgroundColor: element.color }}
+                        />
+                        <h3 className="font-bold text-sm">{element.label || 'Circle'}</h3>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-2">{element.description || 'No description provided'}</p>
+                      <div className="space-y-1">
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Risk:</span>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            element.risk === 'High' ? 'bg-red-100 text-red-800' :
+                            element.risk === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-green-100 text-green-800'
+                          }`}>
+                            {element.risk || 'Low'}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Category:</span>
+                          <span className="text-xs">{element.category || 'Uncategorized'}</span>
+                        </div>
+                        {element.createdAt && (
+                          <div className="flex items-center">
+                            <span className="text-xs font-medium mr-2">Created:</span>
+                            <span className="text-xs">{new Date(element.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex space-x-1">
+                        <button
+                          onClick={() => handleEditElement(element)}
+                          className="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 bg-blue-100 rounded"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteElement(element.id)}
+                          className="text-red-600 hover:text-red-800 text-xs px-2 py-1 bg-red-100 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </Popup>
+                </Circle>
               );
             }
             return null;
@@ -559,8 +764,8 @@ export default function AdminMapEditor({
       {/* Edit Element Modal */}
       {editingElement && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
-            <h3 className="text-lg font-semibold mb-4">Edit Element</h3>
+          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">Edit Map Element</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
@@ -569,11 +774,44 @@ export default function AdminMapEditor({
                   value={editingElement.label || ''}
                   onChange={(e) => setEditingElement(prev => prev ? { ...prev, label: e.target.value } : null)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter element label"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={editingElement.description || ''}
+                  onChange={(e) => setEditingElement(prev => prev ? { ...prev, description: e.target.value } : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={3}
+                  placeholder="Enter element description"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
+                <select
+                  value={editingElement.risk || 'Low'}
+                  onChange={(e) => setEditingElement(prev => prev ? { ...prev, risk: e.target.value as 'High' | 'Medium' | 'Low' } : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <input
+                  type="text"
+                  value={editingElement.category || ''}
+                  onChange={(e) => setEditingElement(prev => prev ? { ...prev, category: e.target.value } : null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter category (e.g., Military, Civilian, Infrastructure)"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-                <div className="flex space-x-1">
+                <div className="flex flex-wrap gap-2">
                   {colors.map((color) => (
                     <button
                       key={color}
@@ -585,6 +823,48 @@ export default function AdminMapEditor({
                     />
                   ))}
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Size/Weight</label>
+                <input
+                  type="number"
+                  value={editingElement.size || 3}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    if (value >= 1) {
+                      setEditingElement(prev => prev ? { ...prev, size: value } : null);
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="1"
+                  max="20"
+                  required
+                />
+              </div>
+              {editingElement.type.toLowerCase() === 'circle' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Radius (meters)</label>
+                  <input
+                    type="number"
+                    value={editingElement.size || 1000}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+                      if (value >= 100) {
+                        setEditingElement(prev => prev ? { ...prev, size: value } : null);
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="100"
+                    max="10000"
+                    required
+                  />
+                </div>
+              )}
+              <div className="text-xs text-gray-500">
+                <p><strong>Type:</strong> {editingElement.type.toLowerCase()}</p>
+                {editingElement.createdAt && (
+                  <p><strong>Created:</strong> {new Date(editingElement.createdAt).toLocaleString()}</p>
+                )}
               </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">
@@ -598,7 +878,7 @@ export default function AdminMapEditor({
                 onClick={handleSaveElement}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                Save
+                Save Changes
               </button>
             </div>
           </div>

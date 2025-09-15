@@ -3,9 +3,15 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Header from './components/Header';
 import PublicSidebar from './components/PublicSidebar';
-import dynamic from 'next/dynamic';
+import LocationCard from './components/LocationCard';
+import EvacuationPlansPage from './components/EvacuationPlansPage';
+import CommunityPage from './components/CommunityPage';
+import AlertsPage from './components/AlertsPage';
+import { sampleLocations } from './data/sampleData';
+import { Location } from './types';
 
 // Dynamically import MapComponent to prevent SSR issues
 const MapComponent = dynamic(() => import('./components/MapComponent'), {
@@ -19,17 +25,12 @@ const MapComponent = dynamic(() => import('./components/MapComponent'), {
     </div>
   )
 });
-import LocationCard from './components/LocationCard';
-import EvacuationPlansPage from './components/EvacuationPlansPage';
-import CommunityPage from './components/CommunityPage';
-import AlertsPage from './components/AlertsPage';
-import { sampleLocations } from './data/sampleData';
 
 export default function Home() {
   const { data: session } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('map');
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   // Admin users can access both public and admin areas
 

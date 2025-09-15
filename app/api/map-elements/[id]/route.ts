@@ -6,7 +6,7 @@ import { db } from '@/app/lib/db';
 // PUT /api/map-elements/[id] - Update a map element
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -18,8 +18,9 @@ export async function PUT(
       );
     }
 
+    const { id } = await params;
     const body = await request.json();
-    const { type, coordinates, color, size, label, description } = body;
+    const { type, coordinates, color, size, label, description, risk, category } = body;
 
     // Convert string type to MapElementType enum if provided
     const updateData: any = {
@@ -28,6 +29,8 @@ export async function PUT(
       size,
       label,
       description,
+      risk: risk ? risk.toUpperCase() : undefined,
+      category,
       updatedAt: new Date()
     };
 
@@ -36,7 +39,7 @@ export async function PUT(
     }
 
     const mapElement = await db.mapElement.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData
     });
 
@@ -53,7 +56,7 @@ export async function PUT(
 // DELETE /api/map-elements/[id] - Delete a map element
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -65,8 +68,10 @@ export async function DELETE(
       );
     }
 
+    const { id } = await params;
+
     await db.mapElement.delete({
-      where: { id: params.id }
+      where: { id }
     });
 
     return NextResponse.json({ success: true });

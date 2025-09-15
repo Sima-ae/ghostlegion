@@ -306,6 +306,8 @@ model MapElement {
   size        Int?          // Line width or circle radius
   label       String?
   description String?
+  risk        RiskLevel?    @default(LOW)
+  category    String?
   createdBy   String?       // User ID who created the element
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -316,4 +318,10 @@ enum MapElementType {
   POLYLINE
   CIRCLE
   MARKER
+}
+
+enum RiskLevel {
+  HIGH
+  MEDIUM
+  LOW
 }

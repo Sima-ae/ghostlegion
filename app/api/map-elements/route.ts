@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { type, coordinates, color, size, label, description } = body;
+    const { type, coordinates, color, size, label, description, risk, category } = body;
 
     if (!type || !coordinates || !color) {
       return NextResponse.json(
@@ -53,6 +53,8 @@ export async function POST(request: NextRequest) {
         size,
         label,
         description,
+        risk: risk ? risk.toUpperCase() : 'LOW',
+        category,
         createdBy: session.user.id
       }
     });
