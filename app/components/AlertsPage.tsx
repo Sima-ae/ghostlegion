@@ -9,7 +9,7 @@ export default function AlertsPage() {
   const alertTypes = [
     { type: 'evacuation', label: 'Evacuation', color: 'bg-pink-100 text-pink-800 border-pink-200' },
     { type: 'security', label: 'Security', color: 'bg-orange-100 text-orange-800 border-orange-200' },
-    { type: 'weather', label: 'Weather', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+    { type: 'warning', label: 'Warning', color: 'bg-blue-100 text-blue-800 border-blue-200' },
     { type: 'medical', label: 'Medical', color: 'bg-green-100 text-green-800 border-green-200' },
     { type: 'transport', label: 'Transport', color: 'bg-purple-100 text-purple-800 border-purple-200' },
   ];
@@ -20,7 +20,7 @@ export default function AlertsPage() {
         return <Users className="h-5 w-5" />;
       case 'security':
         return <Shield className="h-5 w-5" />;
-      case 'weather':
+      case 'warning':
         return <AlertTriangle className="h-5 w-5" />;
       case 'medical':
         return <Bell className="h-5 w-5" />;
@@ -122,42 +122,37 @@ export default function AlertsPage() {
 
         {/* Alerts List */}
         <div className="bg-white rounded-lg shadow-sm border">
-          <div className="p-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Alert Messages ({filteredAlerts.length})
-              </h3>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-600">Filter:</span>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => setSelectedFilter('all')}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center justify-center ${
-                      selectedFilter === 'all' 
-                        ? 'bg-gray-100 text-gray-800 border-gray-300' 
-                        : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
-                    }`}
-                  >
-                    All
-                  </button>
-                  {alertTypes.map((alertType) => (
-                    <button
-                      key={alertType.type}
-                      onClick={() => setSelectedFilter(alertType.type)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center justify-center ${
-                        selectedFilter === alertType.type 
-                          ? alertType.color 
-                          : `${alertType.color} hover:opacity-80`
-                      }`}
-                    >
-                      {getAlertIcon(alertType.type)}
-                      <span className="ml-1">{alertType.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+                  <div className="p-4 border-b border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-600">Filter:</span>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => setSelectedFilter('all')}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center justify-center ${
+                            selectedFilter === 'all'
+                              ? 'bg-gray-100 text-gray-800 border-gray-300'
+                              : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          All
+                        </button>
+                        {alertTypes.map((alertType) => (
+                          <button
+                            key={alertType.type}
+                            onClick={() => setSelectedFilter(alertType.type)}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center justify-center ${
+                              selectedFilter === alertType.type
+                                ? alertType.color
+                                : `${alertType.color} hover:opacity-80`
+                            }`}
+                          >
+                            {getAlertIcon(alertType.type)}
+                            <span className="ml-1">{alertType.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
           <div className="p-6">
             {filteredAlerts.length > 0 ? (
               <div className="space-y-4">
@@ -187,12 +182,6 @@ export default function AlertsPage() {
                               <Clock className="h-4 w-4 mr-1" />
                               {formatTimestamp(alert.timestamp)}
                             </div>
-                            {alert.expiresAt && (
-                              <div className="flex items-center">
-                                <Bell className="h-4 w-4 mr-1" />
-                                Expires: {formatTimestamp(alert.expiresAt)}
-                              </div>
-                            )}
                           </div>
                         </div>
                         <div className="flex-shrink-0">

@@ -209,8 +209,7 @@ export const sampleAlerts: Alert[] = [
     severity: 'high',
     type: 'evacuation',
     location: 'A1 Amsterdam-Utrecht',
-    timestamp: '2024-01-15T12:30:00Z',
-    expiresAt: '2024-01-15T18:00:00Z',
+    timestamp: '2025-09-11T12:30:00Z',
     acknowledgedBy: ['1', '2']
   },
   {
@@ -220,18 +219,17 @@ export const sampleAlerts: Alert[] = [
     severity: 'medium',
     type: 'security',
     location: 'The Hague Bunker Complex',
-    timestamp: '2024-01-15T11:45:00Z',
+    timestamp: '2025-09-11T11:45:00Z',
     acknowledgedBy: ['1']
   },
   {
     id: '3',
-    title: 'Demo Alert: Severe Weather Warning',
-    message: 'Heavy storms expected in the northern regions. Take necessary precautions.',
+    title: 'Demo Alert: Border Infiltration Warning',
+    message: 'Suspected infiltration activity detected along the German border near Maastricht. Military units deployed to investigate.',
     severity: 'high',
-    type: 'weather',
-    location: 'Northern Netherlands',
-    timestamp: '2024-01-15T11:00:00Z',
-    expiresAt: '2024-01-16T06:00:00Z',
+    type: 'warning',
+    location: 'German Border - Maastricht Area',
+    timestamp: '2025-09-11T11:00:00Z',
     acknowledgedBy: []
   },
   {
@@ -241,7 +239,7 @@ export const sampleAlerts: Alert[] = [
     severity: 'high',
     type: 'medical',
     location: 'Utrecht Medical Center',
-    timestamp: '2024-01-15T10:30:00Z',
+    timestamp: '2025-09-11T10:30:00Z',
     acknowledgedBy: ['2']
   },
   {
@@ -251,8 +249,7 @@ export const sampleAlerts: Alert[] = [
     severity: 'medium',
     type: 'transport',
     location: 'Amsterdam',
-    timestamp: '2024-01-15T10:00:00Z',
-    expiresAt: '2024-01-15T16:00:00Z',
+    timestamp: '2025-09-11T10:00:00Z',
     acknowledgedBy: []
   },
   {
@@ -262,8 +259,7 @@ export const sampleAlerts: Alert[] = [
     severity: 'high',
     type: 'evacuation',
     location: 'Rotterdam City Center',
-    timestamp: '2024-01-15T09:45:00Z',
-    expiresAt: '2024-01-15T20:00:00Z',
+    timestamp: '2025-09-11T09:45:00Z',
     acknowledgedBy: ['1', '3']
   }
 ];
