@@ -204,7 +204,7 @@ export const sampleResources: Resource[] = [
 export const sampleAlerts: Alert[] = [
   {
     id: '1',
-    title: 'Evacuation Route A1 Closed',
+    title: 'Demo Alert: Evacuation Route A1 Closed',
     message: 'The A1 between Amsterdam and Utrecht is closed due to military activities. Use alternative routes.',
     severity: 'high',
     type: 'evacuation',
@@ -215,22 +215,56 @@ export const sampleAlerts: Alert[] = [
   },
   {
     id: '2',
-    title: 'Medical Supplies Low',
-    message: 'Gasoline supplies in The Hague are low. New delivery expected in 2 hours.',
+    title: 'Demo Alert: Security Alert - Suspicious Activity',
+    message: 'Reported suspicious activity near The Hague Bunker Complex. Security personnel investigating.',
     severity: 'medium',
-    type: 'logistics',
+    type: 'security',
     location: 'The Hague Bunker Complex',
     timestamp: '2024-01-15T11:45:00Z',
     acknowledgedBy: ['1']
   },
   {
     id: '3',
-    title: 'New Evacuation Centers Opened',
-    message: 'Two new evacuation centers have been opened in Rotterdam and Eindhoven. Details in the system.',
-    severity: 'low',
-    type: 'general',
-    timestamp: '2024-01-15T10:00:00Z',
+    title: 'Demo Alert: Severe Weather Warning',
+    message: 'Heavy storms expected in the northern regions. Take necessary precautions.',
+    severity: 'high',
+    type: 'weather',
+    location: 'Northern Netherlands',
+    timestamp: '2024-01-15T11:00:00Z',
+    expiresAt: '2024-01-16T06:00:00Z',
     acknowledgedBy: []
+  },
+  {
+    id: '4',
+    title: 'Demo Alert: Medical Emergency - Mass Casualty',
+    message: 'Multiple casualties reported at Utrecht Medical Center. Additional medical personnel requested.',
+    severity: 'high',
+    type: 'medical',
+    location: 'Utrecht Medical Center',
+    timestamp: '2024-01-15T10:30:00Z',
+    acknowledgedBy: ['2']
+  },
+  {
+    id: '5',
+    title: 'Demo Alert: Transport Disruption - Public Transport',
+    message: 'Public transport services suspended in Amsterdam due to security concerns.',
+    severity: 'medium',
+    type: 'transport',
+    location: 'Amsterdam',
+    timestamp: '2024-01-15T10:00:00Z',
+    expiresAt: '2024-01-15T16:00:00Z',
+    acknowledgedBy: []
+  },
+  {
+    id: '6',
+    title: 'Demo Alert: Evacuation Order - Rotterdam Area',
+    message: 'Immediate evacuation ordered for Rotterdam city center. Follow designated routes.',
+    severity: 'high',
+    type: 'evacuation',
+    location: 'Rotterdam City Center',
+    timestamp: '2024-01-15T09:45:00Z',
+    expiresAt: '2024-01-15T20:00:00Z',
+    acknowledgedBy: ['1', '3']
   }
 ];
 

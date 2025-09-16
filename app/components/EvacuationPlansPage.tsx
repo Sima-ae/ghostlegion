@@ -104,7 +104,7 @@ export default function EvacuationPlansPage() {
   };
 
   return (
-    <div className="h-full bg-gray-50 p-6 overflow-y-auto">
+    <div className="bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Evacuation Plans</h1>
@@ -190,109 +190,6 @@ export default function EvacuationPlansPage() {
           </div>
         </div>
 
-        {/* Emergency Checklist */}
-        <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-6">
-          <div className="flex items-start space-x-3">
-            <AlertTriangle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-red-800 mb-4 text-xl">Emergency Checklist: What to do when war starts in The Netherlands</h4>              
-              {/* Phase 1 */}
-              <div className="mb-6">
-                <h5 className="font-semibold text-red-700 mb-3 text-lg">Phase 1: Stay Informed & Prepare (Before Conflict Escalates)</h5>
-                
-                <div className="mb-4">
-                  <h6 className="font-medium text-red-700 mb-2">Follow Official Announcements</h6>
-                  <ul className="text-sm text-red-600 space-y-1">
-                    <li>✅ Monitor news sources: NOS, Rijksoverheid, NL-Alert, Crisis.nl</li>
-                    <li>✅ Listen to emergency broadcasts on NPO Radio 1 & local authorities</li>
-                  </ul>
-                </div>
-
-                <div className="mb-4">
-                  <h6 className="font-medium text-red-700 mb-2">Assemble an Emergency Kit</h6>
-                  <ul className="text-sm text-red-600 space-y-1">
-                    <li>✅ <strong>Food & Water:</strong> 3-7 days' worth of non-perishable food and bottled water</li>
-                    <li>✅ <strong>First Aid Kit:</strong> Medical supplies, prescription medicines</li>
-                    <li>✅ <strong>Communication Tools:</strong> Battery-powered radio, power banks</li>
-                    <li>✅ <strong>Identification & Documents:</strong> Passport, insurance papers, cash</li>
-                  </ul>
-                </div>
-
-                <div className="mb-4">
-                  <h6 className="font-medium text-red-700 mb-2">Additional Supplies</h6>
-                  <ul className="text-sm text-red-600 space-y-1">
-                    <li>✅ Sleeping bags or thermal blankets (for warmth and comfort)</li>
-                    <li>✅ Face masks and gloves (protection against dust, debris, or chemical hazards)</li>
-                    <li>✅ Waterproof matches or lighters (for starting fires in emergencies)</li>
-                    <li>✅ Maps of the local area and evacuation routes (in case GPS is unavailable)</li>
-                    <li>✅ Extra keys for home and vehicle (useful for emergency evacuations)</li>
-                    <li>✅ Duct tape and plastic sheeting (for sealing windows or temporary repairs)</li>
-                  </ul>
-                </div>
-
-                <div className="mb-4">
-                  <h6 className="font-medium text-red-700 mb-2">Plan Shelter Options</h6>
-                  <ul className="text-sm text-red-600 space-y-1">
-                    <li>✅ Identify safe locations at home (basement, windowless rooms)</li>
-                    <li>✅ Find the nearest official shelter or bunker (check municipality info)</li>
-                  </ul>
-                </div>
-
-                <div className="mb-4">
-                  <h6 className="font-medium text-red-700 mb-2">Prepare an Evacuation Plan</h6>
-                  <ul className="text-sm text-red-600 space-y-1">
-                    <li>✅ Arrange transportation options (car, bike, walking routes)</li>
-                    <li>✅ Know safe evacuation zones (rural areas, designated safe zones)</li>
-                    <li>✅ Fill car fuel tanks & charge electronic devices</li>
-                    <li>✅ Inform family & create a communication plan in case of network failure</li>
-                    <li>✅ Stock up on essential medications & pet supplies if needed</li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Phase 2 */}
-              <div className="mb-6">
-                <h5 className="font-semibold text-red-700 mb-3 text-lg">Phase 2: Immediate Action When War Starts</h5>
-                <ul className="text-sm text-red-600 space-y-1">
-                  <li>✅ Stay indoors & seek shelter (reinforced room, away from windows)</li>
-                  <li>✅ Lock doors & windows, turn off ventilation if necessary</li>
-                  <li>✅ Follow NL-Alert & emergency services updates</li>
-                  <li>✅ Only call <strong>112</strong> for life-threatening emergencies</li>
-                  <li>✅ Use texts or radio to communicate; conserve phone battery</li>
-                  <li>✅ Avoid conflict zones, military sites & government buildings</li>
-                  <li>✅ Do not approach military personnel or vehicles</li>
-                </ul>
-              </div>
-
-              {/* Phase 3 */}
-              <div className="mb-6">
-                <h5 className="font-semibold text-red-700 mb-3 text-lg">Phase 3: Survival & Recovery</h5>
-                <ul className="text-sm text-red-600 space-y-1">
-                  <li>✅ Follow government & military instructions</li>
-                  <li>✅ If evacuation is ordered, leave only with essential items</li>
-                  <li>✅ Help elderly, disabled, and vulnerable individuals</li>
-                  <li>✅ Expect possible power, water & internet outages</li>
-                  <li>✅ Rely on stored supplies and practice hygiene with limited resources</li>
-                  <li>✅ Report damages and seek aid from local authorities when safe</li>
-                  <li>✅ Wait for official confirmation before returning to normal activities</li>
-                </ul>
-              </div>
-
-              {/* Final Reminders */}
-              <div className="bg-red-100 border border-red-300 rounded-lg p-4">
-                <h5 className="font-semibold text-red-800 mb-2 text-lg">Final Reminders</h5>
-                <ul className="text-sm text-red-700 space-y-1">
-                  <li>✔ Stay calm and avoid panic</li>
-                  <li>✔ Trust only official sources; do not spread misinformation</li>
-                  <li>✔ Understand your rights under international humanitarian law</li>
-                </ul>
-                <p className="text-sm text-red-600 mt-3 font-medium">
-                  <strong>Keep this checklist in a safe and accessible place.</strong>
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

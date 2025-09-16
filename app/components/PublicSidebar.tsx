@@ -35,9 +35,13 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
 
   const mainMenuItems = [
     { id: 'map', label: 'Map', icon: Map, isPublic: true },
-    { id: 'evacuation', label: 'Evacuation Plans', icon: Route, isPublic: true },
-    { id: 'community', label: 'Community', icon: MessageSquare, isPublic: true },
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle, isPublic: true },
+    { id: 'community', label: 'Community', icon: MessageSquare, isPublic: true },
+    { id: 'emergency-checklist', label: 'Emergency Checklist', icon: AlertTriangle, isPublic: true },
+    { id: 'evacuation', label: 'Evacuation Plans', icon: Route, isPublic: true },
+    
+    { id: 'resources', label: 'Resources', icon: Package, isPublic: true },
+    
   ];
 
   const communitySpaces = [
@@ -64,26 +68,11 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
       isCollapsed ? 'w-16 lg:w-20' : 'w-full lg:w-80'
     } border-r border-gray-200 flex-shrink-0`}>
       <div className="flex flex-col h-full">
-        {/* Header */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center mr-3">
-              <span className="text-white font-bold text-sm">S</span>
-            </div>
-            {!isCollapsed && (
-              <div>
-                <h1 className="text-lg font-semibold">Feed</h1>
-                <p className="text-xs text-gray-500">Community Hub</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Main Navigation */}
+        {/* Menu */}
         <nav className="flex-1 p-4 space-y-2">
           <div className="space-y-1">
             <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
-              {!isCollapsed && <span>Main Navigation</span>}
+              {!isCollapsed && <span>Menu</span>}
             </div>
             {mainMenuItems.map((item) => {
               const Icon = item.icon;
@@ -104,10 +93,10 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
             })}
           </div>
 
-          {/* Community Spaces */}
+          {/* Locations */}
           <div className="mt-6">
             <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
-              {!isCollapsed && <span>Community Spaces</span>}
+              {!isCollapsed && <span>Locations and Services</span>}
             </div>
             <div className="space-y-1">
               {communitySpaces.map((space) => {
@@ -144,7 +133,13 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
         {/* Footer */}
         <div className="p-4 border-t border-gray-200">
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={() => {
+              setIsCollapsed(!isCollapsed);
+              // Trigger resize event to update map
+              setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+              }, 300); // Wait for transition to complete
+            }}
             className="w-full flex items-center justify-center p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
           >
             <div className={`w-6 h-6 transform transition-transform ${isCollapsed ? 'rotate-180' : ''}`}>

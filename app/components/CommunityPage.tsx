@@ -290,7 +290,7 @@ export default function CommunityPage() {
     : communityCategories.filter(cat => cat.id === selectedCategory);
 
   return (
-    <div className="h-full bg-gray-50 p-6 overflow-y-auto">
+    <div className="bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Community Spaces</h1>

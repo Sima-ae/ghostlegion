@@ -29,9 +29,20 @@ interface MapComponentProps {
 export default function MapComponent({ locations, selectedLocation, onLocationSelect }: MapComponentProps) {
   const [mapElements, setMapElements] = useState<MapElement[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const [mapKey, setMapKey] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
+  }, []);
+
+  // Force map re-render when window resizes (e.g., sidebar collapse)
+  useEffect(() => {
+    const handleResize = () => {
+      setMapKey(prev => prev + 1);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Load map elements from database
@@ -50,10 +61,14 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
           }));
           setMapElements(convertedElements);
         } else {
-          console.error('Failed to load map elements:', response.status);
+          console.error('Failed to load map elements:', response.status, response.statusText);
+          // Set empty array on error to prevent map rendering issues
+          setMapElements([]);
         }
       } catch (error) {
         console.error('Error loading map elements:', error);
+        // Set empty array on error to prevent map rendering issues
+        setMapElements([]);
       }
     };
 
@@ -76,6 +91,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
   return (
     <div className="w-full h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
       <MapContainer
+        key={mapKey}
         center={[52.1326, 5.2913]} // Center of Netherlands
         zoom={7}
         style={{ height: '100%', width: '100%' }}

@@ -9,7 +9,9 @@ import PublicSidebar from './components/PublicSidebar';
 import LocationCard from './components/LocationCard';
 import EvacuationPlansPage from './components/EvacuationPlansPage';
 import CommunityPage from './components/CommunityPage';
+import ResourcesPage from './components/ResourcesPage';
 import AlertsPage from './components/AlertsPage';
+import EmergencyChecklistPage from './emergency-checklist/page';
 import { sampleLocations } from './data/sampleData';
 import { Location } from './types';
 
@@ -47,11 +49,17 @@ export default function Home() {
           </div>
         );
       
+      case 'emergency-checklist':
+        return <EmergencyChecklistPage />;
+      
       case 'evacuation':
         return <EvacuationPlansPage />;
       
       case 'community':
         return <CommunityPage />;
+      
+      case 'resources':
+        return <ResourcesPage />;
       
       case 'alerts':
         return <AlertsPage />;
@@ -70,14 +78,19 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <div className="min-h-screen bg-gray-50 w-full flex flex-col">
       <Header />
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)] w-full">
+      <div className="flex flex-col lg:flex-row flex-1 w-full">
         <PublicSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1 w-full overflow-hidden">
+        <main className="flex-1 w-full overflow-y-auto min-w-0">
           {renderContent()}
         </main>
       </div>
+      <footer className="w-full bg-gray-800 text-white py-4">
+        <div className="text-center">
+          <p className="text-sm font-bold">Ghost Legion © 2025</p>
+        </div>
+      </footer>
     </div>
   );
 }

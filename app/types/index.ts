@@ -72,7 +72,7 @@ export interface Alert {
   title: string;
   message: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  type: 'security' | 'evacuation' | 'medical' | 'logistics' | 'general';
+  type: 'evacuation' | 'security' | 'weather' | 'medical' | 'transport';
   location?: string;
   timestamp: string;
   expiresAt?: string;

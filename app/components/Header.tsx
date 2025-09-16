@@ -25,7 +25,7 @@ export default function Header() {
             </div>
             <div className="hidden sm:block min-w-0">
               <h1 className="text-lg sm:text-xl font-bold truncate">Ghost Legion</h1>
-              <p className="text-xs text-gray-400 truncate">Military Preparedness Platform</p>
+              <p className="text-xs text-gray-400 truncate">We analyze, we hunt, we strike!</p>
             </div>
             <div className="block sm:hidden">
               <h1 className="text-lg font-bold">GL</h1>
