@@ -24,7 +24,7 @@ interface Alert {
   type: 'security' | 'medical' | 'weather' | 'warning' | 'transport' | 'infrastructure';
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   status: 'active' | 'resolved' | 'cancelled';
-  affectedAreas: string[];
+  affectedAreas?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -71,7 +71,7 @@ export default function AlertsManagement() {
   const filteredAlerts = alerts.filter(alert => {
     const matchesSearch = alert.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          alert.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         alert.affectedAreas.some(area => area.toLowerCase().includes(searchTerm.toLowerCase()));
+                         (alert.affectedAreas && alert.affectedAreas.some(area => area.toLowerCase().includes(searchTerm.toLowerCase())));
     
     const matchesType = selectedType === 'all' || alert.type === selectedType;
     const matchesSeverity = selectedSeverity === 'all' || alert.severity === selectedSeverity;
@@ -541,7 +541,7 @@ function EditAlertForm({ alert, onSave, onCancel }: EditAlertFormProps) {
     type: alert.type,
     severity: alert.severity,
     status: alert.status,
-    affectedAreas: alert.affectedAreas.join(', ')
+    affectedAreas: (alert.affectedAreas && Array.isArray(alert.affectedAreas)) ? alert.affectedAreas.join(', ') : ''
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -549,7 +549,7 @@ function EditAlertForm({ alert, onSave, onCancel }: EditAlertFormProps) {
     const updatedAlert = {
       ...alert,
       ...formData,
-      affectedAreas: formData.affectedAreas.split(',').map(a => a.trim()).filter(a => a)
+      affectedAreas: formData.affectedAreas ? formData.affectedAreas.split(',').map(a => a.trim()).filter(a => a) : []
     };
     onSave(updatedAlert);
   };
