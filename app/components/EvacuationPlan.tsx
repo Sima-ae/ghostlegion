@@ -42,8 +42,8 @@ export default function EvacuationPlan({ routes }: EvacuationPlanProps) {
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Evacuatieplannen Nederland</h2>
-            <p className="text-gray-600">Overzicht van alle beschikbare evacuatieroutes tijdens crisis</p>
+            <h2 className="text-2xl font-bold text-gray-900">Netherlands Evacuation Plans</h2>
+            <p className="text-gray-600">Overview of all available evacuation routes during crisis</p>
           </div>
           <div className="flex space-x-2">
             <select
@@ -179,13 +179,13 @@ export default function EvacuationPlan({ routes }: EvacuationPlanProps) {
 
               {/* Footer */}
               <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-100">
-                <span>Bijgewerkt: {formatDate(route.lastUpdated)}</span>
+                <span>Updated: {formatDate(route.lastUpdated)}</span>
                 <div className="flex space-x-2">
                   <button className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
-                    Bekijk Route
+                    View Route
                   </button>
                   <button className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
-                    Start Evacuatie
+                    Start Evacuation
                   </button>
                 </div>
               </div>

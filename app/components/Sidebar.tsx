@@ -27,98 +27,98 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'map', label: 'Locaties & Kaart', icon: Map },
-    { id: 'personnel', label: 'Personeel', icon: Users },
-    { id: 'evacuation', label: 'Evacuatieplannen', icon: Route },
-    { id: 'resources', label: 'Voorraden', icon: Package },
-    { id: 'alerts', label: 'Waarschuwingen', icon: AlertTriangle },
-    { id: 'community', label: 'Gemeenschap', icon: MessageSquare },
+    { id: 'map', label: 'Locations & Map', icon: Map },
+    { id: 'personnel', label: 'Personnel', icon: Users },
+    { id: 'evacuation', label: 'Evacuation Plans', icon: Route },
+    { id: 'resources', label: 'Resources', icon: Package },
+    { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
+    { id: 'community', label: 'Community', icon: MessageSquare },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
   const departmentSections = [
     {
-      title: 'Militair & Defensie',
+      title: 'Military & Defense',
       icon: Shield,
       items: [
-        'Soldaten & Commandanten',
-        'Inlichtingen',
-        'EOD Specialisten',
-        'Luchtmacht',
-        'Marine',
-        'Militaire Medici',
-        'Logistiek',
+        'Soldiers & Commanders',
+        'Intelligence',
+        'EOD Specialists',
+        'Air Force',
+        'Navy',
+        'Military Medics',
+        'Logistics',
         'Cybersecurity'
       ]
     },
     {
-      title: 'Overheid & Crisisbeheer',
+      title: 'Government & Crisis Management',
       icon: Settings,
       items: [
         'Crisis Managers',
-        'Burgerbescherming',
-        'Evacuatie Planners',
-        'Diplomatiek Personeel',
-        'Media & Communicatie',
-        'Grenscontrole'
+        'Civil Protection',
+        'Evacuation Planners',
+        'Diplomatic Personnel',
+        'Media & Communication',
+        'Border Control'
       ]
     },
     {
-      title: 'Humanitair & Hulpverlening',
+      title: 'Humanitarian & Relief',
       icon: Heart,
       items: [
-        'VN Personeel',
-        'Rode Kruis',
-        'NGO Medewerkers',
-        'Vluchtelingen Coordinatie',
+        'UN Personnel',
+        'Red Cross',
+        'NGO Staff',
+        'Refugee Coordination',
         'Trauma Counselors',
-        'Sociale Werkers'
+        'Social Workers'
       ]
     },
     {
-      title: 'Medisch & Gezondheidszorg',
+      title: 'Medical & Healthcare',
       icon: Heart,
       items: [
-        'Dokters & Chirurgen',
-        'Paramedici',
-        'Verpleegkundigen',
-        'Apothekers',
-        'Geestelijke Gezondheid',
-        'Ziekenhuis Personeel'
+        'Doctors & Surgeons',
+        'Paramedics',
+        'Nurses',
+        'Pharmacists',
+        'Mental Health',
+        'Hospital Staff'
       ]
     },
     {
-      title: 'Logistiek & Transport',
+      title: 'Logistics & Transport',
       icon: Truck,
       items: [
-        'Vrachtwagen Chauffeurs',
-        'Piloten',
-        'Scheepvaart',
+        'Truck Drivers',
+        'Pilots',
+        'Maritime',
         'Warehouse Managers',
-        'Bouw & Infrastructuur',
-        'Energie Technici'
+        'Construction & Infrastructure',
+        'Energy Technicians'
       ]
     },
     {
-      title: 'Communicatie & IT',
+      title: 'Communication & IT',
       icon: MessageSquare,
       items: [
-        'Journalisten',
-        'IT Specialisten',
-        'Communicatie Operators',
+        'Journalists',
+        'IT Specialists',
+        'Communication Operators',
         'Social Media Managers',
-        'Bibliothecarissen'
+        'Librarians'
       ]
     },
     {
-      title: 'Wet & Orde',
+      title: 'Law & Order',
       icon: Gavel,
       items: [
-        'Politie',
-        'Privé Beveiliging',
-        'Grensbewaking',
-        'Contra-inlichtingen',
-        'Gevangenis Personeel'
+        'Police',
+        'Private Security',
+        'Border Guards',
+        'Counterintelligence',
+        'Prison Staff'
       ]
     }
   ];

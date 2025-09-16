@@ -46,21 +46,23 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
 
   const communitySpaces = [
     { id: 'join', label: '- Join Us Today -', icon: MessageSquare, isPublic: true },
-    { id: 'animal-rescue', label: 'Animal Rescue and Care', icon: Heart, isPublic: false },
-    { id: 'childcare', label: 'Childcare and Education', icon: BookOpen, isPublic: false },
-    { id: 'communication', label: 'Communication and IT', icon: Monitor, isPublic: false },
-    { id: 'distribution', label: 'Distribution', icon: Truck, isPublic: false },
-    { id: 'food-water', label: 'Food and Water Supply', icon: Utensils, isPublic: false },
-    { id: 'legal', label: 'Legal and Administrative...', icon: Gavel, isPublic: false },
-    { id: 'medical', label: 'Medical Assistance', icon: Cross, isPublic: false },
-    { id: 'medicines', label: 'Medicines Supply', icon: Syringe, isPublic: false },
-    { id: 'mental-health', label: 'Mental and Emotional Su...', icon: Users, isPublic: false },
-    { id: 'rebuilding', label: 'Rebuilding and Infrastruct...', icon: Building, isPublic: false },
-    { id: 'resources', label: 'Resource Collection', icon: Package, isPublic: false },
-    { id: 'sanitation', label: 'Sanitation and Cleanliness', icon: Sparkles, isPublic: false },
+
     { id: 'security', label: 'Security and Defense', icon: Shield, isPublic: false },
     { id: 'shelter', label: 'Shelter and Housing', icon: Home, isPublic: false },
+    { id: 'food-water', label: 'Food and Water Supply', icon: Utensils, isPublic: false },
+    { id: 'medical', label: 'Medical Assistance', icon: Cross, isPublic: false },
+    { id: 'medicines', label: 'Medicines Supply', icon: Syringe, isPublic: false },
+    { id: 'sanitation', label: 'Sanitation and Cleanliness', icon: Sparkles, isPublic: false },
     { id: 'transportation', label: 'Transportation', icon: Train, isPublic: false },
+    { id: 'distribution', label: 'Distribution', icon: Truck, isPublic: false },
+    { id: 'communication', label: 'Communication and IT', icon: Monitor, isPublic: false },
+    { id: 'animal-rescue', label: 'Animal Rescue and Care', icon: Heart, isPublic: false },
+    
+    { id: 'rebuilding', label: 'Rebuilding and Infrastruct...', icon: Building, isPublic: false },
+    { id: 'childcare', label: 'Childcare and Education', icon: BookOpen, isPublic: false },
+    { id: 'legal', label: 'Legal and Administrative...', icon: Gavel, isPublic: false },
+    { id: 'mental-health', label: 'Mental and Emotional Su...', icon: Users, isPublic: false },
+
   ];
 
   return (

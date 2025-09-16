@@ -26,7 +26,7 @@ export default function Dashboard() {
       change: '+5 vandaag'
     },
     {
-      title: 'Evacuatie Routes',
+      title: 'Evacuation Routes',
       value: sampleEvacuationRoutes.filter(r => r.status === 'open').length,
       total: sampleEvacuationRoutes.length,
       icon: Route,
@@ -34,7 +34,7 @@ export default function Dashboard() {
       change: 'Alle operationeel'
     },
     {
-      title: 'Kritieke Waarschuwingen',
+      title: 'Critical Alerts',
       value: sampleAlerts.filter(a => a.severity === 'critical' || a.severity === 'high').length,
       total: sampleAlerts.length,
       icon: AlertTriangle,
@@ -60,7 +60,7 @@ export default function Dashboard() {
       {/* Header */}
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Ghost Legion Dashboard</h1>
-        <p className="text-gray-600">Overzicht van militaire paraatheid en gemeenschapsbeheer voor Nederland</p>
+        <p className="text-gray-600">Overview of military preparedness and community management for the Netherlands</p>
       </div>
 
       {/* Stats Grid */}
@@ -93,7 +93,7 @@ export default function Dashboard() {
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Recente Waarschuwingen</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Recent Alerts</h2>
               <span className="text-sm text-gray-500">{recentAlerts.length} items</span>
             </div>
           </div>
@@ -198,23 +198,23 @@ export default function Dashboard() {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Snelle Acties</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <Shield className="h-8 w-8 text-blue-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Nieuwe Locatie</span>
+            <span className="text-sm font-medium text-gray-900">New Location</span>
           </button>
           <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <Users className="h-8 w-8 text-green-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Personeel Toevoegen</span>
+            <span className="text-sm font-medium text-gray-900">Add Personnel</span>
           </button>
           <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <Route className="h-8 w-8 text-purple-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Evacuatie Starten</span>
+            <span className="text-sm font-medium text-gray-900">Start Evacuation</span>
           </button>
           <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <AlertTriangle className="h-8 w-8 text-red-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Waarschuwing Versturen</span>
+            <span className="text-sm font-medium text-gray-900">Send Alert</span>
           </button>
         </div>
       </div>

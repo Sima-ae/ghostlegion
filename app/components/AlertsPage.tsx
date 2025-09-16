@@ -1,30 +1,69 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertTriangle, Clock, MapPin, Users, Shield, Bell } from 'lucide-react';
-import { sampleAlerts } from '../data/sampleData';
+
+interface Alert {
+  id: string;
+  title: string;
+  message: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  type: 'SECURITY' | 'EVACUATION' | 'MEDICAL' | 'LOGISTICS' | 'GENERAL';
+  location?: string;
+  expiresAt?: string;
+  acknowledgedBy: string[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function AlertsPage() {
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  
   const alertTypes = [
-    { type: 'evacuation', label: 'Evacuation', color: 'bg-pink-100 text-pink-800 border-pink-200' },
-    { type: 'security', label: 'Security', color: 'bg-orange-100 text-orange-800 border-orange-200' },
-    { type: 'warning', label: 'Warning', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-    { type: 'medical', label: 'Medical', color: 'bg-green-100 text-green-800 border-green-200' },
-    { type: 'transport', label: 'Transport', color: 'bg-purple-100 text-purple-800 border-purple-200' },
+    { type: 'EVACUATION', label: 'Evacuation', color: 'bg-pink-100 text-pink-800 border-pink-200' },
+    { type: 'SECURITY', label: 'Security', color: 'bg-orange-100 text-orange-800 border-orange-200' },
+    { type: 'GENERAL', label: 'General', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+    { type: 'MEDICAL', label: 'Medical', color: 'bg-green-100 text-green-800 border-green-200' },
+    { type: 'LOGISTICS', label: 'Logistics', color: 'bg-purple-100 text-purple-800 border-purple-200' },
   ];
+
+  // Load alerts from database
+  useEffect(() => {
+    loadAlerts();
+  }, []);
+
+  const loadAlerts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/alerts');
+      if (response.ok) {
+        const data = await response.json();
+        setAlerts(data);
+      } else {
+        console.error('Failed to load alerts');
+        setAlerts([]);
+      }
+    } catch (error) {
+      console.error('Error loading alerts:', error);
+      setAlerts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getAlertIcon = (type: string) => {
     switch (type) {
-      case 'evacuation':
+      case 'EVACUATION':
         return <Users className="h-5 w-5" />;
-      case 'security':
+      case 'SECURITY':
         return <Shield className="h-5 w-5" />;
-      case 'warning':
+      case 'GENERAL':
         return <AlertTriangle className="h-5 w-5" />;
-      case 'medical':
+      case 'MEDICAL':
         return <Bell className="h-5 w-5" />;
-      case 'transport':
+      case 'LOGISTICS':
         return <MapPin className="h-5 w-5" />;
       default:
         return <AlertTriangle className="h-5 w-5" />;
@@ -33,11 +72,13 @@ export default function AlertsPage() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high':
+      case 'CRITICAL':
         return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium':
+      case 'HIGH':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'MEDIUM':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low':
+      case 'LOW':
         return 'bg-green-100 text-green-800 border-green-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -57,8 +98,23 @@ export default function AlertsPage() {
 
   // Filter alerts based on selected filter
   const filteredAlerts = selectedFilter === 'all' 
-    ? sampleAlerts 
-    : sampleAlerts.filter(alert => alert.type === selectedFilter);
+    ? alerts 
+    : alerts.filter(alert => alert.type === selectedFilter);
+
+  if (isLoading) {
+    return (
+      <div className="bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading alerts...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 p-6">
@@ -82,7 +138,7 @@ export default function AlertsPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">Active Alerts</p>
-                  <p className="text-xl font-bold text-gray-900">{sampleAlerts.length}</p>
+                  <p className="text-xl font-bold text-gray-900">{alerts.length}</p>
                 </div>
               </div>
               <div className="flex items-center">
@@ -92,7 +148,7 @@ export default function AlertsPage() {
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">High Priority</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {sampleAlerts.filter(alert => alert.severity === 'high').length}
+                    {alerts.filter(alert => alert.severity === 'HIGH' || alert.severity === 'CRITICAL').length}
                   </p>
                 </div>
               </div>
@@ -103,7 +159,7 @@ export default function AlertsPage() {
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-600">Affected Areas</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {new Set(sampleAlerts.map(alert => alert.location)).size}
+                    {new Set(alerts.map(alert => alert.location).filter(Boolean)).size}
                   </p>
                 </div>
               </div>
@@ -180,7 +236,7 @@ export default function AlertsPage() {
                             </div>
                             <div className="flex items-center">
                               <Clock className="h-4 w-4 mr-1" />
-                              {formatTimestamp(alert.timestamp)}
+                              {formatTimestamp(alert.createdAt)}
                             </div>
                           </div>
                         </div>

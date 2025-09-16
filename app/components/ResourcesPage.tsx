@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { 
   Package, 
   AlertTriangle, 
@@ -18,11 +19,11 @@ import {
 interface Resource {
   id: string;
   name: string;
-  type: 'FOOD' | 'WATER' | 'MEDICAL' | 'FUEL' | 'AMMUNITION' | 'EQUIPMENT' | 'TRANSPORT';
+  type: 'food' | 'water' | 'medical' | 'fuel' | 'ammunition' | 'equipment' | 'transport';
   quantity: number;
   unit: string;
   location: string;
-  status: 'AVAILABLE' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'DAMAGED';
+  status: 'available' | 'low_stock' | 'out_of_stock' | 'damaged';
   expiryDate?: string;
   createdAt: string;
   updatedAt: string;
@@ -37,6 +38,7 @@ interface ResourceStats {
 }
 
 export default function ResourcesPage() {
+  const { data: session } = useSession();
   const [resources, setResources] = useState<Resource[]>([]);
   const [filteredResources, setFilteredResources] = useState<Resource[]>([]);
   const [stats, setStats] = useState<ResourceStats>({
@@ -52,6 +54,10 @@ export default function ResourcesPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  // Check if user is admin
+  const isAdmin = session?.user?.role === 'ADMIN';
+  const isLoggedIn = !!session;
 
   // Load resources from database
   useEffect(() => {
@@ -113,10 +119,10 @@ export default function ResourcesPage() {
   useEffect(() => {
     const newStats: ResourceStats = {
       totalResources: resources.length,
-      availableResources: resources.filter(r => r.status === 'AVAILABLE').length,
-      lowStockResources: resources.filter(r => r.status === 'LOW_STOCK').length,
-      outOfStockResources: resources.filter(r => r.status === 'OUT_OF_STOCK').length,
-      damagedResources: resources.filter(r => r.status === 'DAMAGED').length
+      availableResources: resources.filter(r => r.status === 'available').length,
+      lowStockResources: resources.filter(r => r.status === 'low_stock').length,
+      outOfStockResources: resources.filter(r => r.status === 'out_of_stock').length,
+      damagedResources: resources.filter(r => r.status === 'damaged').length
     };
     setStats(newStats);
   }, [resources]);
@@ -130,144 +136,50 @@ export default function ResourcesPage() {
         setResources(data);
       } else {
         console.error('Failed to load resources:', response.status);
-        // Use sample data if API fails
-        setResources(getSampleResources());
+        setResources([]);
       }
     } catch (error) {
       console.error('Error loading resources:', error);
-      // Use sample data if API fails
-      setResources(getSampleResources());
+      setResources([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getSampleResources = (): Resource[] => [
-    {
-      id: '1',
-      name: 'Emergency Food Rations',
-      type: 'FOOD',
-      quantity: 500,
-      unit: 'packages',
-      location: 'Central Warehouse, Amsterdam',
-      status: 'AVAILABLE',
-      expiryDate: '2025-12-31',
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-15T10:00:00Z'
-    },
-    {
-      id: '2',
-      name: 'Bottled Water',
-      type: 'WATER',
-      quantity: 1000,
-      unit: 'liters',
-      location: 'Distribution Center, Rotterdam',
-      status: 'LOW_STOCK',
-      expiryDate: '2026-06-30',
-      createdAt: '2024-01-10T08:00:00Z',
-      updatedAt: '2024-01-20T14:30:00Z'
-    },
-    {
-      id: '3',
-      name: 'First Aid Kits',
-      type: 'MEDICAL',
-      quantity: 150,
-      unit: 'kits',
-      location: 'Medical Supply Depot, Utrecht',
-      status: 'AVAILABLE',
-      createdAt: '2024-01-05T12:00:00Z',
-      updatedAt: '2024-01-05T12:00:00Z'
-    },
-    {
-      id: '4',
-      name: 'Diesel Fuel',
-      type: 'FUEL',
-      quantity: 2000,
-      unit: 'liters',
-      location: 'Fuel Storage, Den Haag',
-      status: 'AVAILABLE',
-      createdAt: '2024-01-12T09:00:00Z',
-      updatedAt: '2024-01-12T09:00:00Z'
-    },
-    {
-      id: '5',
-      name: 'Communication Equipment',
-      type: 'EQUIPMENT',
-      quantity: 25,
-      unit: 'units',
-      location: 'Tech Warehouse, Eindhoven',
-      status: 'LOW_STOCK',
-      createdAt: '2024-01-08T11:00:00Z',
-      updatedAt: '2024-01-18T16:45:00Z'
-    },
-    {
-      id: '6',
-      name: 'Emergency Vehicles',
-      type: 'TRANSPORT',
-      quantity: 8,
-      unit: 'vehicles',
-      location: 'Vehicle Depot, Groningen',
-      status: 'AVAILABLE',
-      createdAt: '2024-01-03T07:00:00Z',
-      updatedAt: '2024-01-03T07:00:00Z'
-    },
-    {
-      id: '7',
-      name: 'Medical Supplies',
-      type: 'MEDICAL',
-      quantity: 0,
-      unit: 'units',
-      location: 'Medical Supply Depot, Utrecht',
-      status: 'OUT_OF_STOCK',
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-25T10:00:00Z'
-    },
-    {
-      id: '8',
-      name: 'Protective Gear',
-      type: 'EQUIPMENT',
-      quantity: 75,
-      unit: 'sets',
-      location: 'Safety Equipment Store, Tilburg',
-      status: 'DAMAGED',
-      createdAt: '2024-01-20T13:00:00Z',
-      updatedAt: '2024-01-22T15:30:00Z'
-    }
-  ];
 
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'AVAILABLE': return 'text-green-600 bg-green-100';
-      case 'LOW_STOCK': return 'text-yellow-600 bg-yellow-100';
-      case 'OUT_OF_STOCK': return 'text-red-600 bg-red-100';
-      case 'DAMAGED': return 'text-gray-600 bg-gray-100';
+      case 'available': return 'text-green-600 bg-green-100';
+      case 'low_stock': return 'text-yellow-600 bg-yellow-100';
+      case 'out_of_stock': return 'text-red-600 bg-red-100';
+      case 'damaged': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'FOOD': return '🍽️';
-      case 'WATER': return '💧';
-      case 'MEDICAL': return '🏥';
-      case 'FUEL': return '⛽';
-      case 'AMMUNITION': return '🔫';
-      case 'EQUIPMENT': return '🔧';
-      case 'TRANSPORT': return '🚗';
+      case 'food': return '🍽️';
+      case 'water': return '💧';
+      case 'medical': return '🏥';
+      case 'fuel': return '⛽';
+      case 'ammunition': return '🔫';
+      case 'equipment': return '🔧';
+      case 'transport': return '🚗';
       default: return '📦';
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'FOOD': return 'text-orange-600 bg-orange-100';
-      case 'WATER': return 'text-blue-600 bg-blue-100';
-      case 'MEDICAL': return 'text-red-600 bg-red-100';
-      case 'FUEL': return 'text-yellow-600 bg-yellow-100';
-      case 'AMMUNITION': return 'text-gray-600 bg-gray-100';
-      case 'EQUIPMENT': return 'text-purple-600 bg-purple-100';
-      case 'TRANSPORT': return 'text-green-600 bg-green-100';
+      case 'food': return 'text-orange-600 bg-orange-100';
+      case 'water': return 'text-blue-600 bg-blue-100';
+      case 'medical': return 'text-red-600 bg-red-100';
+      case 'fuel': return 'text-yellow-600 bg-yellow-100';
+      case 'ammunition': return 'text-gray-600 bg-gray-100';
+      case 'equipment': return 'text-purple-600 bg-purple-100';
+      case 'transport': return 'text-green-600 bg-green-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
@@ -280,13 +192,6 @@ export default function ResourcesPage() {
     });
   };
 
-  const getDaysUntilExpiry = (expiryDate?: string) => {
-    if (!expiryDate) return null;
-    const expiry = new Date(expiryDate);
-    const now = new Date();
-    const days = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    return days;
-  };
 
   if (isLoading) {
     return (
@@ -451,10 +356,12 @@ export default function ResourcesPage() {
               <h2 className="text-lg font-semibold text-gray-900">
                 Resources ({filteredResources.length})
               </h2>
-              <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex items-center">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Resource
-              </button>
+              {isLoggedIn && (
+                <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 flex items-center">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Resource
+                </button>
+              )}
             </div>
           </div>
 
@@ -467,13 +374,13 @@ export default function ResourcesPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expiry</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  {isAdmin && (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredResources.map((resource) => {
-                  const daysUntilExpiry = getDaysUntilExpiry(resource.expiryDate);
                   return (
                     <tr key={resource.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -505,37 +412,21 @@ export default function ResourcesPage() {
                           <span className="text-sm text-gray-900">{resource.location}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {resource.expiryDate ? (
-                          <div className="text-sm">
-                            <div className="text-gray-900">{formatDate(resource.expiryDate)}</div>
-                            {daysUntilExpiry !== null && (
-                              <div className={`text-xs ${
-                                daysUntilExpiry < 0 ? 'text-red-600' :
-                                daysUntilExpiry <= 30 ? 'text-yellow-600' :
-                                'text-gray-500'
-                              }`}>
-                                {daysUntilExpiry < 0 ? 'Expired' : `${daysUntilExpiry} days left`}
-                              </div>
-                            )}
+                      {isAdmin && (
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex space-x-2">
+                            <button className="text-blue-600 hover:text-blue-900">
+                              <Eye className="h-4 w-4" />
+                            </button>
+                            <button className="text-green-600 hover:text-green-900">
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button className="text-red-600 hover:text-red-900">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
-                        ) : (
-                          <span className="text-sm text-gray-500">No expiry</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button className="text-blue-600 hover:text-blue-900">
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button className="text-green-600 hover:text-green-900">
-                            <Edit className="h-4 w-4" />
-                          </button>
-                          <button className="text-red-600 hover:text-red-900">
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}

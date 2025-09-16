@@ -157,39 +157,30 @@ export const sampleEvacuationRoutes: EvacuationRoute[] = [
 ];
 
 export const sampleResources: Resource[] = [
+  // Food & Water Resources
   {
-    id: '1',
-    name: 'Medicines - Painkillers',
-    type: 'medical',
+    id: '0001',
+    name: 'Emergency Food Rations',
+    type: 'food',
     quantity: 5000,
-    unit: 'units',
-    location: 'Utrecht Medical Center',
+    unit: 'packages',
+    location: 'Central Warehouse, Amsterdam',
     status: 'available',
     expiryDate: '2025-12-31',
-    lastUpdated: '2024-01-15T09:00:00Z'
+    lastUpdated: '2024-01-15T10:00:00Z'
   },
   {
-    id: '2',
+    id: '0002',
     name: 'Drinking Water',
     type: 'water',
     quantity: 10000,
     unit: 'liters',
-    location: 'Amsterdam RAI Evacuation Center',
+    location: 'Distribution Center, Rotterdam',
     status: 'available',
     lastUpdated: '2024-01-15T08:30:00Z'
   },
   {
-    id: '3',
-    name: 'Gasoline',
-    type: 'fuel',
-    quantity: 5000,
-    unit: 'liters',
-    location: 'The Hague Bunker Complex',
-    status: 'low_stock',
-    lastUpdated: '2024-01-15T07:15:00Z'
-  },
-  {
-    id: '4',
+    id: '0003',
     name: 'Canned Food',
     type: 'food',
     quantity: 2000,
@@ -198,6 +189,598 @@ export const sampleResources: Resource[] = [
     status: 'available',
     expiryDate: '2026-06-30',
     lastUpdated: '2024-01-15T06:45:00Z'
+  },
+  {
+    id: '0004',
+    name: 'MRE (Meals Ready to Eat)',
+    type: 'food',
+    quantity: 1500,
+    unit: 'meals',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    expiryDate: '2027-03-15',
+    lastUpdated: '2024-01-15T11:15:00Z'
+  },
+  {
+    id: '0005',
+    name: 'Water Purification Tablets',
+    type: 'water',
+    quantity: 50000,
+    unit: 'tablets',
+    location: 'Medical Supply Depot, Utrecht',
+    status: 'available',
+    expiryDate: '2026-12-31',
+    lastUpdated: '2024-01-15T09:30:00Z'
+  },
+  {
+    id: '0006',
+    name: 'Energy Bars',
+    type: 'food',
+    quantity: 3000,
+    unit: 'bars',
+    location: 'Central Warehouse, Amsterdam',
+    status: 'available',
+    expiryDate: '2025-08-31',
+    lastUpdated: '2024-01-15T08:15:00Z'
+  },
+  {
+    id: '0007',
+    name: 'Dehydrated Meals',
+    type: 'food',
+    quantity: 800,
+    unit: 'meals',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    expiryDate: '2028-12-31',
+    lastUpdated: '2024-01-15T07:45:00Z'
+  },
+  {
+    id: '0008',
+    name: 'Water Storage Tanks',
+    type: 'water',
+    quantity: 50,
+    unit: 'tanks',
+    location: 'Distribution Center, Rotterdam',
+    status: 'available',
+    lastUpdated: '2024-01-15T06:30:00Z'
+  },
+
+  // Medical Supplies
+  {
+    id: '0009',
+    name: 'First Aid Kits',
+    type: 'medical',
+    quantity: 500,
+    unit: 'kits',
+    location: 'Medical Supply Depot, Utrecht',
+    status: 'available',
+    lastUpdated: '2024-01-05T12:00:00Z'
+  },
+  {
+    id: '0010',
+    name: 'Painkillers (Morphine)',
+    type: 'medical',
+    quantity: 2000,
+    unit: 'vials',
+    location: 'Utrecht Medical Center',
+    status: 'available',
+    expiryDate: '2025-12-31',
+    lastUpdated: '2024-01-15T09:00:00Z'
+  },
+  {
+    id: '0011',
+    name: 'Antibiotics',
+    type: 'medical',
+    quantity: 1000,
+    unit: 'packages',
+    location: 'Utrecht Medical Center',
+    status: 'available',
+    expiryDate: '2025-08-15',
+    lastUpdated: '2024-01-15T08:45:00Z'
+  },
+  {
+    id: '0012',
+    name: 'Blood Plasma',
+    type: 'medical',
+    quantity: 100,
+    unit: 'units',
+    location: 'Utrecht Medical Center',
+    status: 'low_stock',
+    expiryDate: '2024-12-31',
+    lastUpdated: '2024-01-15T07:20:00Z'
+  },
+  {
+    id: '0013',
+    name: 'Surgical Instruments',
+    type: 'medical',
+    quantity: 50,
+    unit: 'sets',
+    location: 'Utrecht Medical Center',
+    status: 'available',
+    lastUpdated: '2024-01-15T06:30:00Z'
+  },
+  {
+    id: '0014',
+    name: 'Bandages & Dressings',
+    type: 'medical',
+    quantity: 10000,
+    unit: 'units',
+    location: 'Medical Supply Depot, Utrecht',
+    status: 'available',
+    lastUpdated: '2024-01-15T05:45:00Z'
+  },
+  {
+    id: '0015',
+    name: 'IV Fluids',
+    type: 'medical',
+    quantity: 500,
+    unit: 'bags',
+    location: 'Utrecht Medical Center',
+    status: 'available',
+    expiryDate: '2025-06-30',
+    lastUpdated: '2024-01-15T04:30:00Z'
+  },
+  {
+    id: '0016',
+    name: 'Defibrillators',
+    type: 'medical',
+    quantity: 25,
+    unit: 'units',
+    location: 'Medical Supply Depot, Utrecht',
+    status: 'available',
+    lastUpdated: '2024-01-15T03:15:00Z'
+  },
+  {
+    id: '0017',
+    name: 'Oxygen Tanks',
+    type: 'medical',
+    quantity: 100,
+    unit: 'tanks',
+    location: 'Utrecht Medical Center',
+    status: 'available',
+    lastUpdated: '2024-01-15T02:00:00Z'
+  },
+  {
+    id: '0018',
+    name: 'Stretchers',
+    type: 'medical',
+    quantity: 75,
+    unit: 'units',
+    location: 'Medical Supply Depot, Utrecht',
+    status: 'available',
+    lastUpdated: '2024-01-15T01:30:00Z'
+  },
+
+  // Fuel & Energy
+  {
+    id: '0019',
+    name: 'Diesel Fuel',
+    type: 'fuel',
+    quantity: 5000,
+    unit: 'liters',
+    location: 'Fuel Storage, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-15T07:15:00Z'
+  },
+  {
+    id: '0020',
+    name: 'Gasoline',
+    type: 'fuel',
+    quantity: 3000,
+    unit: 'liters',
+    location: 'The Hague Bunker Complex',
+    status: 'low_stock',
+    lastUpdated: '2024-01-15T07:15:00Z'
+  },
+  {
+    id: '0021',
+    name: 'Portable Generators',
+    type: 'equipment',
+    quantity: 25,
+    unit: 'units',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-15T05:45:00Z'
+  },
+  {
+    id: '0022',
+    name: 'Batteries (AA/AAA)',
+    type: 'equipment',
+    quantity: 10000,
+    unit: 'packs',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-15T04:20:00Z'
+  },
+  {
+    id: '0023',
+    name: 'Solar Panels',
+    type: 'equipment',
+    quantity: 100,
+    unit: 'panels',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-15T03:45:00Z'
+  },
+  {
+    id: '0024',
+    name: 'Power Banks',
+    type: 'equipment',
+    quantity: 200,
+    unit: 'units',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-15T02:30:00Z'
+  },
+  {
+    id: '0025',
+    name: 'Fuel Cans (20L)',
+    type: 'fuel',
+    quantity: 500,
+    unit: 'cans',
+    location: 'Fuel Storage, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-15T01:15:00Z'
+  },
+
+  // Communication & Equipment
+  {
+    id: '0026',
+    name: 'Radio Communication Sets',
+    type: 'equipment',
+    quantity: 100,
+    unit: 'sets',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-15T03:15:00Z'
+  },
+  {
+    id: '0027',
+    name: 'Satellite Phones',
+    type: 'equipment',
+    quantity: 20,
+    unit: 'units',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-15T02:30:00Z'
+  },
+  {
+    id: '0028',
+    name: 'Protective Gear Sets',
+    type: 'equipment',
+    quantity: 200,
+    unit: 'sets',
+    location: 'Safety Equipment Store, Tilburg',
+    status: 'available',
+    lastUpdated: '2024-01-15T01:45:00Z'
+  },
+  {
+    id: '0029',
+    name: 'Gas Masks',
+    type: 'equipment',
+    quantity: 500,
+    unit: 'units',
+    location: 'Safety Equipment Store, Tilburg',
+    status: 'available',
+    lastUpdated: '2024-01-15T00:30:00Z'
+  },
+  {
+    id: '0030',
+    name: 'Body Armor',
+    type: 'equipment',
+    quantity: 150,
+    unit: 'sets',
+    location: 'Safety Equipment Store, Tilburg',
+    status: 'available',
+    lastUpdated: '2024-01-14T23:45:00Z'
+  },
+  {
+    id: '0031',
+    name: 'Helmets',
+    type: 'equipment',
+    quantity: 300,
+    unit: 'units',
+    location: 'Safety Equipment Store, Tilburg',
+    status: 'available',
+    lastUpdated: '2024-01-14T22:30:00Z'
+  },
+  {
+    id: '0032',
+    name: 'Night Vision Goggles',
+    type: 'equipment',
+    quantity: 50,
+    unit: 'pairs',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T21:15:00Z'
+  },
+  {
+    id: '0033',
+    name: 'Tactical Radios',
+    type: 'equipment',
+    quantity: 75,
+    unit: 'units',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T20:00:00Z'
+  },
+  {
+    id: '0034',
+    name: 'GPS Devices',
+    type: 'equipment',
+    quantity: 100,
+    unit: 'units',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T18:45:00Z'
+  },
+
+  // Transport & Vehicles
+  {
+    id: '0035',
+    name: 'Emergency Vehicles',
+    type: 'transport',
+    quantity: 15,
+    unit: 'vehicles',
+    location: 'Vehicle Depot, Groningen',
+    status: 'available',
+    lastUpdated: '2024-01-14T23:15:00Z'
+  },
+  {
+    id: '0036',
+    name: 'Military Trucks',
+    type: 'transport',
+    quantity: 8,
+    unit: 'vehicles',
+    location: 'Vehicle Depot, Groningen',
+    status: 'available',
+    lastUpdated: '2024-01-14T22:00:00Z'
+  },
+  {
+    id: '0037',
+    name: 'Ambulances',
+    type: 'transport',
+    quantity: 12,
+    unit: 'vehicles',
+    location: 'Medical Supply Depot, Utrecht',
+    status: 'available',
+    lastUpdated: '2024-01-14T21:30:00Z'
+  },
+  {
+    id: '0038',
+    name: 'Motorcycles',
+    type: 'transport',
+    quantity: 20,
+    unit: 'units',
+    location: 'Vehicle Depot, Groningen',
+    status: 'available',
+    lastUpdated: '2024-01-14T20:15:00Z'
+  },
+  {
+    id: '0039',
+    name: 'ATVs (All-Terrain Vehicles)',
+    type: 'transport',
+    quantity: 15,
+    unit: 'units',
+    location: 'Vehicle Depot, Groningen',
+    status: 'available',
+    lastUpdated: '2024-01-14T19:00:00Z'
+  },
+  {
+    id: '0040',
+    name: 'Boats (Rescue)',
+    type: 'transport',
+    quantity: 8,
+    unit: 'boats',
+    location: 'Vehicle Depot, Groningen',
+    status: 'available',
+    lastUpdated: '2024-01-14T17:45:00Z'
+  },
+  {
+    id: '0041',
+    name: 'Helicopters',
+    type: 'transport',
+    quantity: 3,
+    unit: 'units',
+    location: 'Vehicle Depot, Groningen',
+    status: 'available',
+    lastUpdated: '2024-01-14T16:30:00Z'
+  },
+
+  // Ammunition & Weapons
+  {
+    id: '0042',
+    name: 'Rifle Ammunition (5.56mm)',
+    type: 'ammunition',
+    quantity: 50000,
+    unit: 'rounds',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-14T20:45:00Z'
+  },
+  {
+    id: '0043',
+    name: 'Pistol Ammunition (9mm)',
+    type: 'ammunition',
+    quantity: 25000,
+    unit: 'rounds',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-14T19:30:00Z'
+  },
+  {
+    id: '0044',
+    name: 'Grenades (Hand)',
+    type: 'ammunition',
+    quantity: 500,
+    unit: 'units',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-14T18:15:00Z'
+  },
+  {
+    id: '0045',
+    name: 'Shotgun Shells',
+    type: 'ammunition',
+    quantity: 10000,
+    unit: 'shells',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-14T17:00:00Z'
+  },
+  {
+    id: '0046',
+    name: 'Sniper Rifle Ammunition',
+    type: 'ammunition',
+    quantity: 5000,
+    unit: 'rounds',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-14T15:45:00Z'
+  },
+  {
+    id: '0047',
+    name: 'Machine Gun Ammunition',
+    type: 'ammunition',
+    quantity: 75000,
+    unit: 'rounds',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-14T14:30:00Z'
+  },
+  {
+    id: '0048',
+    name: 'Explosives (C4)',
+    type: 'ammunition',
+    quantity: 100,
+    unit: 'blocks',
+    location: 'Military Supply Depot, Den Haag',
+    status: 'available',
+    lastUpdated: '2024-01-14T13:15:00Z'
+  },
+
+  // Emergency Shelter & Supplies
+  {
+    id: '0049',
+    name: 'Emergency Blankets',
+    type: 'equipment',
+    quantity: 2000,
+    unit: 'units',
+    location: 'Central Warehouse, Amsterdam',
+    status: 'available',
+    lastUpdated: '2024-01-14T17:00:00Z'
+  },
+  {
+    id: '0050',
+    name: 'Tents (4-person)',
+    type: 'equipment',
+    quantity: 100,
+    unit: 'tents',
+    location: 'Central Warehouse, Amsterdam',
+    status: 'available',
+    lastUpdated: '2024-01-14T16:30:00Z'
+  },
+  {
+    id: '0051',
+    name: 'Sleeping Bags',
+    type: 'equipment',
+    quantity: 500,
+    unit: 'units',
+    location: 'Central Warehouse, Amsterdam',
+    status: 'available',
+    lastUpdated: '2024-01-14T15:45:00Z'
+  },
+  {
+    id: '0052',
+    name: 'Portable Toilets',
+    type: 'equipment',
+    quantity: 50,
+    unit: 'units',
+    location: 'Central Warehouse, Amsterdam',
+    status: 'available',
+    lastUpdated: '2024-01-14T14:30:00Z'
+  },
+  {
+    id: '0053',
+    name: 'Shower Units',
+    type: 'equipment',
+    quantity: 25,
+    unit: 'units',
+    location: 'Central Warehouse, Amsterdam',
+    status: 'available',
+    lastUpdated: '2024-01-14T13:15:00Z'
+  },
+  {
+    id: '0054',
+    name: 'Heating Units',
+    type: 'equipment',
+    quantity: 30,
+    unit: 'units',
+    location: 'Central Warehouse, Amsterdam',
+    status: 'available',
+    lastUpdated: '2024-01-14T12:00:00Z'
+  },
+
+  // Tools & Maintenance
+  {
+    id: '0055',
+    name: 'Tool Kits (Complete)',
+    type: 'equipment',
+    quantity: 50,
+    unit: 'kits',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T14:20:00Z'
+  },
+  {
+    id: '0056',
+    name: 'Rope & Cables',
+    type: 'equipment',
+    quantity: 1000,
+    unit: 'meters',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T13:15:00Z'
+  },
+  {
+    id: '0057',
+    name: 'Flashlights',
+    type: 'equipment',
+    quantity: 200,
+    unit: 'units',
+    location: 'Safety Equipment Store, Tilburg',
+    status: 'available',
+    lastUpdated: '2024-01-14T12:00:00Z'
+  },
+  {
+    id: '0058',
+    name: 'Welding Equipment',
+    type: 'equipment',
+    quantity: 15,
+    unit: 'sets',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T11:00:00Z'
+  },
+  {
+    id: '0059',
+    name: 'Cutting Tools',
+    type: 'equipment',
+    quantity: 100,
+    unit: 'sets',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T10:30:00Z'
+  },
+  {
+    id: '0060',
+    name: 'Measuring Equipment',
+    type: 'equipment',
+    quantity: 75,
+    unit: 'units',
+    location: 'Tech Warehouse, Eindhoven',
+    status: 'available',
+    lastUpdated: '2024-01-14T09:15:00Z'
   }
 ];
 
