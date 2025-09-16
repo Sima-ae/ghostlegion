@@ -13,7 +13,8 @@ import {
   Box,
   AlertTriangle,
   CheckCircle,
-  Clock
+  Clock,
+  X
 } from 'lucide-react';
 
 interface Resource {
@@ -37,6 +38,10 @@ export default function ResourcesManagement() {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     if (session?.user?.role === 'ADMIN') {
@@ -93,6 +98,63 @@ export default function ResourcesManagement() {
       case 'communication': return 'bg-indigo-100 text-indigo-800';
       case 'transport': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleView = (resource: Resource) => {
+    setSelectedResource(resource);
+    setShowViewModal(true);
+  };
+
+  const handleEdit = (resource: Resource) => {
+    setSelectedResource(resource);
+    setShowEditModal(true);
+  };
+
+  const handleDelete = (resource: Resource) => {
+    setSelectedResource(resource);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedResource) return;
+    
+    try {
+      const response = await fetch(`/api/resources/${selectedResource.id}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        setResources(resources.filter(r => r.id !== selectedResource.id));
+        setShowDeleteModal(false);
+        setSelectedResource(null);
+      } else {
+        console.error('Failed to delete resource');
+      }
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+    }
+  };
+
+  const handleSaveEdit = async (updatedResource: Resource) => {
+    try {
+      const response = await fetch(`/api/resources/${updatedResource.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedResource),
+      });
+      
+      if (response.ok) {
+        setResources(resources.map(r => r.id === updatedResource.id ? updatedResource : r));
+        setShowEditModal(false);
+        setSelectedResource(null);
+      } else {
+        console.error('Failed to update resource');
+      }
+    } catch (error) {
+      console.error('Error updating resource:', error);
     }
   };
 
@@ -277,13 +339,25 @@ export default function ResourcesManagement() {
                   {isAdmin && (
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900">
+                        <button 
+                          onClick={() => handleView(resource)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="View Details"
+                        >
                           <Eye className="h-4 w-4" />
                         </button>
-                        <button className="text-green-600 hover:text-green-900">
+                        <button 
+                          onClick={() => handleEdit(resource)}
+                          className="text-green-600 hover:text-green-900"
+                          title="Edit Resource"
+                        >
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button className="text-red-600 hover:text-red-900">
+                        <button 
+                          onClick={() => handleDelete(resource)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Delete Resource"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
@@ -295,6 +369,264 @@ export default function ResourcesManagement() {
           </table>
         </div>
       </div>
+
+      {/* View Modal */}
+      {showViewModal && selectedResource && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Resource Details</h3>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-gray-600">Name</label>
+                <p className="text-gray-900">{selectedResource.name}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Type</label>
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(selectedResource.type)}`}>
+                  {selectedResource.type.charAt(0).toUpperCase() + selectedResource.type.slice(1)}
+                </span>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Status</label>
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedResource.status)}`}>
+                  {selectedResource.status.replace('_', ' ')}
+                </span>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Quantity</label>
+                <p className="text-gray-900">{selectedResource.quantity} {selectedResource.unit}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Location</label>
+                <p className="text-gray-900">{selectedResource.location}</p>
+              </div>
+              {selectedResource.expiryDate && (
+                <div>
+                  <label className="text-sm font-medium text-gray-600">Expiry Date</label>
+                  <p className="text-gray-900">{new Date(selectedResource.expiryDate).toLocaleDateString()}</p>
+                </div>
+              )}
+            </div>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {showEditModal && selectedResource && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Edit Resource</h3>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <EditResourceForm
+              resource={selectedResource}
+              onSave={handleSaveEdit}
+              onCancel={() => setShowEditModal(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedResource && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-red-600">Confirm Delete</h3>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="mb-6">
+              <p className="text-gray-700 mb-2">
+                Are you sure you want to delete this resource?
+              </p>
+              <div className="bg-gray-50 p-3 rounded-md">
+                <p className="font-medium">{selectedResource.name}</p>
+                <p className="text-sm text-gray-600">{selectedResource.type} - {selectedResource.quantity} {selectedResource.unit}</p>
+              </div>
+              <p className="text-red-600 text-sm mt-2">
+                This action cannot be undone.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+// Edit Resource Form Component
+interface EditResourceFormProps {
+  resource: Resource;
+  onSave: (resource: Resource) => void;
+  onCancel: () => void;
+}
+
+function EditResourceForm({ resource, onSave, onCancel }: EditResourceFormProps) {
+  const [formData, setFormData] = useState({
+    name: resource.name,
+    type: resource.type,
+    status: resource.status,
+    quantity: resource.quantity,
+    unit: resource.unit,
+    location: resource.location,
+    expiryDate: resource.expiryDate || ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedResource = {
+      ...resource,
+      ...formData,
+      expiryDate: formData.expiryDate || undefined
+    };
+    onSave(updatedResource);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+        <input
+          type="text"
+          value={formData.name}
+          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          required
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+        <select
+          value={formData.type}
+          onChange={(e) => setFormData({...formData, type: e.target.value})}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="food">Food</option>
+          <option value="water">Water</option>
+          <option value="medical">Medical</option>
+          <option value="fuel">Fuel</option>
+          <option value="equipment">Equipment</option>
+          <option value="shelter">Shelter</option>
+          <option value="communication">Communication</option>
+          <option value="transport">Transport</option>
+        </select>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+        <select
+          value={formData.status}
+          onChange={(e) => setFormData({...formData, status: e.target.value as any})}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          <option value="AVAILABLE">Available</option>
+          <option value="LOW_STOCK">Low Stock</option>
+          <option value="OUT_OF_STOCK">Out of Stock</option>
+          <option value="DAMAGED">Damaged</option>
+        </select>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+          <input
+            type="number"
+            value={formData.quantity}
+            onChange={(e) => setFormData({...formData, quantity: parseInt(e.target.value)})}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+          <input
+            type="text"
+            value={formData.unit}
+            onChange={(e) => setFormData({...formData, unit: e.target.value})}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          />
+        </div>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+        <input
+          type="text"
+          value={formData.location}
+          onChange={(e) => setFormData({...formData, location: e.target.value})}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          required
+        />
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date (Optional)</label>
+        <input
+          type="date"
+          value={formData.expiryDate}
+          onChange={(e) => setFormData({...formData, expiryDate: e.target.value})}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+      </div>
+      
+      <div className="flex justify-end space-x-3 pt-4">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Save Changes
+        </button>
+      </div>
+    </form>
   );
 }
