@@ -6,19 +6,13 @@ import {
   AlertTriangle, 
   TrendingUp, 
   TrendingDown, 
-  Clock, 
   MapPin, 
-  Filter,
   Search,
   RefreshCw,
   Plus,
   Edit,
   Trash2,
-  Eye,
-  Calendar,
-  BarChart3,
-  PieChart,
-  Activity
+  Eye
 } from 'lucide-react';
 
 interface Resource {
@@ -40,8 +34,6 @@ interface ResourceStats {
   lowStockResources: number;
   outOfStockResources: number;
   damagedResources: number;
-  totalValue: number;
-  expiringSoon: number;
 }
 
 export default function ResourcesPage() {
@@ -52,9 +44,7 @@ export default function ResourcesPage() {
     availableResources: 0,
     lowStockResources: 0,
     outOfStockResources: 0,
-    damagedResources: 0,
-    totalValue: 0,
-    expiringSoon: 0
+    damagedResources: 0
   });
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -126,15 +116,7 @@ export default function ResourcesPage() {
       availableResources: resources.filter(r => r.status === 'AVAILABLE').length,
       lowStockResources: resources.filter(r => r.status === 'LOW_STOCK').length,
       outOfStockResources: resources.filter(r => r.status === 'OUT_OF_STOCK').length,
-      damagedResources: resources.filter(r => r.status === 'DAMAGED').length,
-      totalValue: resources.reduce((sum, r) => sum + (r.quantity * getResourceValue(r.type)), 0),
-      expiringSoon: resources.filter(r => {
-        if (!r.expiryDate) return false;
-        const expiryDate = new Date(r.expiryDate);
-        const now = new Date();
-        const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        return daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
-      }).length
+      damagedResources: resources.filter(r => r.status === 'DAMAGED').length
     };
     setStats(newStats);
   }, [resources]);
@@ -253,18 +235,6 @@ export default function ResourcesPage() {
     }
   ];
 
-  const getResourceValue = (type: string): number => {
-    const values: { [key: string]: number } = {
-      'FOOD': 5,
-      'WATER': 2,
-      'MEDICAL': 25,
-      'FUEL': 1.5,
-      'AMMUNITION': 50,
-      'EQUIPMENT': 100,
-      'TRANSPORT': 1000
-    };
-    return values[type] || 10;
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -398,40 +368,6 @@ export default function ResourcesPage() {
           </div>
         </div>
 
-        {/* Additional Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Value</p>
-                <p className="text-2xl font-bold text-gray-900">€{stats.totalValue.toLocaleString()}</p>
-              </div>
-              <BarChart3 className="h-8 w-8 text-purple-600" />
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Expiring Soon</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.expiringSoon}</p>
-                <p className="text-xs text-gray-500">Next 30 days</p>
-              </div>
-              <Clock className="h-8 w-8 text-orange-600" />
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Damaged Items</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.damagedResources}</p>
-                <p className="text-xs text-gray-500">Needs attention</p>
-              </div>
-              <Activity className="h-8 w-8 text-red-600" />
-            </div>
-          </div>
-        </div>
 
         {/* Filters and Search */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
