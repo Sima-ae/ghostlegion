@@ -76,12 +76,6 @@ export default function EvacuationPlansPage() {
     }
   };
 
-  const emergencyContacts = [
-    { name: 'Emergency Services', number: '112', type: 'emergency' },
-    { name: 'Evacuation Hotline', number: '0800-1234', type: 'info' },
-    { name: 'Red Cross', number: '0800-5678', type: 'support' },
-    { name: 'Military Command', number: '0800-9999', type: 'military' }
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -176,17 +170,30 @@ export default function EvacuationPlansPage() {
           ))}
         </div>
 
-        {/* Emergency Contacts */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">Emergency Contacts</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {emergencyContacts.map((contact, index) => (
-              <div key={index} className="p-4 bg-gray-50 rounded-lg text-center">
-                <div className="text-lg font-bold text-blue-600 mb-1">{contact.number}</div>
-                <div className="text-sm font-medium text-gray-900 mb-1">{contact.name}</div>
-                <div className="text-xs text-gray-500 capitalize">{contact.type}</div>
-              </div>
-            ))}
+        {/* Emergency Phone Numbers */}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <h3 className="text-xl font-semibold text-black-800 mb-4">Phone Numbers</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-lg border border-red-200">
+              <h4 className="font-semibold text-black-800 text-sm">Emergency Services</h4>
+              <p className="text-2xl font-bold text-red-600">112</p>
+              <p className="text-xs text-black-600">For life-threatening situations</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-red-200">
+              <h4 className="font-semibold text-black-800 text-sm">Ministry of Defense</h4>
+              <p className="text-2xl font-bold text-red-600">088-9550550</p>
+              <p className="text-xs text-black-600">Military command and coordination</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-red-200">
+              <h4 className="font-semibold text-black-800 text-sm">Police</h4>
+              <p className="text-2xl font-bold text-red-600">0900-8844</p>
+              <p className="text-xs text-black-600">National Phone Number</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-red-200">
+              <h4 className="font-semibold text-black-800 text-sm">Red Cross</h4>
+              <p className="text-2xl font-bold text-red-600">070-4455678</p>
+              <p className="text-xs text-black-600">Humanitarian aid and support</p>
+            </div>
           </div>
         </div>
 
