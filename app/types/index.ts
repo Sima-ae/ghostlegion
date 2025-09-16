@@ -11,7 +11,7 @@ export interface Location {
   lastUpdated: string;
 }
 
-export interface Personnel {
+export interface People {
   id: string;
   name: string;
   role: PersonnelRole;
@@ -71,10 +71,13 @@ export interface Alert {
   id: string;
   title: string;
   message: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  type: 'evacuation' | 'security' | 'warning' | 'medical' | 'transport';
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  type: 'security' | 'medical' | 'weather' | 'warning' | 'transport' | 'infrastructure';
+  status: 'active' | 'resolved' | 'cancelled';
   location?: string;
-  timestamp: string;
+  affectedAreas: string[];
+  createdAt: string;
+  updatedAt: string;
   expiresAt?: string;
   acknowledgedBy: string[];
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { MapPin, Users, Route, Package, AlertTriangle, Activity, Shield, Heart } from 'lucide-react';
-import { sampleLocations, samplePersonnel, sampleEvacuationRoutes, sampleResources, sampleAlerts, sampleCommunityMembers } from '../data/sampleData';
+import { sampleLocations, samplePeople, sampleEvacuationRoutes, sampleResources, sampleAlerts, sampleCommunityMembers } from '../data/sampleData';
 import { getStatusColor, getSeverityColor, formatTimeAgo } from '../lib/utils';
 
 export default function Dashboard() {
@@ -19,8 +19,8 @@ export default function Dashboard() {
     },
     {
       title: 'Personeel Online',
-      value: samplePersonnel.filter(p => p.status === 'active').length,
-      total: samplePersonnel.length,
+      value: samplePeople.filter(p => p.status === 'active').length,
+      total: samplePeople.length,
       icon: Users,
       color: 'text-blue-600 bg-blue-100',
       change: '+5 vandaag'
@@ -35,7 +35,7 @@ export default function Dashboard() {
     },
     {
       title: 'Critical Alerts',
-      value: sampleAlerts.filter(a => a.severity === 'critical' || a.severity === 'high').length,
+      value: sampleAlerts.filter(a => a.severity === 'CRITICAL' || a.severity === 'HIGH').length,
       total: sampleAlerts.length,
       icon: AlertTriangle,
       color: 'text-red-600 bg-red-100',
@@ -44,10 +44,10 @@ export default function Dashboard() {
   ];
 
   const recentAlerts = sampleAlerts
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
-  const onlinePersonnel = sampleCommunityMembers
+  const onlinePeople = sampleCommunityMembers
     .filter(p => p.status === 'online')
     .slice(0, 8);
 
@@ -108,7 +108,7 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-gray-900">{alert.title}</p>
                     <p className="text-sm text-gray-600 line-clamp-2">{alert.message}</p>
                     <div className="flex items-center mt-2 space-x-4 text-xs text-gray-500">
-                      <span>{formatTimeAgo(alert.timestamp)}</span>
+                      <span>{formatTimeAgo(alert.createdAt)}</span>
                       {alert.location && <span>• {alert.location}</span>}
                     </div>
                   </div>
@@ -123,17 +123,17 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Online Personnel */}
+        {/* Online People */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Online Personeel</h2>
-              <span className="text-sm text-gray-500">{onlinePersonnel.length} online</span>
+              <h2 className="text-lg font-semibold text-gray-900">Online People</h2>
+              <span className="text-sm text-gray-500">{onlinePeople.length} online</span>
             </div>
           </div>
           <div className="p-6">
             <div className="space-y-3">
-              {onlinePersonnel.map((person) => (
+              {onlinePeople.map((person) => (
                 <div key={person.id} className="flex items-center space-x-3">
                   <div className="flex-shrink-0">
                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
@@ -206,7 +206,7 @@ export default function Dashboard() {
           </button>
           <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <Users className="h-8 w-8 text-green-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Add Personnel</span>
+            <span className="text-sm font-medium text-gray-900">Add People</span>
           </button>
           <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
             <Route className="h-8 w-8 text-purple-600 mb-2" />

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
-import { db } from '@/app/lib/db';
+import { prisma } from '../../../../lib/prisma';
 
 // PUT /api/alerts/[id] - Update an alert
 export async function PUT(
@@ -9,15 +7,6 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const { id } = await params;
     const body = await request.json();
     const { title, message, severity, type, location, expiresAt } = body;
@@ -36,10 +25,10 @@ export async function PUT(
     }
 
     if (type) {
-      updateData.type = type.toUpperCase() as 'SECURITY' | 'EVACUATION' | 'MEDICAL' | 'LOGISTICS' | 'GENERAL';
+      updateData.type = type.toUpperCase() as 'SECURITY' | 'MEDICAL' | 'WEATHER' | 'WARNING' | 'TRANSPORT' | 'INFRASTRUCTURE';
     }
 
-    const alert = await db.alert.update({
+    const alert = await prisma.alert.update({
       where: { id },
       data: updateData
     });
@@ -60,18 +49,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
     const { id } = await params;
 
-    await db.alert.delete({
+    await prisma.alert.delete({
       where: { id }
     });
 

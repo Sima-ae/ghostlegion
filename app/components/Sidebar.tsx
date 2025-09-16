@@ -28,7 +28,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'map', label: 'Locations & Map', icon: Map },
-    { id: 'personnel', label: 'Personnel', icon: Users },
+    { id: 'people', label: 'People', icon: Users },
     { id: 'evacuation', label: 'Evacuation Plans', icon: Route },
     { id: 'resources', label: 'Resources', icon: Package },
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle },

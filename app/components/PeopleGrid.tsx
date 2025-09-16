@@ -1,25 +1,25 @@
 'use client';
 
-import { Personnel, PersonnelDepartment } from '../types';
+import { People, PersonnelDepartment } from '../types';
 import { getRoleIcon, getStatusColor, formatTimeAgo } from '../lib/utils';
 import { Search, Filter, Plus, Eye, Edit, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-interface PersonnelGridProps {
-  personnel: Personnel[];
-  onPersonnelSelect?: (personnel: Personnel) => void;
+interface PeopleGridProps {
+  people: People[];
+  onPeopleSelect?: (people: People) => void;
 }
 
-export default function PersonnelGrid({ personnel, onPersonnelSelect }: PersonnelGridProps) {
+export default function PeopleGrid({ people, onPeopleSelect }: PeopleGridProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState<PersonnelDepartment | 'all'>('all');
   const [selectedRole, setSelectedRole] = useState<string>('all');
 
   const departments: PersonnelDepartment[] = ['military', 'government', 'humanitarian', 'medical', 'logistics', 'communication', 'law_enforcement', 'civilian', 'volunteer'];
   
-  const roles = Array.from(new Set(personnel.map(p => p.role)));
+  const roles = Array.from(new Set(people.map(p => p.role)));
 
-  const filteredPersonnel = personnel.filter(person => {
+  const filteredPeople = people.filter(person => {
     const matchesSearch = person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          person.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          person.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -89,13 +89,13 @@ export default function PersonnelGrid({ personnel, onPersonnelSelect }: Personne
         </div>
       </div>
 
-      {/* Personnel Grid */}
+      {/* People Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filteredPersonnel.map((person) => (
+        {filteredPeople.map((person) => (
           <div
             key={person.id}
             className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => onPersonnelSelect?.(person)}
+            onClick={() => onPeopleSelect?.(person)}
           >
             <div className="p-4">
               {/* Header */}
@@ -187,7 +187,7 @@ export default function PersonnelGrid({ personnel, onPersonnelSelect }: Personne
 
       {/* Results Count */}
       <div className="text-sm text-gray-500 text-center">
-        {filteredPersonnel.length} van {personnel.length} personeelsleden gevonden
+        {filteredPeople.length} van {people.length} people found
       </div>
     </div>
   );

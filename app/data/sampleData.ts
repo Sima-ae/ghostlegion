@@ -1,4 +1,4 @@
-import { Location, Personnel, EvacuationRoute, Resource, Alert, CommunityMember } from '../types';
+import { Location, People, EvacuationRoute, Resource, Alert, CommunityMember } from '../types';
 
 export const sampleLocations: Location[] = [
   {
@@ -63,7 +63,7 @@ export const sampleLocations: Location[] = [
   }
 ];
 
-export const samplePersonnel: Personnel[] = [
+export const samplePeople: People[] = [
   {
     id: '1',
     name: 'General van der Berg',
@@ -789,60 +789,78 @@ export const sampleAlerts: Alert[] = [
     id: '1',
     title: 'Demo Alert: Evacuation Route A1 Closed',
     message: 'The A1 between Amsterdam and Utrecht is closed due to military activities. Use alternative routes.',
-    severity: 'high',
-    type: 'evacuation',
+    severity: 'HIGH',
+    type: 'warning',
     location: 'A1 Amsterdam-Utrecht',
-    timestamp: '2025-09-11T12:30:00Z',
+    createdAt: '2025-09-11T12:30:00Z',
+    updatedAt: '2025-09-11T12:30:00Z',
+    status: 'active',
+    affectedAreas: ['Amsterdam', 'Utrecht'],
     acknowledgedBy: ['1', '2']
   },
   {
     id: '2',
     title: 'Demo Alert: Security Alert - Suspicious Activity',
     message: 'Reported suspicious activity near The Hague Bunker Complex. Security personnel investigating.',
-    severity: 'medium',
+    severity: 'MEDIUM',
     type: 'security',
     location: 'The Hague Bunker Complex',
-    timestamp: '2025-09-11T11:45:00Z',
+    createdAt: '2025-09-11T11:45:00Z',
+    updatedAt: '2025-09-11T11:45:00Z',
+    status: 'active',
+    affectedAreas: ['The Hague'],
     acknowledgedBy: ['1']
   },
   {
     id: '3',
     title: 'Demo Alert: Border Infiltration Warning',
     message: 'Suspected infiltration activity detected along the German border near Maastricht. Military units deployed to investigate.',
-    severity: 'high',
+    severity: 'HIGH',
     type: 'warning',
     location: 'German Border - Maastricht Area',
-    timestamp: '2025-09-11T11:00:00Z',
+    createdAt: '2025-09-11T11:00:00Z',
+    updatedAt: '2025-09-11T11:00:00Z',
+    status: 'active',
+    affectedAreas: ['Maastricht'],
     acknowledgedBy: []
   },
   {
     id: '4',
     title: 'Demo Alert: Medical Emergency - Mass Casualty',
     message: 'Multiple casualties reported at Utrecht Medical Center. Additional medical personnel requested.',
-    severity: 'high',
+    severity: 'HIGH',
     type: 'medical',
     location: 'Utrecht Medical Center',
-    timestamp: '2025-09-11T10:30:00Z',
+    createdAt: '2025-09-11T10:30:00Z',
+    updatedAt: '2025-09-11T10:30:00Z',
+    status: 'active',
+    affectedAreas: ['Utrecht'],
     acknowledgedBy: ['2']
   },
   {
     id: '5',
     title: 'Demo Alert: Transport Disruption - Public Transport',
     message: 'Public transport services suspended in Amsterdam due to security concerns.',
-    severity: 'medium',
+    severity: 'MEDIUM',
     type: 'transport',
     location: 'Amsterdam',
-    timestamp: '2025-09-11T10:00:00Z',
+    createdAt: '2025-09-11T10:00:00Z',
+    updatedAt: '2025-09-11T10:00:00Z',
+    status: 'active',
+    affectedAreas: ['Amsterdam'],
     acknowledgedBy: []
   },
   {
     id: '6',
     title: 'Demo Alert: Evacuation Order - Rotterdam Area',
     message: 'Immediate evacuation ordered for Rotterdam city center. Follow designated routes.',
-    severity: 'high',
-    type: 'evacuation',
+    severity: 'HIGH',
+    type: 'warning',
     location: 'Rotterdam City Center',
-    timestamp: '2025-09-11T09:45:00Z',
+    createdAt: '2025-09-11T09:45:00Z',
+    updatedAt: '2025-09-11T09:45:00Z',
+    status: 'active',
+    affectedAreas: ['Rotterdam'],
     acknowledgedBy: ['1', '3']
   }
 ];

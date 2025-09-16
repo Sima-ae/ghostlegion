@@ -51,7 +51,7 @@ model User {
 
   accounts Account[]
   sessions Session[]
-  personnel Personnel?
+  people People?
 }
 
 model VerificationToken {
@@ -105,7 +105,7 @@ enum LocationStatus {
   UNDER_CONSTRUCTION
 }
 
-model Personnel {
+model People {
   id            String         @id @default(cuid())
   name          String
   role          PersonnelRole

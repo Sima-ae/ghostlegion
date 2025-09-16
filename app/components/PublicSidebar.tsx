@@ -36,18 +36,12 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
   const mainMenuItems = [
     { id: 'map', label: 'Map', icon: Map, isPublic: true },
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle, isPublic: true },
-    { id: 'community', label: 'Community', icon: MessageSquare, isPublic: true },
+    
     { id: 'emergency-checklist', label: 'Emergency Checklist', icon: AlertTriangle, isPublic: true },
     { id: 'evacuation', label: 'Evacuation Plans', icon: Route, isPublic: true },
     
     { id: 'resources', label: 'Resources', icon: Package, isPublic: true },
-    
-  ];
-
-  const communitySpaces = [
-    { id: 'join', label: '- Join Us Today -', icon: MessageSquare, isPublic: true },
-
-    { id: 'security', label: 'Security and Defense', icon: Shield, isPublic: false },
+    { id: 'security', label: 'Defense and Security', icon: Shield, isPublic: false },
     { id: 'shelter', label: 'Shelter and Housing', icon: Home, isPublic: false },
     { id: 'food-water', label: 'Food and Water Supply', icon: Utensils, isPublic: false },
     { id: 'medical', label: 'Medical Assistance', icon: Cross, isPublic: false },
@@ -60,9 +54,15 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
     
     { id: 'rebuilding', label: 'Rebuilding and Infrastruct...', icon: Building, isPublic: false },
     { id: 'childcare', label: 'Childcare and Education', icon: BookOpen, isPublic: false },
-    { id: 'legal', label: 'Legal and Administrative...', icon: Gavel, isPublic: false },
     { id: 'mental-health', label: 'Mental and Emotional Su...', icon: Users, isPublic: false },
+    { id: 'legal', label: 'Legal and Administrative...', icon: Gavel, isPublic: false },
+    
+    
+  ];
 
+  const communitySpaces = [
+    { id: 'join-us', label: '- Join Us Today -', icon: MessageSquare, isPublic: true },
+    
   ];
 
   return (
@@ -70,35 +70,11 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
       isCollapsed ? 'w-16 lg:w-20' : 'w-full lg:w-80'
     } border-r border-gray-200 flex-shrink-0`}>
       <div className="flex flex-col h-full">
-        {/* Menu */}
+        {/* Community Section - Moved to top */}
         <nav className="flex-1 p-4 space-y-2">
           <div className="space-y-1">
             <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
-              {!isCollapsed && <span>Menu</span>}
-            </div>
-            {mainMenuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onTabChange(item.id)}
-                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    activeTab === item.id
-                      ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                      : 'text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
-                  {!isCollapsed && <span>{item.label}</span>}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Locations */}
-          <div className="mt-6">
-            <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
-              {!isCollapsed && <span>Locations and Services</span>}
+              {!isCollapsed && <span>Community</span>}
             </div>
             <div className="space-y-1">
               {communitySpaces.map((space) => {
@@ -106,9 +82,9 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
                 return (
                   <button
                     key={space.id}
-                    onClick={() => onTabChange(space.id)}
+                    onClick={() => onTabChange(space.id === 'join-us' ? 'community' : space.id)}
                     className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      activeTab === space.id
+                      activeTab === (space.id === 'join-us' ? 'community' : space.id)
                         ? 'bg-blue-100 text-blue-700 border border-blue-200'
                         : 'text-gray-700 hover:bg-gray-200'
                     }`}
@@ -125,6 +101,32 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
                         )}
                       </div>
                     )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Menu */}
+          <div className="mt-6">
+            <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
+              {!isCollapsed && <span>Menu</span>}
+            </div>
+            <div className="space-y-1">
+              {mainMenuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onTabChange(item.id)}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      activeTab === item.id
+                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                        : 'text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
+                    {!isCollapsed && <span>{item.label}</span>}
                   </button>
                 );
               })}
