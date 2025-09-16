@@ -19,11 +19,11 @@ import {
 interface Resource {
   id: string;
   name: string;
-  type: 'food' | 'water' | 'medical' | 'fuel' | 'ammunition' | 'equipment' | 'transport';
+  type: 'FOOD' | 'WATER' | 'MEDICAL' | 'FUEL' | 'AMMUNITION' | 'EQUIPMENT' | 'TRANSPORT';
   quantity: number;
   unit: string;
   location: string;
-  status: 'available' | 'low_stock' | 'out_of_stock' | 'damaged';
+  status: 'AVAILABLE' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'DAMAGED';
   expiryDate?: string;
   createdAt: string;
   updatedAt: string;
@@ -119,10 +119,10 @@ export default function ResourcesPage() {
   useEffect(() => {
     const newStats: ResourceStats = {
       totalResources: resources.length,
-      availableResources: resources.filter(r => r.status === 'available').length,
-      lowStockResources: resources.filter(r => r.status === 'low_stock').length,
-      outOfStockResources: resources.filter(r => r.status === 'out_of_stock').length,
-      damagedResources: resources.filter(r => r.status === 'damaged').length
+      availableResources: resources.filter(r => r.status === 'AVAILABLE').length,
+      lowStockResources: resources.filter(r => r.status === 'LOW_STOCK').length,
+      outOfStockResources: resources.filter(r => r.status === 'OUT_OF_STOCK').length,
+      damagedResources: resources.filter(r => r.status === 'DAMAGED').length
     };
     setStats(newStats);
   }, [resources]);
@@ -150,36 +150,36 @@ export default function ResourcesPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return 'text-green-600 bg-green-100';
-      case 'low_stock': return 'text-yellow-600 bg-yellow-100';
-      case 'out_of_stock': return 'text-red-600 bg-red-100';
-      case 'damaged': return 'text-gray-600 bg-gray-100';
+      case 'AVAILABLE': return 'text-green-600 bg-green-100';
+      case 'LOW_STOCK': return 'text-yellow-600 bg-yellow-100';
+      case 'OUT_OF_STOCK': return 'text-red-600 bg-red-100';
+      case 'DAMAGED': return 'text-gray-600 bg-gray-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'food': return '🍽️';
-      case 'water': return '💧';
-      case 'medical': return '🏥';
-      case 'fuel': return '⛽';
-      case 'ammunition': return '🔫';
-      case 'equipment': return '🔧';
-      case 'transport': return '🚗';
+      case 'FOOD': return '🍽️';
+      case 'WATER': return '💧';
+      case 'MEDICAL': return '🏥';
+      case 'FUEL': return '⛽';
+      case 'AMMUNITION': return '🔫';
+      case 'EQUIPMENT': return '🔧';
+      case 'TRANSPORT': return '🚗';
       default: return '📦';
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'food': return 'text-orange-600 bg-orange-100';
-      case 'water': return 'text-blue-600 bg-blue-100';
-      case 'medical': return 'text-red-600 bg-red-100';
-      case 'fuel': return 'text-yellow-600 bg-yellow-100';
-      case 'ammunition': return 'text-gray-600 bg-gray-100';
-      case 'equipment': return 'text-purple-600 bg-purple-100';
-      case 'transport': return 'text-green-600 bg-green-100';
+      case 'FOOD': return 'text-orange-600 bg-orange-100';
+      case 'WATER': return 'text-blue-600 bg-blue-100';
+      case 'MEDICAL': return 'text-red-600 bg-red-100';
+      case 'FUEL': return 'text-yellow-600 bg-yellow-100';
+      case 'AMMUNITION': return 'text-gray-600 bg-gray-100';
+      case 'EQUIPMENT': return 'text-purple-600 bg-purple-100';
+      case 'TRANSPORT': return 'text-green-600 bg-green-100';
       default: return 'text-gray-600 bg-gray-100';
     }
   };

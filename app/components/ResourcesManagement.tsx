@@ -20,12 +20,13 @@ interface Resource {
   id: string;
   name: string;
   type: string;
-  status: 'available' | 'low_stock' | 'out_of_stock' | 'damaged' | 'maintenance';
+  status: 'AVAILABLE' | 'LOW_STOCK' | 'OUT_OF_STOCK' | 'DAMAGED';
   quantity: number;
+  unit: string;
   location: string;
-  description: string;
-  lastUpdated: string;
+  expiryDate?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export default function ResourcesManagement() {
@@ -59,11 +60,10 @@ export default function ResourcesManagement() {
   };
 
   const types = ['food', 'water', 'medical', 'fuel', 'equipment', 'shelter', 'communication', 'transport'];
-  const statuses = ['available', 'low_stock', 'out_of_stock', 'damaged', 'maintenance'];
+  const statuses = ['AVAILABLE', 'LOW_STOCK', 'OUT_OF_STOCK', 'DAMAGED'];
 
   const filteredResources = resources.filter(resource => {
     const matchesSearch = resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         resource.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          resource.location.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesType = selectedType === 'all' || resource.type === selectedType;
@@ -74,11 +74,10 @@ export default function ResourcesManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return 'bg-green-100 text-green-800';
-      case 'low_stock': return 'bg-yellow-100 text-yellow-800';
-      case 'out_of_stock': return 'bg-red-100 text-red-800';
-      case 'damaged': return 'bg-red-100 text-red-800';
-      case 'maintenance': return 'bg-blue-100 text-blue-800';
+      case 'AVAILABLE': return 'bg-green-100 text-green-800';
+      case 'LOW_STOCK': return 'bg-yellow-100 text-yellow-800';
+      case 'OUT_OF_STOCK': return 'bg-red-100 text-red-800';
+      case 'DAMAGED': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -164,7 +163,7 @@ export default function ResourcesManagement() {
               <option value="all">All Statuses</option>
               {statuses.map(status => (
                 <option key={status} value={status}>
-                  {status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ')}
+                  {status.replace('_', ' ')}
                 </option>
               ))}
             </select>
@@ -189,8 +188,8 @@ export default function ResourcesManagement() {
             <CheckCircle className="h-8 w-8 text-green-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Available</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {resources.filter(r => r.status === 'available').length}
+              <p className="text-2xl font-bold text-green-600">
+                {resources.filter(r => r.status === 'AVAILABLE').length}
               </p>
             </div>
           </div>
@@ -201,8 +200,8 @@ export default function ResourcesManagement() {
             <AlertTriangle className="h-8 w-8 text-yellow-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Low Stock</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {resources.filter(r => r.status === 'low_stock').length}
+              <p className="text-2xl font-bold text-yellow-600">
+                {resources.filter(r => r.status === 'LOW_STOCK').length}
               </p>
             </div>
           </div>
@@ -213,8 +212,8 @@ export default function ResourcesManagement() {
             <Clock className="h-8 w-8 text-red-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Out of Stock</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {resources.filter(r => r.status === 'out_of_stock').length}
+              <p className="text-2xl font-bold text-red-600">
+                {resources.filter(r => r.status === 'OUT_OF_STOCK').length}
               </p>
             </div>
           </div>
@@ -252,7 +251,7 @@ export default function ResourcesManagement() {
                       <Package className="h-5 w-5 text-blue-600 mr-3" />
                       <div>
                         <div className="text-sm font-medium text-gray-900">{resource.name}</div>
-                        <div className="text-sm text-gray-500">{resource.description}</div>
+                        <div className="text-sm text-gray-500">{resource.id}</div>
                       </div>
                     </div>
                   </td>
@@ -262,18 +261,18 @@ export default function ResourcesManagement() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {resource.quantity}
+                    {resource.quantity} {resource.unit}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(resource.status)}`}>
-                      {resource.status.charAt(0).toUpperCase() + resource.status.slice(1).replace('_', ' ')}
+                      {resource.status.replace('_', ' ')}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {resource.location}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {resource.lastUpdated}
+                    {new Date(resource.updatedAt).toLocaleDateString()}
                   </td>
                   {isAdmin && (
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
