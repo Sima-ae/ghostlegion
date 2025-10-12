@@ -139,43 +139,22 @@ export default function AdminDashboard() {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Location>>({});
 
-  useEffect(() => {
-    if (status === 'loading') return;
+  const loadAdminStats = async (retryCount = 0) => {
+    // Only run on client side
+    if (typeof window === 'undefined') {
+      return;
+    }
     
-    if (!session) {
-      router.push('/auth/signin');
-      return;
-    }
-
-    if (session.user?.role !== 'ADMIN') {
-      router.push('/');
-      return;
-    }
-
-    // Load admin stats
-    loadAdminStats();
-  }, [session, status, router]);
-
-  // Show loading while checking authentication
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Redirect if not authenticated or not admin
-  if (!session || session.user?.role !== 'ADMIN') {
-    return null;
-  }
-
-  const loadAdminStats = async () => {
     try {
-      const response = await fetch('/api/admin/stats');
+      const response = await fetch('/api/admin/stats', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies for authentication
+        cache: 'no-cache', // Prevent caching issues
+      });
+      
       if (response.ok) {
         const realStats = await response.json();
         setStats(realStats);
@@ -205,9 +184,19 @@ export default function AdminDashboard() {
           routesStatus: 'All operational'
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error loading admin stats:', error);
-      // Fallback to mock data
+      
+      // Retry up to 2 times with exponential backoff
+      if (retryCount < 2) {
+        console.log(`Retrying admin stats fetch (attempt ${retryCount + 1})...`);
+        setTimeout(() => {
+          loadAdminStats(retryCount + 1);
+        }, Math.pow(2, retryCount) * 1000); // 1s, 2s delays
+        return;
+      }
+      
+      // Fallback to mock data after all retries failed
       setStats({
         totalUsers: 156,
         totalLocations: locations.length,
@@ -235,6 +224,44 @@ export default function AdminDashboard() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (status === 'loading') return;
+    
+    if (!session) {
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (session.user?.role !== 'ADMIN' && session.user?.role !== 'COMMANDER') {
+      router.push('/');
+      return;
+    }
+
+    // Load admin stats with a small delay to ensure session is fully loaded
+    setTimeout(() => {
+      if (session && session.user) {
+        loadAdminStats();
+      }
+    }, 200);
+  }, [session, status, router]);
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect if not authenticated or not admin/commander
+  if (!session || (session.user?.role !== 'ADMIN' && session.user?.role !== 'COMMANDER')) {
+    return null;
+  }
 
   const handleLocationAdd = (locationData: Omit<Location, 'id'>) => {
     const newLocation: Location = {
@@ -766,7 +793,7 @@ export default function AdminDashboard() {
 
       {/* View Location Modal */}
       {viewModalOpen && selectedLocation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -854,7 +881,7 @@ export default function AdminDashboard() {
 
       {/* Edit Location Modal */}
       {editModalOpen && selectedLocation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">

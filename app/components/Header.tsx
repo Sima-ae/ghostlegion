@@ -15,7 +15,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-gray-900 text-white shadow-lg w-full">
+    <header className="bg-gray-900 text-white shadow-lg w-full relative z-[1000]">
       <div className="w-full px-2 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-16 w-full">
           {/* Logo and Title - Left Side */}
@@ -71,7 +71,7 @@ export default function Header() {
                 </button>
 
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999]">
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       Profile
                     </a>
@@ -81,7 +81,7 @@ export default function Header() {
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       Help
                     </a>
-                    {session?.user?.role === 'ADMIN' && (
+                    {(session?.user?.role === 'ADMIN' || session?.user?.role === 'COMMANDER') && (
                       <>
                         <hr className="my-1" />
                         <button
