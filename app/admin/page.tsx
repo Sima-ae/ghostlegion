@@ -138,6 +138,7 @@ export default function AdminDashboard() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Location>>({});
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   const loadAdminStats = async (retryCount = 0) => {
     // Only run on client side
@@ -409,6 +410,20 @@ export default function AdminDashboard() {
               <p className="text-gray-600">Ghost Legion - System Administration</p>
             </div>
             <div className="flex items-center space-x-4">
+              {/* DEMO Mode Toggle */}
+              <div className="flex items-center space-x-2">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isDemoMode}
+                    onChange={(e) => setIsDemoMode(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <span className={`text-sm font-medium ${isDemoMode ? 'text-orange-600 font-bold' : 'text-gray-700'}`}>
+                    DEMO Mode {isDemoMode && '🔴'}
+                  </span>
+                </label>
+              </div>
               <span className="text-sm text-gray-500">
                 Welcome, {session.user?.name || session.user?.email}
               </span>
@@ -456,6 +471,25 @@ export default function AdminDashboard() {
             </nav>
           </div>
         </div>
+
+        {/* Demo Mode Banner */}
+        {isDemoMode && (
+          <div className="mb-6 bg-orange-100 border border-orange-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-orange-600 text-2xl">🔴</span>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-orange-800">
+                  DEMO MODE ACTIVE
+                </h3>
+                <p className="text-sm text-orange-700">
+                  All alerts and routes will display with a transparent demo overlay to indicate they are for demonstration purposes only.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tab Content */}
         {activeTab === 'overview' && (
@@ -777,7 +811,7 @@ export default function AdminDashboard() {
 
         {/* Routes Management */}
         {activeTab === 'routes' && (
-          <RoutesManagement />
+          <RoutesManagement isDemoMode={isDemoMode} />
         )}
 
         {/* Resources Management */}
@@ -787,7 +821,7 @@ export default function AdminDashboard() {
 
         {/* Alerts Management */}
         {activeTab === 'alerts' && (
-          <AlertsManagement />
+          <AlertsManagement isDemoMode={isDemoMode} />
         )}
       </div>
 

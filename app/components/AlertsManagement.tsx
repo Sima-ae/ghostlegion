@@ -27,9 +27,18 @@ interface Alert {
   affectedAreas?: string[];
   createdAt: string;
   updatedAt: string;
+  notifyUsers?: boolean;
+  isUrgent?: boolean;
+  autoResolve?: boolean;
+  requiresAcknowledgment?: boolean;
+  showDemoOverlay?: boolean;
 }
 
-export default function AlertsManagement() {
+interface AlertsManagementProps {
+  isDemoMode?: boolean;
+}
+
+export default function AlertsManagement({ isDemoMode = false }: AlertsManagementProps) {
   const { data: session } = useSession();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -333,7 +342,7 @@ export default function AlertsManagement() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredAlerts.map((alert) => (
-                <tr key={alert.id} className="hover:bg-gray-50">
+                <tr key={alert.id} className="hover:bg-gray-50 relative">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <AlertTriangle className="h-5 w-5 text-red-600 mr-3" />
@@ -342,6 +351,16 @@ export default function AlertsManagement() {
                         <div className="text-sm text-gray-500 max-w-xs truncate">{alert.message}</div>
                       </div>
                     </div>
+                    {/* DEMO Overlay */}
+                    {alert.showDemoOverlay && (
+                      <div className="absolute inset-0 pointer-events-none">
+                        <img 
+                          src="/demo.png" 
+                          alt="DEMO" 
+                          className="w-full h-full object-cover opacity-30"
+                        />
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(alert.type || '')}`}>
@@ -541,7 +560,12 @@ function EditAlertForm({ alert, onSave, onCancel }: EditAlertFormProps) {
     type: alert.type,
     severity: alert.severity,
     status: alert.status,
-    affectedAreas: (alert.affectedAreas && Array.isArray(alert.affectedAreas)) ? alert.affectedAreas.join(', ') : ''
+    affectedAreas: (alert.affectedAreas && Array.isArray(alert.affectedAreas)) ? alert.affectedAreas.join(', ') : '',
+    notifyUsers: alert.notifyUsers || false,
+    isUrgent: alert.isUrgent || false,
+    autoResolve: alert.autoResolve || false,
+    requiresAcknowledgment: alert.requiresAcknowledgment || false,
+    showDemoOverlay: alert.showDemoOverlay || false
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -549,7 +573,12 @@ function EditAlertForm({ alert, onSave, onCancel }: EditAlertFormProps) {
     const updatedAlert = {
       ...alert,
       ...formData,
-      affectedAreas: formData.affectedAreas ? formData.affectedAreas.split(',').map(a => a.trim()).filter(a => a) : []
+      affectedAreas: formData.affectedAreas ? formData.affectedAreas.split(',').map(a => a.trim()).filter(a => a) : [],
+      notifyUsers: formData.notifyUsers,
+      isUrgent: formData.isUrgent,
+      autoResolve: formData.autoResolve,
+      requiresAcknowledgment: formData.requiresAcknowledgment,
+      showDemoOverlay: formData.showDemoOverlay
     };
     onSave(updatedAlert);
   };
@@ -629,6 +658,63 @@ function EditAlertForm({ alert, onSave, onCancel }: EditAlertFormProps) {
           onChange={(e) => setFormData({...formData, affectedAreas: e.target.value})}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
+      </div>
+      
+      {/* Checkbox Options */}
+      <div className="space-y-3 pt-4 border-t border-gray-200">
+        <h4 className="text-sm font-medium text-gray-700">Alert Options</h4>
+        
+        <div className="space-y-2">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.notifyUsers}
+              onChange={(e) => setFormData({...formData, notifyUsers: e.target.checked})}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Notify all users immediately</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.isUrgent}
+              onChange={(e) => setFormData({...formData, isUrgent: e.target.checked})}
+              className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Mark as urgent (high priority)</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.autoResolve}
+              onChange={(e) => setFormData({...formData, autoResolve: e.target.checked})}
+              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Auto-resolve after 24 hours</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.requiresAcknowledgment}
+              onChange={(e) => setFormData({...formData, requiresAcknowledgment: e.target.checked})}
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Require user acknowledgment</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.showDemoOverlay}
+              onChange={(e) => setFormData({...formData, showDemoOverlay: e.target.checked})}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Show DEMO overlay</span>
+          </label>
+        </div>
       </div>
       
       <div className="flex justify-end space-x-3 pt-4">

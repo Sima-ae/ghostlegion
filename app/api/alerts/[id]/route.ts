@@ -9,7 +9,19 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, message, severity, type, location, expiresAt } = body;
+    const { 
+      title, 
+      message, 
+      severity, 
+      type, 
+      location, 
+      expiresAt,
+      notifyUsers,
+      isUrgent,
+      autoResolve,
+      requiresAcknowledgment,
+      showDemoOverlay
+    } = body;
 
     // Convert string values to enums if provided
     const updateData: any = {
@@ -17,6 +29,11 @@ export async function PUT(
       message,
       location,
       expiresAt: expiresAt ? new Date(expiresAt) : null,
+      notifyUsers: notifyUsers || false,
+      isUrgent: isUrgent || false,
+      autoResolve: autoResolve || false,
+      requiresAcknowledgment: requiresAcknowledgment || false,
+      showDemoOverlay: showDemoOverlay || false,
       updatedAt: new Date()
     };
 

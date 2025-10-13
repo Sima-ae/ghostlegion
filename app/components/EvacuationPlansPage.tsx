@@ -1,88 +1,110 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Clock, Users, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+
+interface EvacuationRoute {
+  id: string;
+  name: string;
+  startLocation: string;
+  endLocation: string;
+  waypoints: [number, number][];
+  estimatedTime: number;
+  status: 'OPEN' | 'CLOSED' | 'CONGESTED' | 'DANGEROUS';
+  capacity: number;
+  transportType: string;
+  priority: string;
+  createdAt: string;
+  updatedAt: string;
+  enableNotifications?: boolean;
+  isPriorityRoute?: boolean;
+  allowReverseDirection?: boolean;
+  requiresEscort?: boolean;
+  showDemoOverlay?: boolean;
+}
 
 export default function EvacuationPlansPage() {
   const [selectedRegion, setSelectedRegion] = useState('north');
+  const [routes, setRoutes] = useState<EvacuationRoute[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load routes from API
+  useEffect(() => {
+    loadRoutes();
+  }, []);
+
+  const loadRoutes = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/routes');
+      if (response.ok) {
+        const data = await response.json();
+        setRoutes(data);
+      } else {
+        console.error('Failed to load routes');
+        setRoutes([]);
+      }
+    } catch (error) {
+      console.error('Error loading routes:', error);
+      setRoutes([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const evacuationRoutes = {
     north: {
       name: 'Northern Netherlands',
-      routes: [
-        {
-          id: 'route-1',
-          name: 'Groningen to Germany',
-          distance: '45 km',
-          duration: '2-3 hours',
-          capacity: '15,000 people',
-          status: 'active',
-          checkpoints: [
-            { name: 'Groningen Central Station', type: 'assembly', capacity: '5,000' },
-            { name: 'Winschoten Border Crossing', type: 'border', capacity: '2,000' },
-            { name: 'Bad Nieuweschans Refugee Center', type: 'shelter', capacity: '8,000' }
-          ]
-        },
-        {
-          id: 'route-2',
-          name: 'Friesland to Denmark',
-          distance: '120 km',
-          duration: '4-5 hours',
-          capacity: '8,000 people',
-          status: 'standby',
-          checkpoints: [
-            { name: 'Leeuwarden Assembly Point', type: 'assembly', capacity: '3,000' },
-            { name: 'Harlingen Port', type: 'port', capacity: '2,000' },
-            { name: 'Esbjerg Reception Center', type: 'shelter', capacity: '5,000' }
-          ]
-        }
-      ]
+      routes: routes.filter(route => 
+        route.startLocation.toLowerCase().includes('groningen') || 
+        route.startLocation.toLowerCase().includes('leeuwarden') ||
+        route.startLocation.toLowerCase().includes('friesland') ||
+        route.startLocation.toLowerCase().includes('drenthe') ||
+        route.startLocation.toLowerCase().includes('harlingen')
+      )
     },
     central: {
       name: 'Central Netherlands',
-      routes: [
-        {
-          id: 'route-3',
-          name: 'Amsterdam to Belgium',
-          distance: '180 km',
-          duration: '3-4 hours',
-          capacity: '25,000 people',
-          status: 'active',
-          checkpoints: [
-            { name: 'Amsterdam Arena', type: 'assembly', capacity: '10,000' },
-            { name: 'Rotterdam Central', type: 'transit', capacity: '8,000' },
-            { name: 'Antwerp Reception Center', type: 'shelter', capacity: '15,000' }
-          ]
-        }
-      ]
+      routes: routes.filter(route => 
+        route.startLocation.toLowerCase().includes('amsterdam') || 
+        route.startLocation.toLowerCase().includes('rotterdam') ||
+        route.startLocation.toLowerCase().includes('utrecht') ||
+        route.startLocation.toLowerCase().includes('den haag') ||
+        route.startLocation.toLowerCase().includes('the hague') ||
+        route.startLocation.toLowerCase().includes('haarlem') ||
+        route.startLocation.toLowerCase().includes('zaandam')
+      )
     },
     south: {
       name: 'Southern Netherlands',
-      routes: [
-        {
-          id: 'route-4',
-          name: 'Eindhoven to France',
-          distance: '220 km',
-          duration: '4-5 hours',
-          capacity: '12,000 people',
-          status: 'active',
-          checkpoints: [
-            { name: 'Eindhoven Airport', type: 'assembly', capacity: '5,000' },
-            { name: 'Tilburg Transit Center', type: 'transit', capacity: '3,000' },
-            { name: 'Lille Reception Center', type: 'shelter', capacity: '8,000' }
-          ]
-        }
-      ]
+      routes: routes.filter(route => 
+        route.startLocation.toLowerCase().includes('eindhoven') || 
+        route.startLocation.toLowerCase().includes('tilburg') ||
+        route.startLocation.toLowerCase().includes('breda') ||
+        route.startLocation.toLowerCase().includes('maastricht') ||
+        route.startLocation.toLowerCase().includes('valkenswaard')
+      )
     }
   };
 
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'text-green-600 bg-green-100';
-      case 'standby': return 'text-yellow-600 bg-yellow-100';
-      case 'closed': return 'text-red-600 bg-red-100';
+      case 'OPEN': return 'text-green-600 bg-green-100';
+      case 'CONGESTED': return 'text-yellow-600 bg-yellow-100'; // This will show as STANDBY with yellow
+      case 'CLOSED': return 'text-red-600 bg-red-100';
+      case 'DANGEROUS': return 'text-red-600 bg-red-100';
       default: return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'OPEN': return 'ACTIVE';
+      case 'CONGESTED': return 'STANDBY'; // Display CONGESTED as STANDBY
+      case 'CLOSED': return 'CLOSED';
+      case 'DANGEROUS': return 'DANGEROUS';
+      default: return status;
     }
   };
 
@@ -96,6 +118,21 @@ export default function EvacuationPlansPage() {
       default: return <MapPin className="h-4 w-4" />;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading evacuation routes...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 p-6">
@@ -129,43 +166,59 @@ export default function EvacuationPlansPage() {
         {/* Evacuation Routes */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {evacuationRoutes[selectedRegion as keyof typeof evacuationRoutes].routes.map((route) => (
-            <div key={route.id} className="bg-white rounded-lg shadow-sm border p-6">
+            <div key={route.id} className="bg-white rounded-lg shadow-sm border p-6 relative">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-semibold text-gray-900">{route.name}</h3>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(route.status)}`}>
-                  {route.status.toUpperCase()}
+                  {getStatusLabel(route.status)}
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{route.distance}</div>
-                  <div className="text-sm text-gray-500">Distance</div>
+                  <div className="text-2xl font-bold text-blue-600">{route.startLocation} → {route.endLocation}</div>
+                  <div className="text-sm text-gray-500">Route</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{route.duration}</div>
+                  <div className="text-2xl font-bold text-green-600">{route.estimatedTime} min</div>
                   <div className="text-sm text-gray-500">Duration</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{route.capacity}</div>
+                  <div className="text-2xl font-bold text-purple-600">{route.capacity} people</div>
                   <div className="text-sm text-gray-500">Capacity</div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900">Checkpoints</h4>
-                {route.checkpoints.map((checkpoint, index) => (
-                  <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                    {getCheckpointIcon(checkpoint.type)}
+                <h4 className="font-medium text-gray-900">Route Details</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <MapPin className="h-4 w-4" />
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{checkpoint.name}</div>
-                      <div className="text-sm text-gray-500 capitalize">
-                        {checkpoint.type} • Capacity: {checkpoint.capacity}
-                      </div>
+                      <div className="font-medium text-gray-900">Transport Type</div>
+                      <div className="text-sm text-gray-500">{route.transportType}</div>
                     </div>
                   </div>
-                ))}
+                  <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <AlertTriangle className="h-4 w-4" />
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">Priority</div>
+                      <div className="text-sm text-gray-500">{route.priority}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
+              
+              {/* DEMO Overlay */}
+              {route.showDemoOverlay && (
+                <div className="absolute inset-0 pointer-events-none">
+                  <img 
+                    src="/demo.png" 
+                    alt="DEMO" 
+                    className="w-full h-full object-cover opacity-30 rounded-lg"
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>

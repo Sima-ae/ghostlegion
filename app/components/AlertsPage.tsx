@@ -14,9 +14,14 @@ interface Alert {
   acknowledgedBy: string[];
   createdAt: string;
   updatedAt: string;
+  showDemoOverlay?: boolean;
 }
 
-export default function AlertsPage() {
+interface AlertsPageProps {
+  isDemoMode?: boolean;
+}
+
+export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
@@ -213,7 +218,7 @@ export default function AlertsPage() {
             {filteredAlerts.length > 0 ? (
               <div className="space-y-4">
                 {filteredAlerts.map((alert) => (
-                  <div key={alert.id} className="bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
+                  <div key={alert.id} className="bg-gray-50 rounded-lg border hover:shadow-md transition-shadow relative">
                     <div className="p-4">
                       <div className="flex items-start space-x-4">
                         <div className="flex-shrink-0">
@@ -247,6 +252,16 @@ export default function AlertsPage() {
                         </div>
                       </div>
                     </div>
+                    {/* DEMO Overlay */}
+                    {alert.showDemoOverlay && (
+                      <div className="absolute inset-0 pointer-events-none">
+                        <img 
+                          src="/demo.png" 
+                          alt="DEMO" 
+                          className="w-full h-full object-cover opacity-30 rounded-lg"
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

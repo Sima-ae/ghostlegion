@@ -9,7 +9,22 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, startLocation, endLocation, waypoints, estimatedTime, status, capacity, transportType, priority } = body;
+    const { 
+      name, 
+      startLocation, 
+      endLocation, 
+      waypoints, 
+      estimatedTime, 
+      status, 
+      capacity, 
+      transportType, 
+      priority,
+      enableNotifications,
+      isPriorityRoute,
+      allowReverseDirection,
+      requiresEscort,
+      showDemoOverlay
+    } = body;
 
     const route = await prisma.evacuationRoute.update({
       where: { id },
@@ -23,6 +38,11 @@ export async function PUT(
         capacity,
         transportType: transportType || 'VEHICLE',
         priority: priority || 'MEDIUM',
+        enableNotifications: enableNotifications || false,
+        isPriorityRoute: isPriorityRoute || false,
+        allowReverseDirection: allowReverseDirection || false,
+        requiresEscort: requiresEscort || false,
+        showDemoOverlay: showDemoOverlay || false,
         updatedAt: new Date()
       }
     });

@@ -20,18 +20,39 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    const {
+      name,
+      startLocation,
+      endLocation,
+      waypoints,
+      estimatedTime,
+      status,
+      capacity,
+      transportType,
+      priority,
+      enableNotifications,
+      isPriorityRoute,
+      allowReverseDirection,
+      requiresEscort,
+      showDemoOverlay
+    } = body;
     
     const route = await prisma.evacuationRoute.create({
       data: {
-        name: body.name,
-        startLocation: body.startLocation,
-        endLocation: body.endLocation,
-        waypoints: body.waypoints || [],
-        estimatedTime: body.estimatedTime,
-        status: body.status || 'OPEN',
-        capacity: body.capacity,
-        transportType: body.transportType || 'VEHICLE',
-        priority: body.priority || 'MEDIUM'
+        name,
+        startLocation,
+        endLocation,
+        waypoints: waypoints || [],
+        estimatedTime,
+        status: status || 'OPEN',
+        capacity,
+        transportType: transportType || 'VEHICLE',
+        priority: priority || 'MEDIUM',
+        enableNotifications: enableNotifications || false,
+        isPriorityRoute: isPriorityRoute || false,
+        allowReverseDirection: allowReverseDirection || false,
+        requiresEscort: requiresEscort || false,
+        showDemoOverlay: showDemoOverlay || false
       }
     });
 

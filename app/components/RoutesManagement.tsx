@@ -30,9 +30,18 @@ interface EvacuationRoute {
   priority: string;
   createdAt: string;
   updatedAt: string;
+  enableNotifications?: boolean;
+  isPriorityRoute?: boolean;
+  allowReverseDirection?: boolean;
+  requiresEscort?: boolean;
+  showDemoOverlay?: boolean;
 }
 
-export default function RoutesManagement() {
+interface RoutesManagementProps {
+  isDemoMode?: boolean;
+}
+
+export default function RoutesManagement({ isDemoMode = false }: RoutesManagementProps) {
   const { data: session } = useSession();
   const [routes, setRoutes] = useState<EvacuationRoute[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -287,7 +296,7 @@ export default function RoutesManagement() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredRoutes.map((route) => (
-                <tr key={route.id} className="hover:bg-gray-50">
+                <tr key={route.id} className="hover:bg-gray-50 relative">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <Route className="h-5 w-5 text-blue-600 mr-3" />
@@ -296,6 +305,16 @@ export default function RoutesManagement() {
                         <div className="text-sm text-gray-500">{route.id}</div>
                       </div>
                     </div>
+                    {/* DEMO Overlay */}
+                    {route.showDemoOverlay && (
+                      <div className="absolute inset-0 pointer-events-none">
+                        <img 
+                          src="/demo.png" 
+                          alt="DEMO" 
+                          className="w-full h-full object-cover opacity-30"
+                        />
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{route.startLocation}</div>
@@ -496,7 +515,12 @@ function EditRouteForm({ route, onSave, onCancel }: EditRouteFormProps) {
     status: route.status,
     capacity: route.capacity,
     transportType: route.transportType,
-    priority: route.priority
+    priority: route.priority,
+    enableNotifications: route.enableNotifications || false,
+    isPriorityRoute: route.isPriorityRoute || false,
+    allowReverseDirection: route.allowReverseDirection || false,
+    requiresEscort: route.requiresEscort || false,
+    showDemoOverlay: route.showDemoOverlay || false
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -504,7 +528,12 @@ function EditRouteForm({ route, onSave, onCancel }: EditRouteFormProps) {
     const updatedRoute = {
       ...route,
       ...formData,
-      waypoints: route.waypoints // Keep existing waypoints
+      waypoints: route.waypoints, // Keep existing waypoints
+      enableNotifications: formData.enableNotifications,
+      isPriorityRoute: formData.isPriorityRoute,
+      allowReverseDirection: formData.allowReverseDirection,
+      requiresEscort: formData.requiresEscort,
+      showDemoOverlay: formData.showDemoOverlay
     };
     onSave(updatedRoute);
   };
@@ -604,6 +633,63 @@ function EditRouteForm({ route, onSave, onCancel }: EditRouteFormProps) {
           <option value="HIGH">High</option>
           <option value="CRITICAL">Critical</option>
         </select>
+      </div>
+      
+      {/* Checkbox Options */}
+      <div className="space-y-3 pt-4 border-t border-gray-200">
+        <h4 className="text-sm font-medium text-gray-700">Route Options</h4>
+        
+        <div className="space-y-2">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.enableNotifications}
+              onChange={(e) => setFormData({...formData, enableNotifications: e.target.checked})}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Enable status change notifications</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.isPriorityRoute}
+              onChange={(e) => setFormData({...formData, isPriorityRoute: e.target.checked})}
+              className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Mark as priority evacuation route</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.allowReverseDirection}
+              onChange={(e) => setFormData({...formData, allowReverseDirection: e.target.checked})}
+              className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Allow reverse direction travel</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.requiresEscort}
+              onChange={(e) => setFormData({...formData, requiresEscort: e.target.checked})}
+              className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Requires security escort</span>
+          </label>
+          
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={formData.showDemoOverlay}
+              onChange={(e) => setFormData({...formData, showDemoOverlay: e.target.checked})}
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span className="ml-2 text-sm text-gray-700">Show DEMO overlay</span>
+          </label>
+        </div>
       </div>
       
       <div className="flex justify-end space-x-3 pt-4">

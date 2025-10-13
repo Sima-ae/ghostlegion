@@ -33,7 +33,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, message, severity, type, location, expiresAt } = body;
+    const { 
+      title, 
+      message, 
+      severity, 
+      type, 
+      location, 
+      expiresAt,
+      notifyUsers,
+      isUrgent,
+      autoResolve,
+      requiresAcknowledgment,
+      showDemoOverlay
+    } = body;
 
     if (!title || !message || !severity || !type) {
       return NextResponse.json(
@@ -54,7 +66,12 @@ export async function POST(request: NextRequest) {
         type: alertType,
         location: location || null,
         expiresAt: expiresAt ? new Date(expiresAt) : null,
-        acknowledgedBy: []
+        acknowledgedBy: [],
+        notifyUsers: notifyUsers || false,
+        isUrgent: isUrgent || false,
+        autoResolve: autoResolve || false,
+        requiresAcknowledgment: requiresAcknowledgment || false,
+        showDemoOverlay: showDemoOverlay || false
       }
     });
 

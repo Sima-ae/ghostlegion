@@ -206,18 +206,23 @@ enum ClearanceLevel {
 }
 
 model EvacuationRoute {
-  id            String        @id @default(cuid())
-  name          String
-  startLocation String
-  endLocation   String
-  waypoints     Json          // Array of [latitude, longitude]
-  estimatedTime Int           // in minutes
-  capacity      Int
-  status        RouteStatus   @default(OPEN)
-  transportType TransportType
-  priority      Priority      @default(MEDIUM)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id                String        @id @default(cuid())
+  name              String
+  startLocation     String
+  endLocation       String
+  waypoints         Json          // Array of [latitude, longitude]
+  estimatedTime     Int           // in minutes
+  capacity          Int
+  status            RouteStatus   @default(OPEN)
+  transportType     TransportType
+  priority          Priority      @default(MEDIUM)
+  enableNotifications Boolean     @default(false)
+  isPriorityRoute   Boolean       @default(false)
+  allowReverseDirection Boolean    @default(false)
+  requiresEscort    Boolean       @default(false)
+  showDemoOverlay   Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }
 
 enum RouteStatus {
@@ -271,16 +276,21 @@ enum ResourceStatus {
 }
 
 model Alert {
-  id            String      @id @default(cuid())
-  title         String
-  message       String
-  severity      Severity
-  type          AlertType
-  location      String?
-  expiresAt     DateTime?
-  acknowledgedBy String[]   // Array of user IDs
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id                    String      @id @default(cuid())
+  title                 String
+  message               String
+  severity              Severity
+  type                  AlertType
+  location              String?
+  expiresAt             DateTime?
+  acknowledgedBy        String[]    // Array of user IDs
+  notifyUsers           Boolean     @default(false)
+  isUrgent              Boolean     @default(false)
+  autoResolve           Boolean     @default(false)
+  requiresAcknowledgment Boolean    @default(false)
+  showDemoOverlay       Boolean     @default(false)
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 }
 
 enum Severity {
