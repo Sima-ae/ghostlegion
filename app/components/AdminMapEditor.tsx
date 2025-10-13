@@ -91,6 +91,7 @@ export default function AdminMapEditor({
     status: 'active' as const,
     facilities: [] as string[],
     contact: '',
+    isPublic: true,
     lastUpdated: new Date().toISOString(),
   });
   const [editingElement, setEditingElement] = useState<MapElement | null>(null);
@@ -281,6 +282,7 @@ export default function AdminMapEditor({
       status: 'active',
       facilities: [],
       contact: '',
+      isPublic: true,
       lastUpdated: new Date().toISOString(),
     });
   };
@@ -741,6 +743,20 @@ export default function AdminMapEditor({
                   onChange={(e) => setNewLocation(prev => ({ ...prev, contact: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-red-600 mb-1">🔒 Visibility</label>
+                <select
+                  value={newLocation.isPublic ? 'public' : 'private'}
+                  onChange={(e) => setNewLocation(prev => ({ ...prev, isPublic: e.target.value === 'public' }))}
+                  className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+                <p className="text-xs text-red-500 mt-1">
+                  Private locations are only visible to logged-in users
+                </p>
               </div>
             </div>
             <div className="flex justify-end space-x-2 mt-6">

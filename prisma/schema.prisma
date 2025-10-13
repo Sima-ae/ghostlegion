@@ -107,6 +107,7 @@ model Location {
   status      LocationStatus @default(ACTIVE)
   facilities  String[]
   contact     String?
+  isPublic    Boolean      @default(true)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }

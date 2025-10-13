@@ -136,7 +136,7 @@ export default function AdminDashboard() {
     routesStatus: 'No routes'
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [locations, setLocations] = useState<Location[]>(sampleLocations);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'map' | 'locations' | 'people' | 'routes' | 'resources' | 'alerts' | 'notifications'>('overview');
   
   // Modal states
@@ -145,6 +145,32 @@ export default function AdminDashboard() {
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Location>>({});
   const [isDemoMode, setIsDemoMode] = useState(false);
+
+  const loadLocations = async () => {
+    try {
+      const response = await fetch('/api/locations?includePrivate=true', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        cache: 'no-cache',
+      });
+      
+      if (response.ok) {
+        const locationsData = await response.json();
+        setLocations(locationsData);
+      } else {
+        console.error('Failed to load locations:', response.status);
+        // Fallback to sample data if API fails
+        setLocations(sampleLocations);
+      }
+    } catch (error) {
+      console.error('Error loading locations:', error);
+      // Fallback to sample data if API fails
+      setLocations(sampleLocations);
+    }
+  };
 
   const loadAdminStats = async (retryCount = 0) => {
     // Only run on client side
@@ -253,6 +279,7 @@ export default function AdminDashboard() {
     setTimeout(() => {
       if (session && session.user) {
         loadAdminStats();
+        loadLocations();
       }
     }, 200);
   }, [session, status, router]);
@@ -274,29 +301,80 @@ export default function AdminDashboard() {
     return null;
   }
 
-  const handleLocationAdd = (locationData: Omit<Location, 'id'>) => {
-    const newLocation: Location = {
-      ...locationData,
-      id: Date.now().toString(),
-      lastUpdated: new Date().toISOString()
-    };
-    setLocations(prev => [...prev, newLocation]);
-    setStats(prev => ({ ...prev, totalLocations: prev.totalLocations + 1 }));
+  const handleLocationAdd = async (locationData: Omit<Location, 'id'>) => {
+    try {
+      const response = await fetch('/api/locations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(locationData),
+      });
+
+      if (response.ok) {
+        const newLocation = await response.json();
+        setLocations(prev => [...prev, newLocation]);
+        setStats(prev => ({ ...prev, totalLocations: prev.totalLocations + 1 }));
+      } else {
+        console.error('Failed to create location:', response.status);
+        alert('Failed to create location');
+      }
+    } catch (error) {
+      console.error('Error creating location:', error);
+      alert('Failed to create location');
+    }
   };
 
-  const handleLocationUpdate = (id: string, updates: Partial<Location>) => {
-    setLocations(prev => 
-      prev.map(loc => 
-        loc.id === id 
-          ? { ...loc, ...updates, lastUpdated: new Date().toISOString() }
-          : loc
-      )
-    );
+  const handleLocationUpdate = async (id: string, updates: Partial<Location>) => {
+    try {
+      const response = await fetch(`/api/locations/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+
+      if (response.ok) {
+        const updatedLocation = await response.json();
+        setLocations(prev => 
+          prev.map(loc => 
+            loc.id === id ? updatedLocation : loc
+          )
+        );
+      } else {
+        console.error('Failed to update location:', response.status);
+        alert('Failed to update location');
+      }
+    } catch (error) {
+      console.error('Error updating location:', error);
+      alert('Failed to update location');
+    }
   };
 
-  const handleLocationDelete = (id: string) => {
-    setLocations(prev => prev.filter(loc => loc.id !== id));
-    setStats(prev => ({ ...prev, totalLocations: prev.totalLocations - 1 }));
+  const handleLocationDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/locations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (response.ok) {
+        setLocations(prev => prev.filter(loc => loc.id !== id));
+        setStats(prev => ({ ...prev, totalLocations: prev.totalLocations - 1 }));
+      } else {
+        console.error('Failed to delete location:', response.status);
+        alert('Failed to delete location');
+      }
+    } catch (error) {
+      console.error('Error deleting location:', error);
+      alert('Failed to delete location');
+    }
   };
 
   const handleViewLocation = (location: Location) => {
@@ -314,28 +392,42 @@ export default function AdminDashboard() {
       capacity: location.capacity,
       coordinates: location.coordinates,
       facilities: location.facilities,
-      contact: location.contact
+      contact: location.contact,
+      isPublic: location.isPublic
     });
     setEditModalOpen(true);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (selectedLocation && editFormData) {
-      const updatedLocation: Location = {
-        ...selectedLocation,
-        ...editFormData,
-        lastUpdated: new Date().toISOString()
-      };
-      
-      setLocations(prev => 
-        prev.map(loc => 
-          loc.id === selectedLocation.id ? updatedLocation : loc
-        )
-      );
-      
-      setEditModalOpen(false);
-      setSelectedLocation(null);
-      setEditFormData({});
+      try {
+        const response = await fetch(`/api/locations/${selectedLocation.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(editFormData),
+        });
+
+        if (response.ok) {
+          const updatedLocation = await response.json();
+          setLocations(prev => 
+            prev.map(loc => 
+              loc.id === selectedLocation.id ? updatedLocation : loc
+            )
+          );
+          setEditModalOpen(false);
+          setSelectedLocation(null);
+          setEditFormData({});
+        } else {
+          console.error('Failed to update location:', response.status);
+          alert('Failed to update location');
+        }
+      } catch (error) {
+        console.error('Error updating location:', error);
+        alert('Failed to update location');
+      }
     }
   };
 
@@ -760,6 +852,7 @@ export default function AdminDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Capacity</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visibility</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
@@ -779,15 +872,24 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          location.status === 'active' 
+                          location.status?.toLowerCase() === 'active' 
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {location.status.toUpperCase()}
+                          {location.status?.toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {location.capacity}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          location.isPublic === false 
+                            ? 'bg-red-100 text-red-800' 
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {location.isPublic === false ? 'PRIVATE' : 'PUBLIC'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
@@ -890,6 +992,21 @@ export default function AdminDashboard() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Contact</label>
                   <p className="text-gray-900 bg-gray-50 p-3 rounded-md">{selectedLocation.contact || 'N/A'}</p>
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-red-600 mb-1">🔒 Visibility</label>
+                <p className="text-gray-900 bg-gray-50 p-3 rounded-md">
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    selectedLocation.isPublic === false 
+                      ? 'bg-red-100 text-red-800' 
+                      : 'bg-green-100 text-green-800'
+                  }`}>
+                    {selectedLocation.isPublic === false ? 'PRIVATE' : 'PUBLIC'}
+                  </span>
+                  {selectedLocation.isPublic === false && (
+                    <span className="text-xs text-red-500 ml-2">(Only visible to logged-in users)</span>
+                  )}
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Facilities</label>
@@ -1014,16 +1131,30 @@ export default function AdminDashboard() {
                     min="0"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact</label>
-                  <input
-                    type="text"
-                    value={editFormData.contact || ''}
-                    onChange={(e) => setEditFormData({...editFormData, contact: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter contact information"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Contact</label>
+                <input
+                  type="text"
+                  value={editFormData.contact || ''}
+                  onChange={(e) => setEditFormData({...editFormData, contact: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter contact information"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-red-600 mb-1">🔒 Visibility</label>
+                <select
+                  value={editFormData.isPublic === true ? 'public' : editFormData.isPublic === false ? 'private' : 'public'}
+                  onChange={(e) => setEditFormData({...editFormData, isPublic: e.target.value === 'public'})}
+                  className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+                <p className="text-xs text-red-500 mt-1">
+                  Private locations are only visible to logged-in users
+                </p>
+              </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Facilities</label>

@@ -525,7 +525,7 @@ export default function NotificationManagement() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                    <label className="block text-sm font-medium text-red-600 mb-1">🔒 Visibility</label>
                     <div className="flex items-center">
                       {selectedNotification.isPublic ? (
                         <>
@@ -534,8 +534,8 @@ export default function NotificationManagement() {
                         </>
                       ) : (
                         <>
-                          <Users className="h-4 w-4 text-blue-500 mr-1" />
-                          <span className="text-sm text-blue-600">Private</span>
+                          <Users className="h-4 w-4 text-red-500 mr-1" />
+                          <span className="text-sm text-red-600">Private</span>
                         </>
                       )}
                     </div>
@@ -659,11 +659,11 @@ export default function NotificationManagement() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                    <label className="block text-sm font-medium text-red-600 mb-1">🔒 Visibility</label>
                     <select
                       name="visibility"
                       defaultValue={editingNotification.isPublic ? 'public' : 'private'}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                       <option value="public">Public</option>
                       <option value="private">Private</option>
@@ -775,11 +775,11 @@ export default function NotificationManagement() {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
+                    <label className="block text-sm font-medium text-red-600 mb-1">🔒 Visibility</label>
                     <select
                       name="visibility"
                       defaultValue="public"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
                       <option value="public">Public</option>
                       <option value="private">Private</option>

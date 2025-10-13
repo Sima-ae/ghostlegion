@@ -8,6 +8,7 @@ export interface Location {
   status: 'active' | 'inactive' | 'damaged' | 'under_construction';
   facilities: string[];
   contact?: string;
+  isPublic?: boolean;
   lastUpdated: string;
 }
 

@@ -221,8 +221,8 @@ export default function NotificationSender({
 
           {/* Visibility */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Visibility
+            <label className="block text-sm font-medium text-red-600 mb-2">
+              🔒 Visibility
             </label>
             <div className="space-y-2">
               <label className="flex items-center">
@@ -231,7 +231,7 @@ export default function NotificationSender({
                   name="visibility"
                   checked={formData.isPublic}
                   onChange={() => setFormData({...formData, isPublic: true})}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-red-300"
                 />
                 <span className="ml-2 flex items-center">
                   <Globe className="h-4 w-4 mr-1" />
@@ -244,7 +244,7 @@ export default function NotificationSender({
                   name="visibility"
                   checked={!formData.isPublic}
                   onChange={() => setFormData({...formData, isPublic: false})}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-red-300"
                 />
                 <span className="ml-2 flex items-center">
                   <Users className="h-4 w-4 mr-1" />

@@ -11,6 +11,7 @@ export const sampleLocations: Location[] = [
     status: 'active',
     facilities: ['Communications', 'Medical Post', 'Storage', 'Sleeping Quarters'],
     contact: '+31 20 1234567',
+    isPublic: true,
     lastUpdated: '2024-01-15T10:30:00Z'
   },
   {
@@ -23,6 +24,7 @@ export const sampleLocations: Location[] = [
     status: 'active',
     facilities: ['Command Center', 'Communications', 'Medical Facilities', 'Storage'],
     contact: '+31 70 1234567',
+    isPublic: false,
     lastUpdated: '2024-01-15T09:15:00Z'
   },
   {
@@ -35,6 +37,7 @@ export const sampleLocations: Location[] = [
     status: 'active',
     facilities: ['Medical Post', 'Dining Hall', 'Sleeping Quarters', 'Sanitary Facilities'],
     contact: '+31 20 5492222',
+    isPublic: true,
     lastUpdated: '2024-01-15T11:00:00Z'
   },
   {
@@ -47,6 +50,7 @@ export const sampleLocations: Location[] = [
     status: 'active',
     facilities: ['Operating Rooms', 'ICU', 'X-Ray', 'Pharmacy', 'Helipad'],
     contact: '+31 88 7555555',
+    isPublic: true,
     lastUpdated: '2024-01-15T08:45:00Z'
   },
   {
@@ -59,6 +63,7 @@ export const sampleLocations: Location[] = [
     status: 'active',
     facilities: ['Communications', 'Storage', 'Sleeping Quarters'],
     contact: '+31 43 1234567',
+    isPublic: false,
     lastUpdated: '2024-01-15T07:30:00Z'
   }
 ];

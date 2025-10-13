@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -33,16 +33,68 @@ export default function Home() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('map');
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(true);
+
+  // Load locations from API
+  const loadLocations = async () => {
+    try {
+      setIsLoadingLocations(true);
+      // Use includePrivate=true if user is logged in
+      const url = session?.user ? '/api/locations?includePrivate=true' : '/api/locations';
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        cache: 'no-cache',
+      });
+      
+      if (response.ok) {
+        const locationsData = await response.json();
+        setLocations(locationsData);
+      } else {
+        console.error('Failed to load locations:', response.status);
+        // Fallback to sample data if API fails
+        setLocations(sampleLocations);
+      }
+    } catch (error) {
+      console.error('Error loading locations:', error);
+      // Fallback to sample data if API fails
+      setLocations(sampleLocations);
+    } finally {
+      setIsLoadingLocations(false);
+    }
+  };
+
+  // Load locations when component mounts or session changes
+  useEffect(() => {
+    loadLocations();
+  }, [session]);
+
+  // Filter locations based on authentication status
+  const filteredLocations = locations; // No need to filter here since API handles it
 
   // Admin users can access both public and admin areas
 
   const renderContent = () => {
     switch (activeTab) {
       case 'map':
+        if (isLoadingLocations) {
+          return (
+            <div className="h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] bg-gray-200 rounded-lg flex items-center justify-center">
+              <div className="text-gray-500 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                <div>Loading locations...</div>
+              </div>
+            </div>
+          );
+        }
         return (
           <div className="h-full">
             <MapComponent 
-              locations={sampleLocations}
+              locations={filteredLocations}
               selectedLocation={selectedLocation}
               onLocationSelect={setSelectedLocation}
             />
@@ -68,7 +120,7 @@ export default function Home() {
         return (
           <div className="h-full">
             <MapComponent 
-              locations={sampleLocations}
+              locations={filteredLocations}
               selectedLocation={selectedLocation}
               onLocationSelect={setSelectedLocation}
             />
