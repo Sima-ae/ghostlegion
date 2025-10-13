@@ -54,6 +54,29 @@ model User {
   people People?
 }
 
+model Notification {
+  id          String             @id @default(cuid())
+  title       String
+  message     String
+  type        NotificationType    @default(INFO)
+  priority    NotificationPriority @default(MEDIUM)
+  isRead      Boolean            @default(false)
+  isPublic    Boolean            @default(true)
+  targetUsers String[]           // Array of user IDs for targeted notifications
+  readByUsers String[]           // Array of user IDs who have read this notification
+  readByIPs   String[]           // Array of IP addresses that have read this notification
+  expiresAt   DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  
+  // Approval workflow fields
+  isApproved  Boolean            @default(false)
+  approvedBy  String?            // User ID of admin who approved
+  approvedAt  DateTime?
+  createdBy   String?            // User ID of who created the notification
+  status      NotificationStatus @default(PENDING)
+}
+
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -334,4 +357,25 @@ enum RiskLevel {
   HIGH
   MEDIUM
   LOW
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ALERT
+  EMERGENCY
+  SYSTEM
+}
+
+enum NotificationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum NotificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

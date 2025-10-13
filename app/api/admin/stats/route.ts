@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
       totalRoutes,
       totalResources,
       totalAlerts,
+      totalNotifications,
       activeUsers,
       recentUsers,
       recentLocations,
@@ -26,6 +27,7 @@ export async function GET(request: NextRequest) {
       peopleThisWeek,
       resourcesThisWeek,
       alertsThisWeek,
+      notificationsThisWeek,
       // Monthly changes
       locationsThisMonth,
       // Daily changes
@@ -38,6 +40,7 @@ export async function GET(request: NextRequest) {
       prisma.evacuationRoute.count(),
       prisma.resource.count(),
       prisma.alert.count(),
+      prisma.notification.count(),
       prisma.user.count({ where: { isActive: true } }),
       prisma.user.findMany({
         take: 5,
@@ -66,6 +69,7 @@ export async function GET(request: NextRequest) {
       prisma.people.count({ where: { createdAt: { gte: oneWeekAgo } } }),
       prisma.resource.count({ where: { createdAt: { gte: oneWeekAgo } } }),
       prisma.alert.count({ where: { createdAt: { gte: oneWeekAgo } } }),
+      prisma.notification.count({ where: { createdAt: { gte: oneWeekAgo } } }),
       // Monthly counts
       prisma.location.count({ where: { createdAt: { gte: oneMonthAgo } } }),
       // Daily counts
@@ -130,6 +134,7 @@ export async function GET(request: NextRequest) {
     const activeUsersChange = usersToday > 0 ? `+${usersToday} today` : '0 today';
     const resourcesChange = resourcesThisWeek > 0 ? `+${resourcesThisWeek} this week` : '0 this week';
     const alertsChange = alertsYesterday > 0 ? `+${alertsYesterday} since yesterday` : '0 since yesterday';
+    const notificationsChange = notificationsThisWeek > 0 ? `+${notificationsThisWeek} this week` : '0 this week';
     const routesStatus = totalRoutes > 0 ? 'All operational' : 'No routes';
 
     const stats = {
@@ -139,6 +144,7 @@ export async function GET(request: NextRequest) {
       totalRoutes,
       totalResources,
       totalAlerts,
+      totalNotifications,
       activeUsers,
       recentActivity,
       recentUsers: recentUsers.map(user => ({
@@ -157,6 +163,7 @@ export async function GET(request: NextRequest) {
       activeUsersChange,
       resourcesChange,
       alertsChange,
+      notificationsChange,
       routesStatus
     };
 

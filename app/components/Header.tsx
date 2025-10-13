@@ -1,14 +1,73 @@
 'use client';
 
-import { Bell, Search, User, Settings, LogOut, Shield } from 'lucide-react';
-import { useState } from 'react';
+import { Bell, Search, User, Settings, LogOut, Shield, Send } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import NotificationDropdown from './NotificationDropdown';
+import NotificationPopup from './NotificationPopup';
+import NotificationSender from './NotificationSender';
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'INFO' | 'WARNING' | 'ALERT' | 'EMERGENCY' | 'SYSTEM';
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  isRead: boolean;
+  isPublic: boolean;
+  createdAt: string;
+  expiresAt?: string;
+}
 
 export default function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isNotificationSenderOpen, setIsNotificationSenderOpen] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [isNotificationPopupOpen, setIsNotificationPopupOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { data: session } = useSession();
   const router = useRouter();
+
+  // Check if user is admin or super admin
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
+
+  // Load unread count on component mount
+  useEffect(() => {
+    loadUnreadCount();
+  }, []);
+
+  const loadUnreadCount = async () => {
+    try {
+      const response = await fetch('/api/notifications?limit=1');
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadCount(data.unreadCount);
+      }
+    } catch (error) {
+      console.error('Error loading unread count:', error);
+    }
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    setSelectedNotification(notification);
+    setIsNotificationPopupOpen(true);
+    setIsNotificationOpen(false);
+    // Update unread count immediately
+    if (!notification.isRead) {
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    }
+  };
+
+  const handleViewAllNotifications = () => {
+    router.push('/notifications');
+  };
+
+  const handleNotificationSent = () => {
+    loadUnreadCount(); // Refresh unread count
+    setIsNotificationSenderOpen(false);
+  };
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/auth/signin' });
@@ -48,11 +107,38 @@ export default function Header() {
 
           {/* Right side icons and login - Right Side */}
           <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
+            {/* Send Notification (All logged-in users) */}
+            {session && (
+              <button 
+                onClick={() => setIsNotificationSenderOpen(true)}
+                className="p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                title="Send Notification"
+              >
+                <Send className="h-5 w-5 sm:h-6 sm:w-6" />
+              </button>
+            )}
+
             {/* Notifications */}
-            <button className="relative p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
-              <Bell className="h-5 w-5 sm:h-6 sm:w-6" />
-              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-gray-900"></span>
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                className="relative p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md touch-manipulation"
+              >
+                <Bell className="h-5 w-5 sm:h-6 sm:w-6" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-3 w-3 sm:h-4 sm:w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              
+              <NotificationDropdown
+                isOpen={isNotificationOpen}
+                onClose={() => setIsNotificationOpen(false)}
+                onNotificationClick={handleNotificationClick}
+                onViewAll={handleViewAllNotifications}
+              />
+            </div>
 
             {/* Settings */}
             <button className="p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
@@ -116,6 +202,22 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      {/* Notification Components */}
+      <NotificationSender
+        isOpen={isNotificationSenderOpen}
+        onClose={() => setIsNotificationSenderOpen(false)}
+        onSuccess={handleNotificationSent}
+      />
+
+      <NotificationPopup
+        notification={selectedNotification}
+        isOpen={isNotificationPopupOpen}
+        onClose={() => {
+          setIsNotificationPopupOpen(false);
+          setSelectedNotification(null);
+        }}
+      />
     </header>
   );
 }

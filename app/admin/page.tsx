@@ -20,7 +20,8 @@ import {
   Map,
   Layers,
   X,
-  Check
+  Check,
+  Bell
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -29,6 +30,7 @@ import PeopleManagement from '../components/PeopleManagement';
 import RoutesManagement from '../components/RoutesManagement';
 import ResourcesManagement from '../components/ResourcesManagement';
 import AlertsManagement from '../components/AlertsManagement';
+import NotificationManagement from '../components/NotificationManagement';
 import { sampleLocations } from '../data/sampleData';
 import { Location } from '../types';
 
@@ -81,6 +83,7 @@ interface AdminStats {
   totalRoutes: number;
   totalResources: number;
   totalAlerts: number;
+  totalNotifications: number;
   activeUsers: number;
   recentActivity: any[];
   recentUsers: {
@@ -104,6 +107,7 @@ interface AdminStats {
   activeUsersChange: string;
   resourcesChange: string;
   alertsChange: string;
+  notificationsChange: string;
   routesStatus: string;
 }
 
@@ -117,6 +121,7 @@ export default function AdminDashboard() {
     totalRoutes: 0,
     totalResources: 0,
     totalAlerts: 0,
+    totalNotifications: 0,
     activeUsers: 0,
     recentActivity: [],
     recentUsers: [],
@@ -127,11 +132,12 @@ export default function AdminDashboard() {
     activeUsersChange: '0 today',
     resourcesChange: '0 this week',
     alertsChange: '0 since yesterday',
+    notificationsChange: '0 this week',
     routesStatus: 'No routes'
   });
   const [isLoading, setIsLoading] = useState(true);
   const [locations, setLocations] = useState<Location[]>(sampleLocations);
-  const [activeTab, setActiveTab] = useState<'overview' | 'map' | 'locations' | 'people' | 'routes' | 'resources' | 'alerts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'map' | 'locations' | 'people' | 'routes' | 'resources' | 'alerts' | 'notifications'>('overview');
   
   // Modal states
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -168,6 +174,7 @@ export default function AdminDashboard() {
           totalRoutes: 12,
           totalResources: 45,
           totalAlerts: 8,
+          totalNotifications: 6,
           activeUsers: 23,
           recentActivity: [
             { id: 1, action: 'New user registered', user: 'John Doe', time: '2 minutes ago' },
@@ -182,6 +189,7 @@ export default function AdminDashboard() {
           activeUsersChange: '0 today',
           resourcesChange: '0 this week',
           alertsChange: '0 since yesterday',
+          notificationsChange: '0 this week',
           routesStatus: 'All operational'
         });
       }
@@ -205,6 +213,7 @@ export default function AdminDashboard() {
         totalRoutes: 12,
         totalResources: 45,
         totalAlerts: 8,
+        totalNotifications: 6,
         activeUsers: 23,
         recentActivity: [
           { id: 1, action: 'New user registered', user: 'John Doe', time: '2 minutes ago' },
@@ -219,6 +228,7 @@ export default function AdminDashboard() {
         activeUsersChange: '0 today',
         resourcesChange: '0 this week',
         alertsChange: '0 since yesterday',
+        notificationsChange: '0 this week',
         routesStatus: 'All operational'
       });
     } finally {
@@ -396,6 +406,13 @@ export default function AdminDashboard() {
       icon: AlertTriangle,
       color: 'text-red-600 bg-red-100',
       change: stats.alertsChange
+    },
+    {
+      title: 'Notifications',
+      value: stats.totalNotifications,
+      icon: Bell,
+      color: 'text-blue-600 bg-blue-100',
+      change: stats.notificationsChange
     }
   ];
 
@@ -451,6 +468,7 @@ export default function AdminDashboard() {
                 { id: 'routes', label: 'Routes', icon: Route },
                 { id: 'resources', label: 'Resources', icon: Package },
                 { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
+                { id: 'notifications', label: 'Notifications', icon: Bell },
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -822,6 +840,10 @@ export default function AdminDashboard() {
         {/* Alerts Management */}
         {activeTab === 'alerts' && (
           <AlertsManagement isDemoMode={isDemoMode} />
+        )}
+
+        {activeTab === 'notifications' && (
+          <NotificationManagement />
         )}
       </div>
 
