@@ -38,14 +38,16 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
   // Check if user is admin or super admin
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
 
-  const mainMenuItems = [
-    { id: 'map', label: 'Map', icon: Map, isPublic: true },
+  // Emergency items at the top
+  const emergencyItems = [
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle, isPublic: true },
-    
     { id: 'emergency-checklist', label: 'Emergency Checklist', icon: AlertTriangle, isPublic: true },
     { id: 'evacuation', label: 'Evacuation Plans', icon: Route, isPublic: true },
-    
-    { id: 'resources', label: 'Resources', icon: Package, isPublic: false, requiresAdmin: true },
+  ];
+
+  // Main menu items (excluding emergency items and resources)
+  const mainMenuItems = [
+    { id: 'map', label: 'Map', icon: Map, isPublic: true },
     { id: 'security', label: 'Defense and Security', icon: Shield, isPublic: false },
     { id: 'shelter', label: 'Shelter and Housing', icon: Home, isPublic: false },
     { id: 'food-water', label: 'Food and Water Supply', icon: Utensils, isPublic: false },
@@ -61,13 +63,11 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
     { id: 'childcare', label: 'Childcare and Education', icon: BookOpen, isPublic: false },
     { id: 'mental-health', label: 'Mental and Emotional Su...', icon: Users, isPublic: false },
     { id: 'legal', label: 'Legal and Administrative...', icon: Gavel, isPublic: false },
-    
-    
   ];
 
   const communitySpaces = [
-    { id: 'join-us', label: '- Join Us Today -', icon: MessageSquare, isPublic: true },
-    
+    { id: 'join-us', label: 'Join Us Today!', icon: MessageSquare, isPublic: true },
+    { id: 'resources', label: 'Resources', icon: Package, isPublic: false, requiresAdmin: true },
   ];
 
   return (
@@ -75,8 +75,8 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
       isCollapsed ? 'w-16 lg:w-20' : 'w-full lg:w-80'
     } border-r border-gray-200 flex-shrink-0`}>
       <div className="flex flex-col h-full">
-        {/* Community Section - Moved to top */}
         <nav className="flex-1 p-4 space-y-2">
+          {/* Community Section - At the top */}
           <div className="space-y-1">
             <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
               {!isCollapsed && <span>Community</span>}
@@ -84,6 +84,12 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
             <div className="space-y-1">
               {communitySpaces.map((space) => {
                 const Icon = space.icon;
+                
+                // Hide Resources if user is not admin
+                if (space.id === 'resources' && !isAdmin) {
+                  return null;
+                }
+                
                 return (
                   <button
                     key={space.id}
@@ -101,7 +107,7 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
                         {!space.isPublic && (
                           <Lock className="h-3 w-3 text-gray-400 ml-2" />
                         )}
-                        {space.isPublic && space.id === 'join' && (
+                        {space.isPublic && (
                           <Unlock className="h-3 w-3 text-green-500 ml-2" />
                         )}
                       </div>
@@ -112,19 +118,55 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
             </div>
           </div>
 
-          {/* Menu */}
-          <div className="mt-6">
+          {/* Spacing between Community and Information */}
+          <div className="py-4">
+            <div className="border-t border-gray-200"></div>
+          </div>
+
+          {/* Information Section */}
+          <div className="space-y-1">
+            <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
+              {!isCollapsed && <span>Information</span>}
+            </div>
+            <div className="space-y-1">
+              {emergencyItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => onTabChange(item.id)}
+                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                      activeTab === item.id
+                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                        : 'text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
+                    {!isCollapsed && (
+                      <div className="flex-1 flex items-center justify-between">
+                        <span>{item.label}</span>
+                        <Unlock className="h-3 w-3 text-green-500 ml-2" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Spacing between Information and Menu */}
+          <div className="py-4">
+            <div className="border-t border-gray-200"></div>
+          </div>
+
+          {/* Main Menu */}
+          <div className="space-y-1">
             <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
               {!isCollapsed && <span>Menu</span>}
             </div>
             <div className="space-y-1">
               {mainMenuItems.map((item) => {
                 const Icon = item.icon;
-                
-                // Hide Resources if user is not admin
-                if (item.id === 'resources' && !isAdmin) {
-                  return null;
-                }
                 
                 return (
                   <button
