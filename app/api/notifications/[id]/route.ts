@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
-import { PrismaClient } from '@prisma/client';
+import { db } from '@/app/lib/db';
 import { getClientIP, getNotificationReadCookie, setNotificationReadCookie } from '@/app/lib/notification-utils';
-
-const prisma = new PrismaClient();
 
 // GET /api/notifications/[id] - Get specific notification
 export async function GET(
@@ -19,7 +17,7 @@ export async function GET(
     const ip = getClientIP(request);
     const cookieReadNotifications = getNotificationReadCookie(request);
 
-    const notification = await prisma.notification.findUnique({
+    const notification = await db.notification.findUnique({
       where: { id }
     });
 
@@ -103,7 +101,7 @@ export async function PUT(
         );
       }
 
-      const notification = await prisma.notification.findUnique({
+      const notification = await db.notification.findUnique({
         where: { id }
       });
 
@@ -115,7 +113,7 @@ export async function PUT(
       }
 
       // Update notification
-      const updatedNotification = await prisma.notification.update({
+      const updatedNotification = await db.notification.update({
         where: { id },
         data: {
           title: body.title,
@@ -138,7 +136,7 @@ export async function PUT(
         );
       }
 
-      const notification = await prisma.notification.findUnique({
+      const notification = await db.notification.findUnique({
         where: { id }
       });
 
@@ -150,7 +148,7 @@ export async function PUT(
       }
 
       // Update notification status
-      const updatedNotification = await prisma.notification.update({
+      const updatedNotification = await db.notification.update({
         where: { id },
         data: {
           status: body.action === 'approve' ? 'APPROVED' : 'REJECTED',
@@ -168,7 +166,7 @@ export async function PUT(
       const ip = getClientIP(request);
       const cookieReadNotifications = getNotificationReadCookie(request);
 
-      const notification = await prisma.notification.findUnique({
+      const notification = await db.notification.findUnique({
         where: { id }
       });
 
@@ -197,7 +195,7 @@ export async function PUT(
 
       // Update read status based on user, IP, or cookies
       let updateData: any = {};
-      let response = NextResponse.json({});
+      let response: NextResponse = NextResponse.json({});
       
       if (session?.user?.id) {
         // For logged-in users, add to readByUsers array
@@ -219,7 +217,7 @@ export async function PUT(
 
       // Only update if there's something to update
       if (Object.keys(updateData).length > 0) {
-        const updatedNotification = await prisma.notification.update({
+        const updatedNotification = await db.notification.update({
           where: { id },
           data: updateData
         });
@@ -283,7 +281,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.notification.delete({
+    await db.notification.delete({
       where: { id }
     });
 

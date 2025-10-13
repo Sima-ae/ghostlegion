@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       }
     } else {
       // Get only approved public notifications for non-logged-in users
-      notifications = await prisma.notification.findMany({
+      notifications = await db.notification.findMany({
         where: {
           status: 'APPROVED', // Only show approved notifications
           isPublic: true,
