@@ -24,6 +24,7 @@ import {
   Unlock
 } from 'lucide-react';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 
 interface PublicSidebarProps {
   activeTab: string;
@@ -31,7 +32,11 @@ interface PublicSidebarProps {
 }
 
 export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarProps) {
+  const { data: session } = useSession();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Check if user is admin or super admin
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
 
   const mainMenuItems = [
     { id: 'map', label: 'Map', icon: Map, isPublic: true },
@@ -40,7 +45,7 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
     { id: 'emergency-checklist', label: 'Emergency Checklist', icon: AlertTriangle, isPublic: true },
     { id: 'evacuation', label: 'Evacuation Plans', icon: Route, isPublic: true },
     
-    { id: 'resources', label: 'Resources', icon: Package, isPublic: true },
+    { id: 'resources', label: 'Resources', icon: Package, isPublic: false, requiresAdmin: true },
     { id: 'security', label: 'Defense and Security', icon: Shield, isPublic: false },
     { id: 'shelter', label: 'Shelter and Housing', icon: Home, isPublic: false },
     { id: 'food-water', label: 'Food and Water Supply', icon: Utensils, isPublic: false },
@@ -115,6 +120,12 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
             <div className="space-y-1">
               {mainMenuItems.map((item) => {
                 const Icon = item.icon;
+                
+                // Hide Resources if user is not admin
+                if (item.id === 'resources' && !isAdmin) {
+                  return null;
+                }
+                
                 return (
                   <button
                     key={item.id}
@@ -126,7 +137,17 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
                     }`}
                   >
                     <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
-                    {!isCollapsed && <span>{item.label}</span>}
+                    {!isCollapsed && (
+                      <div className="flex-1 flex items-center justify-between">
+                        <span>{item.label}</span>
+                        {!item.isPublic && (
+                          <Lock className="h-3 w-3 text-gray-400 ml-2" />
+                        )}
+                        {item.isPublic && (
+                          <Unlock className="h-3 w-3 text-green-500 ml-2" />
+                        )}
+                      </div>
+                    )}
                   </button>
                 );
               })}

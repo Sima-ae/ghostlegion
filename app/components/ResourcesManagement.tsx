@@ -44,7 +44,7 @@ export default function ResourcesManagement() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
-    if (session?.user?.role === 'ADMIN') {
+    if (session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN') {
       setIsAdmin(true);
     }
     loadResources();
@@ -157,6 +157,24 @@ export default function ResourcesManagement() {
       console.error('Error updating resource:', error);
     }
   };
+
+  // Show access denied if not admin
+  if (!isAdmin) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Restricted</h2>
+          <p className="text-gray-600 mb-4">
+            You need administrator privileges to access the Resources Management.
+          </p>
+          <p className="text-sm text-gray-500">
+            Please contact your system administrator for access.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

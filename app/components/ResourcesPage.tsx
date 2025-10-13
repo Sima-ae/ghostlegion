@@ -55,8 +55,8 @@ export default function ResourcesPage() {
   const [sortBy, setSortBy] = useState<string>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Check if user is admin
-  const isAdmin = session?.user?.role === 'ADMIN';
+  // Check if user is admin or super admin
+  const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
   const isLoggedIn = !!session;
 
   // Load resources from database
@@ -192,6 +192,28 @@ export default function ResourcesPage() {
     });
   };
 
+
+  // Show access denied if not admin
+  if (!isAdmin) {
+    return (
+      <div className="bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Restricted</h2>
+              <p className="text-gray-600 mb-4">
+                You need administrator privileges to access the Resources Management page.
+              </p>
+              <p className="text-sm text-gray-500">
+                Please contact your system administrator for access.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
