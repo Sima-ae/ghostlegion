@@ -46,8 +46,8 @@ export default function SignIn() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="bg-gray-900 p-3 rounded-full">
-            <Shield className="h-8 w-8 text-white" />
+          <div className="p-3 rounded-full">
+            <Shield className="h-8 w-8 text-gray-900" />
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

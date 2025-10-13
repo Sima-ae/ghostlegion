@@ -79,15 +79,12 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 w-full">
           {/* Logo and Title - Left Side */}
           <div className="flex items-center flex-shrink-0 min-w-0">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
-              <span className="text-white font-bold text-sm">G</span>
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center mr-1 sm:mr-2">
+              <Shield className="h-8 w-8 text-white" />
             </div>
-            <div className="hidden sm:block min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold truncate">Ghost Legion</h1>
-              <p className="text-xs text-gray-400 truncate">We analyze, we hunt, we strike!</p>
-            </div>
-            <div className="block sm:hidden">
-              <h1 className="text-lg font-bold">GL</h1>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-lg md:text-xl font-bold truncate">Ghost Legion</h1>
+              <p className="text-xs text-gray-400 truncate hidden sm:block">We analyze, we hunt, we strike!</p>
             </div>
           </div>
 

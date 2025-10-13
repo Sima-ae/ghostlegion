@@ -16,6 +16,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Ghost Legion - Military Preparedness & Community Management",
   description: "Comprehensive military preparedness platform for the Netherlands with evacuation plans, location mapping, and community management",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
