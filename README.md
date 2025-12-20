@@ -231,12 +231,35 @@ The application is fully responsive and works on:
 - **Interactive Elements**: Hover effects and smooth transitions
 - **Accessibility**: Screen reader friendly and keyboard navigation
 
-## 🔒 Security Considerations
+## 🔒 Security
 
+### Security Updates Applied
+- ✅ **React 19.1.4**: Fixed CVE-2025-55184 (DoS) and CVE-2025-55183 (Source Code Exposure)
+- ✅ **Next.js 15.5.9**: Fixed RCE, Source Code Exposure, and DoS vulnerabilities
+- ✅ **NextAuth 4.24.13**: Fixed email misdelivery vulnerability
+- ✅ **Security Headers**: Configured in `next.config.ts`
+- ✅ **No Hardcoded Secrets**: All credentials use environment variables
+- ✅ **Input Sanitization**: No XSS vulnerabilities detected
+
+### Environment Variables Required
+See `SECURITY.md` for detailed security documentation.
+
+**Required for production:**
+- `DATABASE_URL` - Database connection string
+- `NEXTAUTH_URL` - Application URL (e.g., https://your-domain.com)
+- `NEXTAUTH_SECRET` - Generate with: `openssl rand -base64 32`
+
+**For development seeding:**
+- `ADMIN_EMAIL` - Admin user email
+- `ADMIN_PASSWORD` - Admin user password
+
+### Security Features
 - Role-based access control
 - Clearance level management
-- Secure data handling
-- Privacy protection for sensitive information
+- Secure password hashing (bcrypt)
+- JWT-based session management
+- Security headers (HSTS, XSS Protection, etc.)
+- Environment variable protection
 
 ## 📄 License
 

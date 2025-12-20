@@ -61,39 +61,19 @@ You'll need to create an admin user in your production database. You can either:
 npx prisma studio
 ```
 
-#### Option B: Create a production seed script
-Create a script to add the admin user to production:
+#### Option B: Use the seed script with environment variables
+Set environment variables and run the seed script:
 
 ```bash
-# Create a production admin user
-node -e "
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
+# Set admin credentials as environment variables
+export ADMIN_EMAIL=your-admin-email@example.com
+export ADMIN_PASSWORD=your-secure-password-here
 
-const prisma = new PrismaClient();
-
-async function createProdAdmin() {
-  const hashedPassword = await bcrypt.hash('Admin123!', 12);
-  
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@ghostlegion.com' },
-    update: {},
-    create: {
-      email: 'admin@ghostlegion.com',
-      name: 'Production Admin',
-      password: hashedPassword,
-      role: 'ADMIN',
-      isActive: true,
-    }
-  });
-  
-  console.log('Production admin created:', admin.email);
-  await prisma.\$disconnect();
-}
-
-createProdAdmin().catch(console.error);
-"
+# Run the seed script
+npm run db:seed
 ```
+
+**IMPORTANT**: Never hardcode passwords in scripts or documentation. Always use environment variables for sensitive credentials.
 
 ### 6. Redeploy
 

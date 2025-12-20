@@ -7,9 +7,19 @@ async function seedAdmin() {
   try {
     console.log('🌱 Seeding admin user...');
 
+    // Get admin credentials from environment variables
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.SEED_ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD || process.env.SEED_ADMIN_PASSWORD;
+
+    if (!adminEmail || !adminPassword) {
+      console.error('❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables must be set');
+      console.error('   Set ADMIN_EMAIL and ADMIN_PASSWORD in your .env file');
+      process.exit(1);
+    }
+
     // Check if admin user already exists
     const existingAdmin = await prisma.user.findUnique({
-      where: { email: 'info@000-it.com' }
+      where: { email: adminEmail }
     });
 
     if (existingAdmin) {
@@ -18,12 +28,12 @@ async function seedAdmin() {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash('Admin123!', 12);
+    const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
     // Create admin user
     const adminUser = await prisma.user.create({
       data: {
-        email: 'info@000-it.com',
+        email: adminEmail,
         name: 'System Administrator',
         password: hashedPassword,
         role: 'ADMIN',
@@ -206,7 +216,7 @@ async function seedAdmin() {
     console.log('✅ Sample alerts created');
 
     console.log('🎉 Database seeding completed successfully!');
-    console.log('📧 Admin credentials: info@000-it.com / Admin123!');
+    console.log('📧 Admin user created with email:', adminEmail);
 
   } catch (error) {
     console.error('❌ Error seeding database:', error);
