@@ -6,6 +6,18 @@ import { db } from '@/app/lib/db';
 // GET /api/locations - Get all locations
 export async function GET(request: NextRequest) {
   try {
+    // Check if DATABASE_URL is set
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not set');
+      return NextResponse.json(
+        { 
+          error: 'Database not configured',
+          message: 'DATABASE_URL environment variable is not set. Please configure your database connection.',
+        },
+        { status: 500 }
+      );
+    }
+
     let session = null;
     try {
       session = await getServerSession(authOptions);
@@ -62,8 +74,27 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(normalizedLocations);
   } catch (error) {
     console.error('Error fetching locations:', error);
+    
+    // Check if it's a database connection error
+    if (error instanceof Error) {
+      if (error.message.includes('DATABASE_URL') || error.message.includes('connection')) {
+        return NextResponse.json(
+          { 
+            error: 'Database connection error',
+            message: 'Please ensure DATABASE_URL is set in your environment variables',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+          },
+          { status: 500 }
+        );
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch locations' },
+      { 
+        error: 'Failed to fetch locations',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+      },
       { status: 500 }
     );
   }

@@ -6,6 +6,18 @@ import { db } from '@/app/lib/db';
 // GET /api/map-elements - Get all map elements
 export async function GET() {
   try {
+    // Check if DATABASE_URL is set
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not set');
+      return NextResponse.json(
+        { 
+          error: 'Database not configured',
+          message: 'DATABASE_URL environment variable is not set. Please configure your database connection.',
+        },
+        { status: 500 }
+      );
+    }
+
     const mapElements = await db.mapElement.findMany({
       orderBy: { createdAt: 'desc' }
     });
@@ -13,8 +25,27 @@ export async function GET() {
     return NextResponse.json(mapElements);
   } catch (error) {
     console.error('Error fetching map elements:', error);
+    
+    // Check if it's a database connection error
+    if (error instanceof Error) {
+      if (error.message.includes('DATABASE_URL') || error.message.includes('connection')) {
+        return NextResponse.json(
+          { 
+            error: 'Database connection error',
+            message: 'Please ensure DATABASE_URL is set in your environment variables',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+          },
+          { status: 500 }
+        );
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch map elements' },
+      { 
+        error: 'Failed to fetch map elements',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+      },
       { status: 500 }
     );
   }

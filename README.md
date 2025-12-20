@@ -78,13 +78,38 @@ A comprehensive military preparedness and community management platform designed
    npm install
    ```
 
-3. **Start the development server**
+3. **Set up environment variables**
+   
+   Create a `.env.local` file in the root directory:
+   ```bash
+   DATABASE_URL="postgresql://user:password@localhost:5432/ghostlegion?schema=public"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="generate-using-openssl-rand-base64-32"
+   ```
+   
+   Generate NEXTAUTH_SECRET:
+   ```bash
+   openssl rand -base64 32
+   ```
+
+4. **Set up database**
+   ```bash
+   # Create database (PostgreSQL)
+   createdb ghostlegion
+   
+   # Run migrations
+   npx prisma db push
+   ```
+
+5. **Start the development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
+6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+**Note**: If you see "Failed to load locations: 500" errors, make sure your `DATABASE_URL` is set correctly. See `SETUP.md` for detailed setup instructions.
 
 ## 📊 Personnel Categories
 
