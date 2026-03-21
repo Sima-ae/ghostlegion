@@ -63,7 +63,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Animal care experience, transportation, basic medical knowledge',
       contact: 'animal-rescue@ghostlegion.nl',
-      members: 45,
+      members: 74,
       isPublic: false
     },
     {
@@ -80,7 +80,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Teaching experience, child psychology background, patience',
       contact: 'childcare@ghostlegion.nl',
-      members: 78,
+      members: 178,
       isPublic: false
     },
     {
@@ -97,7 +97,7 @@ export default function CommunityPage() {
       ],
       requirements: 'IT/Telecommunications background, technical skills',
       contact: 'communication@ghostlegion.nl',
-      members: 32,
+      members: 326,
       isPublic: false
     },
     {
@@ -114,7 +114,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Logistics experience, organizational skills, transportation',
       contact: 'distribution@ghostlegion.nl',
-      members: 56,
+      members: 562,
       isPublic: false
     },
     {
@@ -131,7 +131,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Food service experience, health and safety knowledge',
       contact: 'food-supply@ghostlegion.nl',
-      members: 89,
+      members: 891,
       isPublic: false
     },
     {
@@ -165,7 +165,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Medical training, first aid certification, healthcare experience',
       contact: 'medical@ghostlegion.nl',
-      members: 124,
+      members: 1241,
       isPublic: false
     },
     {
@@ -182,7 +182,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Pharmaceutical knowledge, medical background',
       contact: 'medicines@ghostlegion.nl',
-      members: 34,
+      members: 344,
       isPublic: false
     },
     {
@@ -199,7 +199,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Psychology background, counseling experience, empathy',
       contact: 'mental-health@ghostlegion.nl',
-      members: 67,
+      members: 167,
       isPublic: false
     },
     {
@@ -216,7 +216,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Construction experience, engineering background, technical skills',
       contact: 'rebuilding@ghostlegion.nl',
-      members: 91,
+      members: 291,
       isPublic: false
     },
     {
@@ -233,7 +233,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Organizational skills, logistics experience, community connections',
       contact: 'resources@ghostlegion.nl',
-      members: 112,
+      members: 1129,
       isPublic: false
     },
     {
@@ -250,7 +250,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Health and safety knowledge, cleaning experience',
       contact: 'sanitation@ghostlegion.nl',
-      members: 58,
+      members: 158,
       isPublic: false
     },
     {
@@ -284,7 +284,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Hospitality experience, property management, community connections',
       contact: 'shelter@ghostlegion.nl',
-      members: 143,
+      members: 1143,
       isPublic: false
     },
     {
@@ -301,7 +301,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Driving license, mechanical knowledge, transportation experience',
       contact: 'transportation@ghostlegion.nl',
-      members: 98,
+      members: 1498,
       isPublic: false
     }
   ];
