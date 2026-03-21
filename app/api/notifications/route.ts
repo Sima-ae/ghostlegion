@@ -13,13 +13,8 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
     const includePending = searchParams.get('includePending') === 'true';
 
-    // Get client IP address and cookie data
     const ip = getClientIP(request);
     const cookieReadNotifications = getNotificationReadCookie(request);
-    
-    console.log('API Debug - IP:', ip);
-    console.log('API Debug - Session:', session?.user?.id || 'No session');
-    console.log('API Debug - Cookie notifications:', cookieReadNotifications);
 
     let notifications;
 
@@ -56,54 +51,53 @@ export async function GET(request: NextRequest) {
         });
       }
     } else {
-      // Get only approved public notifications for non-logged-in users
       notifications = await db.notification.findMany({
         where: {
-          status: 'APPROVED', // Only show approved notifications
+          status: 'APPROVED',
           isPublic: true,
           OR: [
             { expiresAt: null },
-            { expiresAt: { gt: new Date() } }
-          ]
+            { expiresAt: { gt: new Date() } },
+          ],
         },
         orderBy: { createdAt: 'desc' },
         take: limit,
-        skip: offset
+        skip: offset,
       });
     }
 
-    // Calculate unread count based on user or IP
     let unreadCount = 0;
     if (session?.user?.id) {
-      // For logged-in users, check if they've read the notification (all approved notifications - public and private)
       unreadCount = await db.notification.count({
         where: {
-          status: 'APPROVED', // Only count approved notifications
+          status: 'APPROVED',
           OR: [
             { expiresAt: null },
-            { expiresAt: { gt: new Date() } }
+            { expiresAt: { gt: new Date() } },
           ],
-          NOT: { readByUsers: { has: session.user.id } }
-        }
+          NOT: { readByUsers: { has: session.user.id } },
+        },
       });
     } else {
-      // For anonymous users, check if their IP or cookies have read the notification
-      const allNotifications = await db.notification.findMany({
-        where: {
-          status: 'APPROVED', // Only count approved notifications
-          isPublic: true,
-          OR: [
-            { expiresAt: null },
-            { expiresAt: { gt: new Date() } }
-          ]
-        }
+      const anonBase = {
+        status: 'APPROVED' as const,
+        isPublic: true,
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      };
+      unreadCount = await db.notification.count({
+        where:
+          cookieReadNotifications.length > 0
+            ? {
+                AND: [
+                  anonBase,
+                  { NOT: { readByIPs: { has: ip } } },
+                  { NOT: { id: { in: cookieReadNotifications } } },
+                ],
+              }
+            : {
+                AND: [anonBase, { NOT: { readByIPs: { has: ip } } }],
+              },
       });
-      
-      // Count notifications not read by IP or cookies
-      unreadCount = allNotifications.filter(notification => 
-        !notification.readByIPs.includes(ip) && 
-        !cookieReadNotifications.includes(notification.id)
-      ).length;
     }
 
     // Add read status to each notification
@@ -114,15 +108,18 @@ export async function GET(request: NextRequest) {
         : notification.readByIPs.includes(ip) || cookieReadNotifications.includes(notification.id)
     }));
 
-    console.log('API Debug - Unread count:', unreadCount);
-    console.log('API Debug - Notifications found:', notifications.length);
-    console.log('API Debug - Notifications with read status:', notificationsWithReadStatus.map(n => ({ id: n.id, title: n.title, isRead: n.isRead })));
-
-    return NextResponse.json({
-      notifications: notificationsWithReadStatus,
-      unreadCount,
-      hasMore: notifications.length === limit
-    });
+    return NextResponse.json(
+      {
+        notifications: notificationsWithReadStatus,
+        unreadCount,
+        hasMore: notifications.length === limit,
+      },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=10',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching notifications:', error);
     return NextResponse.json(

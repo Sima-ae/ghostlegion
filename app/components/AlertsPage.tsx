@@ -255,9 +255,13 @@ export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
                     {/* DEMO Overlay */}
                     {alert.showDemoOverlay && (
                       <div className="absolute inset-0 pointer-events-none">
-                        <img 
-                          src="/demo.png" 
-                          alt="DEMO" 
+                        <img
+                          src="/demo.png"
+                          alt="Ghost Legion demo: illustrative map view for emergency alerts and regional monitoring in the Netherlands"
+                          width={640}
+                          height={360}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover opacity-30 rounded-lg"
                         />
                       </div>

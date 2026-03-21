@@ -148,13 +148,12 @@ export default function AdminDashboard() {
 
   const loadLocations = async () => {
     try {
-      const response = await fetch('/api/locations?includePrivate=true', {
+      const response = await fetch('/api/locations', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        cache: 'no-cache',
       });
       
       if (response.ok) {
@@ -180,7 +179,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const loadAdminStats = async (retryCount = 0) => {
+  const loadAdminStats = async () => {
     // Only run on client side
     if (typeof window === 'undefined') {
       return;
@@ -192,10 +191,9 @@ export default function AdminDashboard() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Include cookies for authentication
-        cache: 'no-cache', // Prevent caching issues
+        credentials: 'include',
       });
-      
+
       if (response.ok) {
         const realStats = await response.json();
         setStats(realStats);
@@ -229,17 +227,7 @@ export default function AdminDashboard() {
       }
     } catch (error: unknown) {
       console.error('Error loading admin stats:', error);
-      
-      // Retry up to 2 times with exponential backoff
-      if (retryCount < 2) {
-        console.log(`Retrying admin stats fetch (attempt ${retryCount + 1})...`);
-        setTimeout(() => {
-          loadAdminStats(retryCount + 1);
-        }, Math.pow(2, retryCount) * 1000); // 1s, 2s delays
-        return;
-      }
-      
-      // Fallback to mock data after all retries failed
+
       setStats({
         totalUsers: 156,
         totalLocations: locations.length,
@@ -283,13 +271,8 @@ export default function AdminDashboard() {
       return;
     }
 
-    // Load admin stats with a small delay to ensure session is fully loaded
-    setTimeout(() => {
-      if (session && session.user) {
-        loadAdminStats();
-        loadLocations();
-      }
-    }, 200);
+    loadAdminStats();
+    loadLocations();
   }, [session, status, router]);
 
   // Show loading while checking authentication

@@ -354,9 +354,13 @@ export default function AlertsManagement({ isDemoMode = false }: AlertsManagemen
                     {/* DEMO Overlay */}
                     {alert.showDemoOverlay && (
                       <div className="absolute inset-0 pointer-events-none">
-                        <img 
-                          src="/demo.png" 
-                          alt="DEMO" 
+                        <img
+                          src="/demo.png"
+                          alt="Ghost Legion admin demo: alert management and map preview for Netherlands preparedness operations"
+                          width={640}
+                          height={360}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover opacity-30"
                         />
                       </div>

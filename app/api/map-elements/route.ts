@@ -2,52 +2,35 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
+import { jsonDbNotConfigured, jsonDbFailure, jsonUnknownFailure } from '@/app/lib/api-response';
 
 // GET /api/map-elements - Get all map elements
 export async function GET() {
   try {
-    // Check if DATABASE_URL is set
     if (!process.env.DATABASE_URL) {
-      console.error('DATABASE_URL is not set');
-      return NextResponse.json(
-        { 
-          error: 'Database not configured',
-          message: 'DATABASE_URL environment variable is not set. Please configure your database connection.',
-        },
-        { status: 500 }
-      );
+      return jsonDbNotConfigured();
     }
 
     const mapElements = await db.mapElement.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(mapElements);
+    return NextResponse.json(mapElements, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error('Error fetching map elements:', error);
-    
-    // Check if it's a database connection error
     if (error instanceof Error) {
-      if (error.message.includes('DATABASE_URL') || error.message.includes('connection')) {
-        return NextResponse.json(
-          { 
-            error: 'Database connection error',
-            message: 'Please ensure DATABASE_URL is set in your environment variables',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-          },
-          { status: 500 }
-        );
+      if (
+        error.message.includes('DATABASE_URL') ||
+        error.message.includes('connection')
+      ) {
+        return jsonDbFailure();
       }
     }
-    
-    return NextResponse.json(
-      { 
-        error: 'Failed to fetch map elements',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
-      },
-      { status: 500 }
-    );
+    return jsonUnknownFailure(error);
   }
 }
 

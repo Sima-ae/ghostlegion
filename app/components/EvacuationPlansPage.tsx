@@ -212,9 +212,13 @@ export default function EvacuationPlansPage() {
               {/* DEMO Overlay */}
               {route.showDemoOverlay && (
                 <div className="absolute inset-0 pointer-events-none">
-                  <img 
-                    src="/demo.png" 
-                    alt="DEMO" 
+                  <img
+                    src="/demo.png"
+                    alt="Ghost Legion evacuation planning demo: routes and waypoints for Netherlands crisis evacuation scenarios"
+                    width={640}
+                    height={360}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover opacity-30 rounded-lg"
                   />
                 </div>

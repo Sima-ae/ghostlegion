@@ -40,15 +40,12 @@ export default function Home() {
   const loadLocations = async () => {
     try {
       setIsLoadingLocations(true);
-      // Use includePrivate=true if user is logged in
-      const url = session?.user ? '/api/locations?includePrivate=true' : '/api/locations';
-      const response = await fetch(url, {
+      const response = await fetch('/api/locations', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        cache: 'no-cache',
       });
       
       if (response.ok) {

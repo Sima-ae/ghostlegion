@@ -2,58 +2,34 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
+import { jsonDbNotConfigured, jsonDbFailure, jsonUnknownFailure } from '@/app/lib/api-response';
 
 // GET /api/locations - Get all locations
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    // Check if DATABASE_URL is set
     if (!process.env.DATABASE_URL) {
-      console.error('DATABASE_URL is not set');
-      return NextResponse.json(
-        { 
-          error: 'Database not configured',
-          message: 'DATABASE_URL environment variable is not set. Please configure your database connection.',
-        },
-        { status: 500 }
-      );
+      return jsonDbNotConfigured();
     }
 
     let session = null;
     try {
       session = await getServerSession(authOptions);
-    } catch (sessionError) {
-      console.log('Session error (continuing without session):', sessionError);
-      // Continue without session - will show only public locations
+    } catch {
+      // Continue without session — public locations only
     }
-    
-    const url = new URL(request.url);
-    const includePrivate = url.searchParams.get('includePrivate') === 'true';
-    
-    console.log('API Debug - Session:', session?.user?.id || 'No session');
-    console.log('API Debug - IncludePrivate:', includePrivate);
 
-    let whereClause: any = {};
+    let whereClause: { isPublic?: boolean } | Record<string, never> = {};
 
-    // If user is not logged in, only show public locations
     if (!session?.user) {
-      whereClause.isPublic = true;
-      console.log('API Debug - Showing only public locations');
+      whereClause = { isPublic: true };
     } else {
-      console.log('API Debug - Showing all locations for logged-in user');
-    }
-    
-    // Temporary fix: if includePrivate=true, show all locations regardless of session
-    if (includePrivate) {
       whereClause = {};
-      console.log('API Debug - Force showing all locations due to includePrivate=true');
     }
 
     const locations = await db.location.findMany({
       where: whereClause,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
-    
-    console.log('API Debug - Found locations:', locations.length);
 
     // Normalize coordinates format for consistency
     const normalizedLocations = locations.map(location => {
@@ -71,32 +47,24 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json(normalizedLocations);
+    const cacheControl = session?.user
+      ? 'private, max-age=30'
+      : 'public, s-maxage=120, stale-while-revalidate=300';
+
+    return NextResponse.json(normalizedLocations, {
+      headers: { 'Cache-Control': cacheControl },
+    });
   } catch (error) {
     console.error('Error fetching locations:', error);
-    
-    // Check if it's a database connection error
     if (error instanceof Error) {
-      if (error.message.includes('DATABASE_URL') || error.message.includes('connection')) {
-        return NextResponse.json(
-          { 
-            error: 'Database connection error',
-            message: 'Please ensure DATABASE_URL is set in your environment variables',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-          },
-          { status: 500 }
-        );
+      if (
+        error.message.includes('DATABASE_URL') ||
+        error.message.includes('connection')
+      ) {
+        return jsonDbFailure();
       }
     }
-    
-    return NextResponse.json(
-      { 
-        error: 'Failed to fetch locations',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
-      },
-      { status: 500 }
-    );
+    return jsonUnknownFailure(error);
   }
 }
 

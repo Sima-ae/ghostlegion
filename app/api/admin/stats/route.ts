@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Calculate date ranges
     const now = new Date();
@@ -167,7 +167,11 @@ export async function GET(request: NextRequest) {
       routesStatus
     };
 
-    return NextResponse.json(stats);
+    return NextResponse.json(stats, {
+      headers: {
+        'Cache-Control': 'private, max-age=15',
+      },
+    });
   } catch (error) {
     console.error('Error fetching admin stats:', error);
     return NextResponse.json(

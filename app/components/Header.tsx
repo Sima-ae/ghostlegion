@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import NotificationDropdown from './NotificationDropdown';
 import NotificationPopup from './NotificationPopup';
 import NotificationSender from './NotificationSender';
+import PwaInstallButton from './pwa/PwaInstallButton';
 
 interface Notification {
   id: string;
@@ -33,10 +34,13 @@ export default function Header() {
   // Check if user is admin or super admin
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
 
-  // Load unread count on component mount
   useEffect(() => {
-    loadUnreadCount();
-  }, []);
+    if (session?.user) {
+      loadUnreadCount();
+    } else {
+      setUnreadCount(0);
+    }
+  }, [session]);
 
   const loadUnreadCount = async () => {
     try {
@@ -104,6 +108,7 @@ export default function Header() {
 
           {/* Right side icons and login - Right Side */}
           <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
+            <PwaInstallButton />
             {/* Send Notification (All logged-in users) */}
             {session && (
               <button 

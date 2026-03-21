@@ -105,11 +105,9 @@ export default function AdminMapEditor({
   // Load map elements from database
   const loadMapElements = async () => {
     try {
-      console.log('AdminMapEditor: Loading map elements...');
       const response = await fetch('/api/map-elements');
       if (response.ok) {
         const elements = await response.json();
-        console.log('AdminMapEditor: Loaded map elements:', elements);
         // Convert risk values from uppercase to mixed case for display
         const convertedElements = elements.map((element: any) => ({
           ...element,

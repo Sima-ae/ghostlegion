@@ -308,9 +308,13 @@ export default function RoutesManagement({ isDemoMode = false }: RoutesManagemen
                     {/* DEMO Overlay */}
                     {route.showDemoOverlay && (
                       <div className="absolute inset-0 pointer-events-none">
-                        <img 
-                          src="/demo.png" 
-                          alt="DEMO" 
+                        <img
+                          src="/demo.png"
+                          alt="Ghost Legion demo: evacuation route editor and strategic path planning for the Netherlands"
+                          width={640}
+                          height={360}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover opacity-30"
                         />
                       </div>

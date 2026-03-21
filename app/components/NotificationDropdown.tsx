@@ -58,11 +58,9 @@ export default function NotificationDropdown({
   const loadNotifications = async () => {
     try {
       setIsLoading(true);
-      console.log('Loading notifications...');
       const response = await fetch('/api/notifications?limit=10');
       if (response.ok) {
         const data = await response.json();
-        console.log('Notifications loaded:', data);
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount);
       } else {

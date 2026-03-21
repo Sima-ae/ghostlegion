@@ -49,11 +49,9 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
   useEffect(() => {
     const loadMapElements = async () => {
       try {
-        console.log('Loading map elements...');
         const response = await fetch('/api/map-elements');
         if (response.ok) {
           const elements = await response.json();
-          console.log('Loaded map elements:', elements);
           // Convert risk values from uppercase to mixed case for display
           const convertedElements = elements.map((element: any) => ({
             ...element,
