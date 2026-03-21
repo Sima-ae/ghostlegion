@@ -246,7 +246,7 @@ export default function CommunityPage() {
       ],
       requirements: 'Security background, law enforcement experience, physical fitness',
       contact: 'security@ghostlegion.nl',
-      members: 76,
+      members: 7483,
       isPublic: false
     },
     {
