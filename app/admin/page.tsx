@@ -161,7 +161,15 @@ export default function AdminDashboard() {
         const locationsData = await response.json();
         setLocations(locationsData);
       } else {
-        console.error('Failed to load locations:', response.status);
+        let detail = '';
+        try {
+          const errBody = await response.json();
+          if (errBody?.message) detail = ` ${errBody.message}`;
+          else if (errBody?.error) detail = ` ${errBody.error}`;
+        } catch {
+          /* non-JSON body */
+        }
+        console.error('Failed to load locations:', response.status, detail);
         // Fallback to sample data if API fails
         setLocations(sampleLocations);
       }
