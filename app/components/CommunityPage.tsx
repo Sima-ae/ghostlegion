@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { 
   Heart, 
   Shield, 
@@ -24,8 +25,28 @@ import {
 } from 'lucide-react';
 
 export default function CommunityPage() {
+  const { data: session, status } = useSession();
+  const isLoggedIn = status === 'authenticated' && !!session?.user;
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showJoinForm, setShowJoinForm] = useState(false);
+  const [joinFormCategoryId, setJoinFormCategoryId] = useState('');
+
+  useEffect(() => {
+    if (!showJoinForm) setJoinFormCategoryId('');
+  }, [showJoinForm]);
+
+  const openJoinCommunity = (categoryId?: string) => {
+    if (isLoggedIn) return;
+    setJoinFormCategoryId(categoryId ?? '');
+    setShowJoinForm(true);
+  };
+
+  const scrollToGroups = () => {
+    document.getElementById('community-categories')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   const communityCategories = [
     {
@@ -308,10 +329,13 @@ export default function CommunityPage() {
                 Become part of our community and help make a difference during crisis situations.
               </p>
               <button
-                onClick={() => setShowJoinForm(true)}
+                type="button"
+                onClick={() =>
+                  isLoggedIn ? scrollToGroups() : openJoinCommunity()
+                }
                 className="bg-white text-blue-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
               >
-                Join Community
+                {isLoggedIn ? 'Join Group' : 'Join Community'}
               </button>
             </div>
             <Users2 className="h-24 w-24 text-blue-200" />
@@ -348,7 +372,10 @@ export default function CommunityPage() {
         </div>
 
         {/* Community Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          id="community-categories"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {filteredCategories.map((category) => {
             const Icon = category.icon;
             return (
@@ -398,8 +425,27 @@ export default function CommunityPage() {
                     <strong>Requirements:</strong> {category.requirements}
                   </div>
                   <div className="flex space-x-2">
-                    <button className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                      Join Group
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (isLoggedIn) {
+                          const subject = encodeURIComponent(
+                            `Join group: ${category.name}`
+                          );
+                          window.location.href = `mailto:${category.contact}?subject=${subject}`;
+                          return;
+                        }
+                        openJoinCommunity(category.id);
+                      }}
+                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      disabled={status === 'loading'}
+                      aria-label={
+                        isLoggedIn
+                          ? `Join ${category.name} group`
+                          : `Join community — ${category.name}`
+                      }
+                    >
+                      {isLoggedIn ? 'Join Group' : 'Join Community'}
                     </button>
                     <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                       Learn More
@@ -441,7 +487,11 @@ export default function CommunityPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Select Category
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select
+                    value={joinFormCategoryId}
+                    onChange={(e) => setJoinFormCategoryId(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
                     <option value="">Choose a category</option>
                     {communityCategories.map((category) => (
                       <option key={category.id} value={category.id}>
