@@ -41,14 +41,29 @@ function safeEmoji(emoji: string) {
   return String(emoji).replace(/[<>&"'`]/g, '');
 }
 
+/** Full pin size from city zoom up; shrinks each time the map zooms out. */
+export function locationPinScale(zoom: number) {
+  const baseZoom = 11;
+  const minScale = 0.18;
+  const maxScale = 1;
+  const perLevel = 0.72;
+  const scale = Math.pow(perLevel, baseZoom - zoom);
+  return Math.min(maxScale, Math.max(minScale, scale));
+}
+
+export function applyLocationPinScale(map: L.Map) {
+  const scale = locationPinScale(map.getZoom());
+  map.getContainer().style.setProperty('--gl-pin-scale', scale.toFixed(3));
+}
+
 export function locationMarkerIcon(emoji = '📍') {
   fixLeafletDefaultIcons();
   const mark = safeEmoji(emoji);
   return L.divIcon({
     className: 'ghostlegion-pin',
-    html: `<div style="width:36px;height:44px;display:flex;justify-content:center;pointer-events:none" aria-hidden="true">
-      <div style="width:32px;height:32px;background:#fff;border:2px solid #1d4ed8;border-radius:50% 50% 50% 0;transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.35)">
-        <span style="transform:rotate(45deg);font-size:16px;line-height:1">${mark}</span>
+    html: `<div class="ghostlegion-pin-wrap" aria-hidden="true">
+      <div class="ghostlegion-pin-body">
+        <span class="ghostlegion-pin-emoji">${mark}</span>
       </div>
     </div>`,
     iconSize: [36, 44],

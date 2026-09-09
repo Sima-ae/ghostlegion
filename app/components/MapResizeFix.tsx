@@ -1,11 +1,21 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { useMap } from 'react-leaflet';
+import { applyLocationPinScale } from '../lib/leaflet-icons';
 
 /** Leaflet must be told when its container size changes (mobile chrome, drawers). */
 export default function MapResizeFix() {
   const map = useMap();
+
+  useLayoutEffect(() => {
+    applyLocationPinScale(map);
+    const syncPins = () => applyLocationPinScale(map);
+    map.on('zoom zoomend', syncPins);
+    return () => {
+      map.off('zoom zoomend', syncPins);
+    };
+  }, [map]);
 
   useEffect(() => {
     const sync = () => {
