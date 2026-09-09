@@ -54,7 +54,7 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-[600px] bg-red-50 rounded-lg flex items-center justify-center border border-red-200">
+        <div className="h-[min(70dvh,600px)] min-h-[280px] bg-red-50 rounded-lg flex items-center justify-center border border-red-200">
           <div className="text-center">
             <div className="text-red-600 mb-2">⚠️ Map Editor Error</div>
             <div className="text-sm text-red-500 mb-4">
@@ -491,12 +491,12 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div className="flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-center py-4 sm:py-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Ghost Legion - System Administration</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              <p className="text-sm sm:text-base text-gray-600">Ghost Legion - System Administration</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               {/* DEMO Mode Toggle */}
               <div className="flex items-center space-x-2">
                 <label className="flex items-center space-x-2 cursor-pointer">
@@ -511,7 +511,7 @@ export default function AdminDashboard() {
                   </span>
                 </label>
               </div>
-              <span className="text-sm text-gray-500">
+              <span className="hidden md:inline text-sm text-gray-500">
                 Welcome, {session.user?.name || session.user?.email}
               </span>
               <button
@@ -529,7 +529,7 @@ export default function AdminDashboard() {
         {/* Navigation Tabs */}
         <div className="bg-white rounded-lg shadow-sm border mb-8">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+            <nav className="flex space-x-4 sm:space-x-8 px-3 sm:px-6 overflow-x-auto">
               {[
                 { id: 'overview', label: 'Overview', icon: BarChart3 },
                 { id: 'map', label: 'Map Editor', icon: Map },
@@ -545,7 +545,7 @@ export default function AdminDashboard() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center px-1 py-4 text-sm font-medium border-b-2 transition-colors ${
+                    className={`flex items-center px-1 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -583,7 +583,7 @@ export default function AdminDashboard() {
         {activeTab === 'overview' && (
           <>
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
             return (
@@ -794,7 +794,7 @@ export default function AdminDashboard() {
                 Add locations, draw strategic areas, and plan operations on the interactive map.
               </p>
             </div>
-            <div className="h-[600px]">
+            <div className="h-[min(70dvh,600px)] min-h-[280px]">
               <ErrorBoundary>
                 <AdminMapEditor
                   locations={locations}

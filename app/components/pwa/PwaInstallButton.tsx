@@ -126,7 +126,7 @@ export default function PwaInstallButton() {
       <button
         type="button"
         onClick={onInstallClick}
-        className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="inline-flex items-center justify-center p-2 sm:px-3 sm:py-1.5 rounded-md text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
         title={
           canUseNativePrompt
             ? 'Install Ghost Legion as an app'
@@ -142,7 +142,6 @@ export default function PwaInstallButton() {
         <span className="hidden sm:inline">
           {justInstalled ? 'Installed' : 'Install app'}
         </span>
-        <span className="sm:hidden">App</span>
       </button>
 
       {open && (

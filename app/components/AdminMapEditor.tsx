@@ -20,6 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { Location } from '../types';
+import MapResizeFix from './MapResizeFix';
 
 fixLeafletDefaultIcons();
 
@@ -316,7 +317,7 @@ export default function AdminMapEditor({
   }
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full min-h-0 flex flex-col">
       {/* Toolbar */}
       <div className="bg-white border-b border-gray-200 p-4 flex flex-wrap items-center gap-4">
         <div className="flex items-center space-x-2">
@@ -404,13 +405,14 @@ export default function AdminMapEditor({
       </div>
 
       {/* Map */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-0">
         <MapContainer
           center={[52.1326, 5.2913]}
           zoom={7}
           style={{ height: '100%', width: '100%' }}
           className="z-0"
         >
+          <MapResizeFix />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -651,7 +653,7 @@ export default function AdminMapEditor({
         </MapContainer>
 
         {/* Map Elements Panel */}
-        <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 w-80 max-h-96 overflow-y-auto">
+        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white rounded-lg shadow-lg p-3 sm:p-4 w-[min(18rem,calc(100%-1rem))] max-h-48 sm:max-h-96 overflow-y-auto">
           <h3 className="font-semibold text-gray-900 mb-3">Map Elements</h3>
           <div className="space-y-2">
             {mapElements.map((element) => (
@@ -686,7 +688,7 @@ export default function AdminMapEditor({
       {/* Add Location Modal */}
       {showAddLocationForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-y-auto">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold mb-4">Add New Location</h3>
             <div className="space-y-4">
               <div>
@@ -775,7 +777,7 @@ export default function AdminMapEditor({
       {/* Edit Element Modal */}
       {editingElement && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-y-auto">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-semibold mb-4">Edit Map Element</h3>
             <div className="space-y-4">
               <div>

@@ -194,7 +194,7 @@ export default function ResourcesPage() {
   // Show access denied if not admin
   if (!isAdmin) {
     return (
-      <div className="bg-gray-50 p-6">
+      <div className="bg-gray-50 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -215,7 +215,7 @@ export default function ResourcesPage() {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-50 p-6">
+      <div className="bg-gray-50 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -229,13 +229,13 @@ export default function ResourcesPage() {
   }
 
   return (
-    <div className="bg-gray-50 p-6">
+    <div className="bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center space-x-3 mb-4">
-            <Package className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Resources Management</h1>
+            <Package className="h-7 w-7 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Resources Management</h1>
           </div>
           <p className="text-lg text-gray-600">
             Monitor and manage essential supplies and equipment across all locations.
@@ -243,7 +243,7 @@ export default function ResourcesPage() {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-sm border">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">

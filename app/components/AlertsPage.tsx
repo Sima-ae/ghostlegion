@@ -106,7 +106,7 @@ export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-50 p-6">
+      <div className="bg-gray-50 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
@@ -120,10 +120,10 @@ export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
   }
 
   return (
-    <div className="bg-gray-50 p-6">
+    <div className="bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Alert Center</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Alert Center</h2>
           <p className="text-gray-700">
             Stay informed about current alerts, warnings, and emergency notifications.
           </p>
@@ -132,7 +132,7 @@ export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
 
         {/* Overview - Full Width */}
         <div className="bg-white rounded-lg shadow-sm border mb-6">
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex items-center">

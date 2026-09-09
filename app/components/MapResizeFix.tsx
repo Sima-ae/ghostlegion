@@ -1,0 +1,36 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useMap } from 'react-leaflet';
+
+/** Leaflet must be told when its container size changes (mobile chrome, drawers). */
+export default function MapResizeFix() {
+  const map = useMap();
+
+  useEffect(() => {
+    const sync = () => {
+      map.invalidateSize({ animate: false });
+    };
+
+    const t1 = window.setTimeout(sync, 50);
+    const t2 = window.setTimeout(sync, 350);
+    window.addEventListener('resize', sync);
+    window.addEventListener('orientationchange', sync);
+
+    const container = map.getContainer();
+    const parent = container.parentElement;
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(sync) : null;
+    ro?.observe(container);
+    if (parent) ro?.observe(parent);
+
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.removeEventListener('resize', sync);
+      window.removeEventListener('orientationchange', sync);
+      ro?.disconnect();
+    };
+  }, [map]);
+
+  return null;
+}

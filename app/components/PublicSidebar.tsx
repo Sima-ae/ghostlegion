@@ -21,31 +21,34 @@ import {
   Home,
   Train,
   Lock,
-  Unlock
+  Unlock,
+  X
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
 interface PublicSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  mobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
-export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarProps) {
+export default function PublicSidebar({
+  activeTab,
+  onTabChange,
+  mobileOpen,
+  onMobileClose,
+}: PublicSidebarProps) {
   const { data: session } = useSession();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  // Check if user is admin or super admin
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
 
-  // Emergency items at the top
   const emergencyItems = [
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle, isPublic: true },
     { id: 'emergency-checklist', label: 'Emergency Checklist', icon: AlertTriangle, isPublic: true },
     { id: 'evacuation', label: 'Evacuation Plans', icon: Route, isPublic: true },
   ];
 
-  // Main menu items (excluding emergency items and resources)
   const mainMenuItems = [
     { id: 'map', label: 'Map', icon: Map, isPublic: true },
     { id: 'security', label: 'Defense and Security', icon: Shield, isPublic: false },
@@ -58,11 +61,10 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
     { id: 'distribution', label: 'Distribution', icon: Truck, isPublic: false },
     { id: 'communication', label: 'Communication and IT', icon: Monitor, isPublic: false },
     { id: 'animal-rescue', label: 'Animal Rescue and Care', icon: Heart, isPublic: false },
-    
-    { id: 'rebuilding', label: 'Rebuilding and Infrastruct...', icon: Building, isPublic: false },
+    { id: 'rebuilding', label: 'Rebuilding and Infrastructure', icon: Building, isPublic: false },
     { id: 'childcare', label: 'Childcare and Education', icon: BookOpen, isPublic: false },
-    { id: 'mental-health', label: 'Mental and Emotional Su...', icon: Users, isPublic: false },
-    { id: 'legal', label: 'Legal and Administrative...', icon: Gavel, isPublic: false },
+    { id: 'mental-health', label: 'Mental and Emotional Support', icon: Users, isPublic: false },
+    { id: 'legal', label: 'Legal and Administrative', icon: Gavel, isPublic: false },
   ];
 
   const communitySpaces = [
@@ -70,154 +72,124 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
     { id: 'resources', label: 'Resources', icon: Package, isPublic: false, requiresAdmin: true },
   ];
 
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const closeOnDesktop = () => {
+      if (mq.matches) onMobileClose();
+    };
+    mq.addEventListener('change', closeOnDesktop);
+    return () => mq.removeEventListener('change', closeOnDesktop);
+  }, [onMobileClose]);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onMobileClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [mobileOpen, onMobileClose]);
+
+  const selectTab = (tab: string) => {
+    onTabChange(tab);
+    onMobileClose();
+  };
+
+  const navButton = (
+    id: string,
+    label: string,
+    Icon: typeof Map,
+    isPublic: boolean,
+    isActive: boolean
+  ) => (
+    <button
+      key={id}
+      type="button"
+      onClick={() => selectTab(id)}
+      className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors ${
+        isActive
+          ? 'bg-blue-100 text-blue-700 border border-blue-200'
+          : 'text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
+      <div className="flex-1 flex items-center justify-between min-w-0">
+        <span className="truncate">{label}</span>
+        {isPublic ? (
+          <Unlock className="h-3 w-3 text-green-500 ml-2 flex-shrink-0" />
+        ) : (
+          <Lock className="h-3 w-3 text-red-500 ml-2 flex-shrink-0" />
+        )}
+      </div>
+    </button>
+  );
+
   return (
-    <div className={`bg-gray-100 text-gray-900 transition-all duration-300 ${
-      isCollapsed ? 'w-16 lg:w-20' : 'w-full lg:w-80'
-    } border-r border-gray-200 flex-shrink-0`}>
-      <div className="flex flex-col h-full">
-        <nav className="flex-1 p-4 space-y-2">
-          {/* Community Section - At the top */}
-          <div className="space-y-1">
-            <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
-              {!isCollapsed && <span>Community</span>}
-            </div>
-            <div className="space-y-1">
-              {communitySpaces.map((space) => {
-                const Icon = space.icon;
-                
-                // Hide Resources if user is not admin
-                if (space.id === 'resources' && !isAdmin) {
-                  return null;
-                }
-                
-                return (
-                  <button
-                    key={space.id}
-                    onClick={() => onTabChange(space.id === 'join-us' ? 'community' : space.id)}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      activeTab === (space.id === 'join-us' ? 'community' : space.id)
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                        : 'text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
-                    {!isCollapsed && (
-                      <div className="flex-1 flex items-center justify-between">
-                        <span className="truncate">{space.label}</span>
-                        {!space.isPublic && (
-                          <Lock className="h-3 w-3 text-red-500 ml-2" />
-                        )}
-                        {space.isPublic && (
-                          <Unlock className="h-3 w-3 text-green-500 ml-2" />
-                        )}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Spacing between Community and Information */}
-          <div className="py-4">
-            <div className="border-t border-gray-200"></div>
-          </div>
-
-          {/* Information Section */}
-          <div className="space-y-1">
-            <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
-              {!isCollapsed && <span>Information</span>}
-            </div>
-            <div className="space-y-1">
-              {emergencyItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => onTabChange(item.id)}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      activeTab === item.id
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                        : 'text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
-                    {!isCollapsed && (
-                      <div className="flex-1 flex items-center justify-between">
-                        <span>{item.label}</span>
-                        <Unlock className="h-3 w-3 text-green-500 ml-2" />
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Spacing between Information and Menu */}
-          <div className="py-4">
-            <div className="border-t border-gray-200"></div>
-          </div>
-
-          {/* Main Menu */}
-          <div className="space-y-1">
-            <div className="flex items-center text-sm font-medium text-gray-500 mb-3">
-              {!isCollapsed && <span>Menu</span>}
-            </div>
-            <div className="space-y-1">
-              {mainMenuItems.map((item) => {
-                const Icon = item.icon;
-                
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => onTabChange(item.id)}
-                    className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      activeTab === item.id
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                        : 'text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
-                    {!isCollapsed && (
-                      <div className="flex-1 flex items-center justify-between">
-                        <span>{item.label}</span>
-                        {!item.isPublic && (
-                          <Lock className="h-3 w-3 text-red-500 ml-2" />
-                        )}
-                        {item.isPublic && (
-                          <Unlock className="h-3 w-3 text-green-500 ml-2" />
-                        )}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </nav>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200">
+    <>
+      <div
+        className={`fixed inset-x-0 bottom-0 top-[calc(3.5rem+env(safe-area-inset-top))] sm:top-[calc(4rem+env(safe-area-inset-top))] z-[1090] bg-black/40 lg:hidden transition-opacity duration-300 ${
+          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        onClick={onMobileClose}
+        aria-hidden={!mobileOpen}
+      />
+      <aside
+        className={`fixed left-0 bottom-0 top-[calc(3.5rem+env(safe-area-inset-top))] sm:top-[calc(4rem+env(safe-area-inset-top))] z-[1100] max-w-[85vw] bg-gray-100 text-gray-900 flex flex-col
+          transform transition-transform duration-300 ease-out
+          ${mobileOpen ? 'translate-x-0 w-72 border-r border-gray-200' : '-translate-x-full w-0 overflow-hidden border-0 pointer-events-none'}
+          lg:static lg:inset-auto lg:top-auto lg:bottom-auto lg:z-auto lg:translate-x-0 lg:w-72 lg:max-w-none lg:flex-shrink-0 lg:overflow-visible lg:border-r lg:border-gray-200 lg:pointer-events-auto`}
+        aria-label="Main navigation"
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 lg:hidden">
+          <span className="font-semibold text-gray-900">Menu</span>
           <button
-            onClick={() => {
-              setIsCollapsed(!isCollapsed);
-              // Trigger resize event to update map
-              setTimeout(() => {
-                window.dispatchEvent(new Event('resize'));
-              }, 300); // Wait for transition to complete
-            }}
-            className="w-full flex items-center justify-center p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
+            type="button"
+            onClick={onMobileClose}
+            className="p-2 rounded-md text-gray-500 hover:bg-gray-200 hover:text-gray-800"
+            aria-label="Close menu"
           >
-            <div className={`w-6 h-6 transform transition-transform ${isCollapsed ? 'rotate-180' : ''}`}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </div>
-            {!isCollapsed && <span className="ml-2 text-sm">Collapse</span>}
+            <X className="h-5 w-5" />
           </button>
         </div>
-      </div>
-    </div>
+
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          <div className="space-y-1">
+            <div className="text-sm font-medium text-gray-500 mb-3">Community</div>
+            {communitySpaces.map((space) => {
+              if (space.id === 'resources' && !isAdmin) return null;
+              const tab = space.id === 'join-us' ? 'community' : space.id;
+              return navButton(tab, space.label, space.icon, space.isPublic, activeTab === tab);
+            })}
+          </div>
+
+          <div className="py-3">
+            <div className="border-t border-gray-200" />
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-sm font-medium text-gray-500 mb-3">Information</div>
+            {emergencyItems.map((item) =>
+              navButton(item.id, item.label, item.icon, item.isPublic, activeTab === item.id)
+            )}
+          </div>
+
+          <div className="py-3">
+            <div className="border-t border-gray-200" />
+          </div>
+
+          <div className="space-y-1">
+            <div className="text-sm font-medium text-gray-500 mb-3">Menu</div>
+            {mainMenuItems.map((item) =>
+              navButton(item.id, item.label, item.icon, item.isPublic, activeTab === item.id)
+            )}
+          </div>
+        </nav>
+      </aside>
+    </>
   );
 }

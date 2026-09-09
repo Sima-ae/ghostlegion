@@ -100,17 +100,17 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Ghost Legion Dashboard</h1>
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Ghost Legion Dashboard</h1>
         <p className="text-gray-600">Overview for management</p>
         {!loaded && <p className="text-sm text-gray-500 mt-2">Loading live data…</p>}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white p-6 rounded-lg shadow-sm border">
+            <div key={index} className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">{stat.title}</p>

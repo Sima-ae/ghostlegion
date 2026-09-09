@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Header from './components/Header';
 import PublicSidebar from './components/PublicSidebar';
-import LocationCard from './components/LocationCard';
 import EvacuationPlansPage from './components/EvacuationPlansPage';
 import CommunityPage from './components/CommunityPage';
 import ResourcesPage from './components/ResourcesPage';
@@ -18,7 +16,7 @@ import { Location } from './types';
 const MapComponent = dynamic(() => import('./components/MapComponent'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] bg-gray-200 rounded-lg flex items-center justify-center">
+    <div className="gl-map-root bg-gray-200 flex items-center justify-center">
       <div className="text-gray-500 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
         <div>Map is loading...</div>
@@ -29,8 +27,8 @@ const MapComponent = dynamic(() => import('./components/MapComponent'), {
 
 export default function Home() {
   const { data: session } = useSession();
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState('map');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [locations, setLocations] = useState<Location[]>([]);
   const [isLoadingLocations, setIsLoadingLocations] = useState(true);
@@ -77,7 +75,7 @@ export default function Home() {
       case 'map':
         if (isLoadingLocations) {
           return (
-            <div className="h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] bg-gray-200 rounded-lg flex items-center justify-center">
+            <div className="gl-map-root bg-gray-200 flex items-center justify-center">
               <div className="text-gray-500 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
                 <div>Loading locations...</div>
@@ -86,7 +84,7 @@ export default function Home() {
           );
         }
         return (
-          <div className="h-full">
+          <div className="gl-map-root">
             <MapComponent 
               locations={filteredLocations}
               selectedLocation={selectedLocation}
@@ -112,7 +110,7 @@ export default function Home() {
       
       default:
         return (
-          <div className="h-full">
+          <div className="gl-map-root">
             <MapComponent 
               locations={filteredLocations}
               selectedLocation={selectedLocation}
@@ -124,19 +122,33 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full flex flex-col">
-      <Header />
-      <div className="flex flex-col lg:flex-row flex-1 w-full">
-        <PublicSidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1 w-full overflow-y-auto min-w-0">
+    <div className="h-dvh max-h-dvh max-w-full bg-gray-50 w-full flex flex-col overflow-hidden overscroll-none">
+      <Header
+        menuOpen={sidebarOpen}
+        onMenuToggle={() => setSidebarOpen((open) => !open)}
+      />
+      <div className="flex flex-1 min-h-0 w-full relative">
+        <PublicSidebar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          mobileOpen={sidebarOpen}
+          onMobileClose={() => setSidebarOpen(false)}
+        />
+        <main
+          className={`flex-1 w-full min-w-0 min-h-0 flex flex-col ${
+            activeTab === 'map' ? 'overflow-hidden' : 'overflow-y-auto'
+          }`}
+        >
           {renderContent()}
         </main>
       </div>
-      <footer className="w-full bg-gray-800 text-white py-4">
-        <div className="text-center">
-          <p className="text-sm font-bold">Ghost Legion © 2026</p>
-        </div>
-      </footer>
+      {activeTab !== 'map' ? (
+        <footer className="w-full bg-gray-800 text-white py-2.5 flex-shrink-0">
+          <div className="text-center px-3">
+            <p className="text-xs sm:text-sm font-bold">Ghost Legion © 2026</p>
+          </div>
+        </footer>
+      ) : null}
     </div>
   );
 }

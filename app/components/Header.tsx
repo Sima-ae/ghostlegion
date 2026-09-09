@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Search, User, Settings, LogOut, Shield, Send } from 'lucide-react';
+import { Bell, Search, User, Settings, LogOut, Shield, Send, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,12 @@ interface Notification {
   expiresAt?: string;
 }
 
-export default function Header() {
+interface HeaderProps {
+  menuOpen?: boolean;
+  onMenuToggle?: () => void;
+}
+
+export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isNotificationSenderOpen, setIsNotificationSenderOpen] = useState(false);
@@ -78,22 +83,33 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-gray-900 text-white shadow-lg w-full relative z-[1000]">
+    <header className="bg-gray-900 text-white shadow-lg w-full relative z-[1000] flex-shrink-0 pt-[env(safe-area-inset-top)]">
       <div className="w-full px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-16 w-full">
+        <div className="flex items-center justify-between h-14 sm:h-16 w-full gap-1 sm:gap-2 min-w-0">
           {/* Logo and Title - Left Side */}
-          <div className="flex items-center flex-shrink-0 min-w-0">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center mr-1 sm:mr-2">
-              <Shield className="h-8 w-8 text-white" />
+          <div className="flex items-center flex-shrink min-w-0">
+            {onMenuToggle ? (
+              <button
+                type="button"
+                onClick={onMenuToggle}
+                className="lg:hidden p-2 mr-1 rounded-md text-gray-300 hover:text-white hover:bg-gray-800"
+                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={menuOpen}
+              >
+                {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            ) : null}
+            <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mr-1 sm:mr-2">
+              <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 overflow-hidden">
               <h1 className="text-sm sm:text-lg md:text-xl font-bold truncate">Ghost Legion</h1>
-              <p className="text-xs text-gray-400 truncate hidden sm:block">We analyze, we hunt, we strike!</p>
+              <p className="text-xs text-gray-400 truncate hidden md:block">We analyze, we hunt, we strike!</p>
             </div>
           </div>
 
           {/* Search Bar - Center */}
-          <div className="flex-1 max-w-md mx-2 sm:mx-4 lg:mx-8">
+          <div className="hidden sm:block flex-1 max-w-md mx-2 sm:mx-4 lg:mx-8">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
@@ -107,7 +123,7 @@ export default function Header() {
           </div>
 
           {/* Right side icons and login - Right Side */}
-          <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 flex-shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-2 lg:gap-4 flex-shrink-0 ml-auto">
             <PwaInstallButton />
             {/* Send Notification (All logged-in users) */}
             {session && (
@@ -143,7 +159,7 @@ export default function Header() {
             </div>
 
             {/* Settings */}
-            <button className="p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
+            <button className="hidden md:inline-flex p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
               <Settings className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
 
@@ -195,7 +211,7 @@ export default function Header() {
             ) : (
               <button
                 onClick={() => router.push('/auth/signin')}
-                className="px-2 sm:px-4 py-1.5 sm:py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap"
               >
                 <span className="hidden sm:inline">Login</span>
                 <span className="sm:hidden">Login</span>

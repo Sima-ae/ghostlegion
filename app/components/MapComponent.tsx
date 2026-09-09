@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, Circle } fro
 import { Location } from '../types';
 import { getLocationTypeIcon, getStatusColor } from '../lib/utils';
 import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
+import MapResizeFix from './MapResizeFix';
 
 interface MapElement {
   id: string;
@@ -30,21 +31,10 @@ interface MapComponentProps {
 export default function MapComponent({ locations, selectedLocation, onLocationSelect }: MapComponentProps) {
   const [mapElements, setMapElements] = useState<MapElement[]>([]);
   const [isClient, setIsClient] = useState(false);
-  const [mapKey, setMapKey] = useState(0);
 
   useEffect(() => {
     fixLeafletDefaultIcons();
     setIsClient(true);
-  }, []);
-
-  // Force map re-render when window resizes (e.g., sidebar collapse)
-  useEffect(() => {
-    const handleResize = () => {
-      setMapKey(prev => prev + 1);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   // Load map elements from database
@@ -75,7 +65,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
 
   if (!isClient) {
     return (
-      <div className="w-full h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] bg-gray-200 rounded-lg flex items-center justify-center">
+      <div className="gl-map-root bg-gray-200 flex items-center justify-center">
         <div className="text-gray-500 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
           <div>Map is loading...</div>
@@ -85,14 +75,15 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
   }
 
   return (
-    <div className="w-full h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
+    <div className="gl-map-root">
       <MapContainer
-        key={mapKey}
         center={[52.1326, 5.2913]}
         zoom={7}
+        scrollWheelZoom
         style={{ height: '100%', width: '100%' }}
-        className="w-full h-full"
+        className="gl-leaflet"
       >
+        <MapResizeFix />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

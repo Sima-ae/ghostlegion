@@ -109,15 +109,15 @@ export default function NotificationPopup({
   if (!isOpen || !notification) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-[1002] p-0 sm:p-4">
+      <div className="bg-white rounded-t-xl sm:rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden relative">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               {getNotificationIcon(notification.type)}
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 pr-2">
                   {notification.title}
                 </h2>
                 <div className="flex items-center space-x-2 mt-1">
@@ -140,7 +140,7 @@ export default function NotificationPopup({
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="prose max-w-none">
             <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
               {notification.message}
@@ -149,8 +149,8 @@ export default function NotificationPopup({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+        <div className="p-4 sm:p-6 border-t border-gray-200 bg-gray-50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-gray-600">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-1">
                 <Clock className="h-4 w-4" />

@@ -311,20 +311,20 @@ export default function CommunityPage() {
     : communityCategories.filter(cat => cat.id === selectedCategory);
 
   return (
-    <div className="bg-gray-50 p-6">
+    <div className="bg-gray-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Community Spaces</h1>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Community Spaces</h1>
           <p className="text-gray-600">
             Join specialized community groups to help with specific tasks during crisis situations.
           </p>
         </div>
 
         {/* Join Us Today Banner */}
-        <div className="mb-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Join Us Today</h2>
+        <div className="mb-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4 sm:p-6 text-white">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2">Join Us Today</h2>
               <p className="text-blue-100 mb-4">
                 Become part of our community and help make a difference during crisis situations.
               </p>
@@ -338,7 +338,7 @@ export default function CommunityPage() {
                 {isLoggedIn ? 'Join Group' : 'Join Community'}
               </button>
             </div>
-            <Users2 className="h-24 w-24 text-blue-200" />
+            <Users2 className="h-16 w-16 sm:h-24 sm:w-24 text-blue-200 hidden sm:block flex-shrink-0" />
           </div>
         </div>
 
@@ -379,7 +379,7 @@ export default function CommunityPage() {
           {filteredCategories.map((category) => {
             const Icon = category.icon;
             return (
-              <div key={category.id} className="bg-white rounded-lg shadow-sm border p-6">
+              <div key={category.id} className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="p-2 bg-blue-100 rounded-lg">
@@ -459,8 +459,8 @@ export default function CommunityPage() {
 
         {/* Join Form Modal */}
         {showJoinForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
+            <div className="bg-white rounded-t-xl sm:rounded-lg p-6 max-w-md w-full mx-0 sm:mx-4 max-h-[90vh] overflow-y-auto">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Join Community</h3>
               <form className="space-y-4">
                 <div>
