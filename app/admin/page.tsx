@@ -141,6 +141,8 @@ export default function AdminDashboard() {
   // Modal states
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isDeletingLocation, setIsDeletingLocation] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Location>>({});
   const [isDemoMode, setIsDemoMode] = useState(false);
@@ -355,6 +357,23 @@ export default function AdminDashboard() {
     }
   };
 
+  const requestLocationDelete = (location: Location) => {
+    setSelectedLocation(location);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmLocationDelete = async () => {
+    if (!selectedLocation || isDeletingLocation) return;
+    setIsDeletingLocation(true);
+    try {
+      await handleLocationDelete(selectedLocation.id);
+      setDeleteModalOpen(false);
+      setSelectedLocation(null);
+    } finally {
+      setIsDeletingLocation(false);
+    }
+  };
+
   const handleViewLocation = (location: Location) => {
     setSelectedLocation(location);
     setViewModalOpen(true);
@@ -412,6 +431,7 @@ export default function AdminDashboard() {
   const handleCloseModals = () => {
     setViewModalOpen(false);
     setEditModalOpen(false);
+    setDeleteModalOpen(false);
     setSelectedLocation(null);
     setEditFormData({});
   };
@@ -886,7 +906,7 @@ export default function AdminDashboard() {
                             <Edit className="h-4 w-4" />
                           </button>
                           <button 
-                            onClick={() => handleLocationDelete(location.id)}
+                            onClick={() => requestLocationDelete(location)}
                             className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors"
                             title="Delete Location"
                           >
@@ -1190,6 +1210,60 @@ export default function AdminDashboard() {
                 <Check className="h-4 w-4 mr-2" />
                 Save Changes
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteModalOpen && selectedLocation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200 flex items-start justify-between">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Delete location?</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    This will permanently remove{' '}
+                    <span className="font-medium text-gray-900">{selectedLocation.name}</span> from the map.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseModals}
+                className="text-gray-400 hover:text-gray-600"
+                aria-label="Close"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="bg-red-50 border border-red-100 rounded-md p-3 mb-6">
+                <p className="text-sm text-red-700">
+                  This action cannot be undone. Make sure you selected the right item before deleting.
+                </p>
+              </div>
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={handleCloseModals}
+                  disabled={isDeletingLocation}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmLocationDelete}
+                  disabled={isDeletingLocation}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+                >
+                  {isDeletingLocation ? 'Deleting…' : 'Delete'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

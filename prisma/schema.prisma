@@ -342,6 +342,7 @@ model MapElement {
   description String?       @db.Text
   risk        RiskLevel?    @default(LOW)
   category    String?
+  visible     Boolean       @default(true)
   createdBy   String?       // User ID who created the element
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

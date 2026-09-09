@@ -5,18 +5,20 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, Circle } fro
 import { Location } from '../types';
 import { getLocationTypeIcon, getStatusColor } from '../lib/utils';
 import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
+import { getPolygonParts } from '../lib/map-geometry';
 import MapResizeFix from './MapResizeFix';
 
 interface MapElement {
   id: string;
   type: 'marker' | 'polygon' | 'polyline' | 'circle' | 'arrow';
-  coordinates: [number, number][] | [number, number];
+  coordinates: [number, number][] | [number, number][][] | [number, number];
   color: string;
   size?: number;
   label?: string;
   description?: string;
   risk?: 'High' | 'Medium' | 'Low';
   category?: string;
+  visible?: boolean;
   createdBy?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -149,12 +151,13 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
 
         {/* Map Elements */}
         {mapElements.map((element) => {
+          if (element.visible === false) return null;
           const elementType = element.type.toLowerCase();
           if (elementType === 'polygon') {
-            return (
+            return getPolygonParts(element.coordinates).map((positions, partIndex) => (
               <Polygon
-                key={element.id}
-                positions={element.coordinates as [number, number][]}
+                key={`${element.id}-${partIndex}`}
+                positions={positions}
                 color={element.color}
                 weight={element.size || 3}
                 fillColor={element.color}
@@ -195,7 +198,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                   </div>
                 </Popup>
               </Polygon>
-            );
+            ));
           } else if (elementType === 'polyline') {
             return (
               <Polyline

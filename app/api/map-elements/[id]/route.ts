@@ -13,7 +13,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { type, coordinates, color, size, label, description, risk, category } = body;
+    const { type, coordinates, color, size, label, description, risk, category, visible } = body;
 
     // Convert string type to MapElementType enum if provided
     const updateData: any = {
@@ -26,6 +26,10 @@ export async function PUT(
       category,
       updatedAt: new Date()
     };
+
+    if (typeof visible === 'boolean') {
+      updateData.visible = visible;
+    }
 
     if (type) {
       updateData.type = type.toUpperCase() as 'POLYGON' | 'POLYLINE' | 'CIRCLE' | 'MARKER';
