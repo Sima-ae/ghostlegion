@@ -102,8 +102,8 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Ghost Legion Dashboard</h1>
-        <p className="text-gray-600">Overview of preparedness and community management</p>
-        {!loaded && <p className="text-sm text-gray-500 mt-2">Loading live MariaDB data…</p>}
+        <p className="text-gray-600">Overview for management</p>
+        {!loaded && <p className="text-sm text-gray-500 mt-2">Loading live data…</p>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

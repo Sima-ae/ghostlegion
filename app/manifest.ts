@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'Ghost Legion — Preparedness & Community',
+    name: 'Ghost Legion',
     short_name: 'Ghost Legion',
     description:
       'Preparedness and community management: mapping, evacuation plans, alerts, and coordination.',

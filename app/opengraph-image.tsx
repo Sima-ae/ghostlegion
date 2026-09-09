@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { SITE_NAME, SITE_TAGLINE } from '@/app/lib/site';
 
 export const alt =
-  'Ghost Legion — preparedness and community coordination platform';
+  'Ghost Legion';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

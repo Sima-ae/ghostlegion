@@ -80,7 +80,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Ghost Legion — preparedness and community coordination platform",
+        alt: "Ghost Legion",
         type: "image/png",
       },
     ],
