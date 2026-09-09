@@ -4,10 +4,18 @@ import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
 import { asStringArray } from '@/app/lib/json-array';
 import { getClientIP, getNotificationReadCookie } from '@/app/lib/notification-utils';
+import { jsonMissingDatabase } from '@/app/lib/api-response';
 
 // GET /api/notifications - Get notifications for current user or public notifications
 export async function GET(request: NextRequest) {
   try {
+    const missingDb = jsonMissingDatabase({
+      notifications: [],
+      unreadCount: 0,
+      hasMore: false,
+    });
+    if (missingDb) return missingDb;
+
     const session = await getServerSession(authOptions);
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '10');

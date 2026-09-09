@@ -58,3 +58,42 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* Leaflet control sprites — served from /public/leaflet (standalone-safe) */
+.leaflet-default-icon-path {
+  background-image: url('/leaflet/marker-icon.png') !important;
+}
+.leaflet-control-layers-toggle {
+  background-image: url('/leaflet/layers.png') !important;
+}
+.leaflet-retina .leaflet-control-layers-toggle {
+  background-image: url('/leaflet/layers-2x.png') !important;
+}
+
+.ghostlegion-pin {
+  background: none !important;
+  border: none !important;
+}
+.ghostlegion-pin-wrap {
+  width: 36px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+}
+.ghostlegion-pin-body {
+  width: 32px;
+  height: 32px;
+  background: #fff;
+  border: 2px solid #1d4ed8;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+.ghostlegion-pin-emoji {
+  transform: rotate(45deg);
+  font-size: 16px;
+  line-height: 1;
+}

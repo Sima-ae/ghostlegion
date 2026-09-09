@@ -41,11 +41,9 @@ export default function EvacuationPlansPage() {
         const data = await response.json();
         setRoutes(data);
       } else {
-        console.error('Failed to load routes');
         setRoutes([]);
       }
-    } catch (error) {
-      console.error('Error loading routes:', error);
+    } catch {
       setRoutes([]);
     } finally {
       setIsLoading(false);

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
-import { jsonDbNotConfigured, jsonDbFailure, jsonUnknownFailure } from '@/app/lib/api-response';
+import { jsonMissingDatabase, jsonDbFailure, jsonUnknownFailure } from '@/app/lib/api-response';
+import { requireStaff } from '@/app/lib/require-auth';
 
 // GET /api/map-elements - Get all map elements
 export async function GET() {
   try {
-    if (!process.env.DATABASE_URL) {
-      return jsonDbNotConfigured();
-    }
+    const missingDb = jsonMissingDatabase([]);
+    if (missingDb) return missingDb;
 
     const mapElements = await db.mapElement.findMany({
       orderBy: { createdAt: 'desc' },
@@ -37,14 +35,8 @@ export async function GET() {
 // POST /api/map-elements - Create a new map element
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const { type, coordinates, color, size, label, description, risk, category } = body;

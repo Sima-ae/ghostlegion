@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
+import { requireStaff } from '@/app/lib/require-auth';
 
 // GET /api/locations/[id] - Get specific location
 export async function GET(
@@ -48,14 +49,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const { 
@@ -104,23 +99,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Check if user is admin or super admin
-    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN';
-    if (!isAdmin) {
-      return NextResponse.json(
-        { error: 'Insufficient permissions' },
-        { status: 403 }
-      );
-    }
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
 
     await db.location.delete({
       where: { id }

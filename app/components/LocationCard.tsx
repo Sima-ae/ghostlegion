@@ -60,7 +60,7 @@ export default function LocationCard({ location, isSelected, onClick }: Location
             Faciliteiten
           </h4>
           <div className="flex flex-wrap gap-1">
-            {location.facilities.slice(0, 3).map((facility, index) => (
+            {(Array.isArray(location.facilities) ? location.facilities : []).slice(0, 3).map((facility, index) => (
               <span
                 key={index}
                 className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"
@@ -68,9 +68,9 @@ export default function LocationCard({ location, isSelected, onClick }: Location
                 {facility}
               </span>
             ))}
-            {location.facilities.length > 3 && (
+            {(Array.isArray(location.facilities) ? location.facilities : []).length > 3 && (
               <span className="text-xs text-gray-500 px-2 py-1">
-                +{location.facilities.length - 3} meer
+                +{(Array.isArray(location.facilities) ? location.facilities : []).length - 3} meer
               </span>
             )}
           </div>

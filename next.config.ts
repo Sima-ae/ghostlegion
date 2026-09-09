@@ -5,6 +5,27 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     '/': ['./node_modules/.prisma/client/**/*', './node_modules/@prisma/client/**/*'],
   },
+  outputFileTracingExcludes: {
+    '*': [
+      './.env',
+      './.env.*',
+      './.env.local',
+      './.env.production',
+      './database/**',
+      '**/*.sql',
+    ],
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: '/.env', destination: '/404' },
+        { source: '/.env.:name*', destination: '/404' },
+        { source: '/database', destination: '/404' },
+        { source: '/database/:path*', destination: '/404' },
+        { source: '/:path*.sql', destination: '/404' },
+      ],
+    };
+  },
   // Security headers
   async headers() {
     return [

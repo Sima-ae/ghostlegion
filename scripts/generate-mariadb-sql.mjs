@@ -1,15 +1,38 @@
 #!/usr/bin/env node
 /**
  * Generates database/ghostlegion-mariadb-full.sql from the Prisma schema + seed data.
- * Run: node scripts/generate-mariadb-sql.mjs
+ * Run: npm run db:sql
+ * The dump is gitignored — keep it local / on the VPS, never commit it.
  */
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+const require = createRequire(import.meta.url);
+const bcrypt = require('bcryptjs');
+
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outFile = join(root, 'database', 'ghostlegion-mariadb-full.sql');
+
+function loadLocalEnv() {
+  for (const name of ['.env.local', '.env']) {
+    const p = join(root, name);
+    if (!existsSync(p)) continue;
+    for (const line of readFileSync(p, 'utf8').split('\n')) {
+      const t = line.trim();
+      if (!t || t.startsWith('#')) continue;
+      const i = t.indexOf('=');
+      if (i === -1) continue;
+      const k = t.slice(0, i).trim();
+      const v = t.slice(i + 1).trim().replace(/^["']|["']$/g, '');
+      if (process.env[k] === undefined) process.env[k] = v;
+    }
+  }
+}
+
+loadLocalEnv();
 
 function sqlStr(value) {
   if (value === null || value === undefined) return 'NULL';
@@ -28,7 +51,13 @@ function sqlDate(value) {
 
 const now = '2026-01-15 12:00:00.000';
 const adminId = 'admin-ghost-legion';
-const adminHash = '$2b$12$WTxE/gkOMsdGtc88z2MWq.QKRsm0GqFK5tvRz5MrWcKmrh.DgIr.W';
+const adminEmail = process.env.ADMIN_EMAIL;
+const adminPassword = process.env.ADMIN_PASSWORD;
+if (!adminEmail || !adminPassword) {
+  console.error('Set ADMIN_EMAIL and ADMIN_PASSWORD (in .env.local) before generating the dump.');
+  process.exit(1);
+}
+const adminHash = bcrypt.hashSync(adminPassword, 12);
 
 const schema = execFileSync(
   'npx',
@@ -162,10 +191,8 @@ lines.push('-- Database: ghos_t_legion_online');
 lines.push('-- Import in phpMyAdmin / CyberPanel SQL importer (select the database first),');
 lines.push('-- or: mysql -u ghos_t_legion_online -p ghos_t_legion_online < database/ghostlegion-mariadb-full.sql');
 lines.push('--');
-lines.push('-- Default admin login after import:');
-lines.push('--   email:    admin@ghostlegion.online');
-lines.push('--   password: ChangeMe!GhostLegion');
-lines.push('-- CHANGE THIS PASSWORD immediately after first login.');
+lines.push('-- Admin user is created from ADMIN_EMAIL at generation time.');
+lines.push('-- This dump contains a password hash. Keep it private — never commit it.');
 lines.push('');
 lines.push('SET NAMES utf8mb4;');
 lines.push('SET FOREIGN_KEY_CHECKS = 0;');
@@ -192,7 +219,7 @@ lines.push(schema.trim());
 lines.push('');
 lines.push('-- Seed data');
 lines.push(`INSERT INTO \`User\` (\`id\`, \`name\`, \`email\`, \`emailVerified\`, \`image\`, \`password\`, \`role\`, \`isActive\`, \`createdAt\`, \`updatedAt\`) VALUES`);
-lines.push(`(${sqlStr(adminId)}, ${sqlStr('System Administrator')}, ${sqlStr('admin@ghostlegion.online')}, NULL, NULL, ${sqlStr(adminHash)}, 'ADMIN', 1, ${sqlStr(now)}, ${sqlStr(now)});`);
+lines.push(`(${sqlStr(adminId)}, ${sqlStr('System Administrator')}, ${sqlStr(adminEmail)}, NULL, NULL, ${sqlStr(adminHash)}, 'ADMIN', 1, ${sqlStr(now)}, ${sqlStr(now)});`);
 lines.push('');
 
 lines.push(`INSERT INTO \`Location\` (\`id\`, \`name\`, \`type\`, \`coordinates\`, \`description\`, \`capacity\`, \`status\`, \`facilities\`, \`contact\`, \`isPublic\`, \`createdAt\`, \`updatedAt\`) VALUES`);

@@ -13,9 +13,10 @@ MariaDB database / user: `ghos_t_legion_online`
    - Point DNS A records to `89.116.38.197`
 
 2. **Import schema + data**
-   - In phpMyAdmin / SQL importer, select `ghos_t_legion_online`
-   - Import `database/ghostlegion-mariadb-full.sql`
-   - Default admin: `admin@ghostlegion.online` / `ChangeMe!GhostLegion` (change immediately)
+   - Generate the dump locally (`npm run db:sql`) — it is gitignored and must not be committed
+   - Copy it privately to the VPS (scp), then in phpMyAdmin / SQL importer select `ghos_t_legion_online`
+   - Import that file; do not publish it
+   - Create the admin on the VPS with `ADMIN_EMAIL` / `ADMIN_PASSWORD` and `node scripts/seed-admin.js` (do not use a shared default password)
 
 3. **App directories and env**
    ```bash

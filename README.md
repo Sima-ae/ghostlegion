@@ -94,9 +94,15 @@ A comprehensive military preparedness and community management platform designed
    ```
 
 4. **Set up MariaDB**
+
+   Do **not** commit SQL dumps. Generate one locally if you need it:
    ```bash
+   npm run db:sql
    mysql -u ghos_t_legion_online -p ghos_t_legion_online < database/ghostlegion-mariadb-full.sql
-   # or: npx prisma db push && npm run db:seed
+   ```
+   Or skip the dump and use Prisma:
+   ```bash
+   npx prisma db push && npm run db:seed
    ```
 
    Production deploys to **https://ghostlegion.online** on the VPS (see `DEPLOYMENT_CHECKLIST.md`). Vercel is not used.

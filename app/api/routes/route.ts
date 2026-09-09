@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
+import { jsonMissingDatabase } from '@/app/lib/api-response';
+import { requireStaff } from '@/app/lib/require-auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const missingDb = jsonMissingDatabase([]);
+    if (missingDb) return missingDb;
+
     const routes = await prisma.evacuationRoute.findMany({
       orderBy: { createdAt: 'desc' }
     });
@@ -19,6 +24,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
+
     const body = await request.json();
     const {
       name,

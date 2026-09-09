@@ -49,8 +49,8 @@ export default function Header() {
         const data = await response.json();
         setUnreadCount(data.unreadCount);
       }
-    } catch (error) {
-      console.error('Error loading unread count:', error);
+    } catch {
+      /* unread count stays 0 */
     }
   };
 

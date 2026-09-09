@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
-const isDev = process.env.NODE_ENV === 'development';
+export function isDatabaseConfigured(): boolean {
+  return Boolean(process.env.DATABASE_URL?.trim());
+}
 
 /** Generic JSON errors — never include stack traces or DB details in production. */
 export function jsonError(
@@ -17,6 +19,15 @@ export function jsonDbNotConfigured() {
   });
 }
 
+/**
+ * When DATABASE_URL is missing, fail clearly.
+ * Never return sample/demo rows — local and production both read MariaDB.
+ */
+export function jsonMissingDatabase<T>(_devFallback?: T) {
+  if (isDatabaseConfigured()) return null;
+  return jsonDbNotConfigured();
+}
+
 export function jsonDbFailure() {
   return jsonError(500, {
     error: 'Service temporarily unavailable',
@@ -24,12 +35,7 @@ export function jsonDbFailure() {
   });
 }
 
-export function jsonUnknownFailure(err: unknown) {
-  if (isDev && err instanceof Error) {
-    return NextResponse.json(
-      { error: 'Request failed', message: err.message },
-      { status: 500 }
-    );
-  }
+export function jsonUnknownFailure(_err: unknown) {
+  // Never send Prisma / connection strings / secrets to the client.
   return jsonError(500, { error: 'Service temporarily unavailable', code: 'INTERNAL' });
 }

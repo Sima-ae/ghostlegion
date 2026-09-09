@@ -52,7 +52,7 @@ fi
 echo ""
 echo "=== Next steps ==="
 echo "1. Edit $SHARED_DIR/.env (DATABASE_URL, NEXTAUTH_SECRET)"
-echo "2. MariaDB: mysql ... < $APP_DIR/database/ghostlegion-mariadb-full.sql"
+echo "2. Generate SQL locally (npm run db:sql) and import privately — do not commit database/*.sql"
 echo "3. GitHub secrets: VPS_HOST=89.116.38.197 VPS_USER=root VPS_SSH_KEY (same as catalogus / toyotas)"
 echo "   If SSH times out from GitHub: bash scripts/vps-allow-github-actions-ssh.sh"
 echo "4. OpenLiteSpeed: bash $APP_DIR/scripts/configure-litespeed-ghostlegion.sh"

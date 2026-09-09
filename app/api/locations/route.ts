@@ -2,21 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
-import { jsonDbNotConfigured, jsonDbFailure, jsonUnknownFailure } from '@/app/lib/api-response';
+import { jsonMissingDatabase, jsonDbFailure, jsonUnknownFailure } from '@/app/lib/api-response';
+import { asStringArray } from '@/app/lib/json-array';
+import { requireStaff } from '@/app/lib/require-auth';
 
 // GET /api/locations - Get all locations
 export async function GET() {
   try {
-    if (!process.env.DATABASE_URL) {
-      return jsonDbNotConfigured();
-    }
-
     let session = null;
     try {
       session = await getServerSession(authOptions);
     } catch {
       // Continue without session — public locations only
     }
+
+    const missingDb = jsonMissingDatabase();
+    if (missingDb) return missingDb;
 
     let whereClause: { isPublic?: boolean } | Record<string, never> = {};
 
@@ -43,7 +44,8 @@ export async function GET() {
       
       return {
         ...location,
-        coordinates
+        coordinates,
+        facilities: asStringArray(location.facilities),
       };
     });
 
@@ -71,14 +73,8 @@ export async function GET() {
 // POST /api/locations - Create a new location
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const { 

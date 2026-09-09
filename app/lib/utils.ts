@@ -92,6 +92,7 @@ export function getRoleIcon(role: string): string {
 }
 
 export function getLocationTypeIcon(type: string): string {
+  const key = type.toLowerCase();
   const typeIcons: Record<string, string> = {
     bunker: '🏗️',
     fortress: '🏰',
@@ -101,5 +102,5 @@ export function getLocationTypeIcon(type: string): string {
     command_center: '🎯',
     supply_depot: '📦'
   };
-  return typeIcons[type] || '📍';
+  return typeIcons[key] || '📍';
 }

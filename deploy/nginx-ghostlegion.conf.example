@@ -3,6 +3,24 @@
 
 root /home/ghostlegion.online/public_html;
 
+# Never serve env files, git metadata, or SQL dumps
+location ~ /\.env {
+    deny all;
+    return 404;
+}
+location ~ /\.git {
+    deny all;
+    return 404;
+}
+location ^~ /database {
+    deny all;
+    return 404;
+}
+location ~* \.sql$ {
+    deny all;
+    return 404;
+}
+
 location /.well-known/acme-challenge/ {
     alias /home/ghostlegion.online/public_html/.well-known/acme-challenge/;
 }

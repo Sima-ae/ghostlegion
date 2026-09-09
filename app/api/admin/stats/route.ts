@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
+import { isDatabaseConfigured, jsonDbNotConfigured } from '@/app/lib/api-response';
+import { requireStaff } from '@/app/lib/require-auth';
 
 export async function GET() {
   try {
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
+
+    if (!isDatabaseConfigured()) {
+      return jsonDbNotConfigured();
+    }
+
     // Calculate date ranges
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);

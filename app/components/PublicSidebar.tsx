@@ -105,7 +105,7 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
                       <div className="flex-1 flex items-center justify-between">
                         <span className="truncate">{space.label}</span>
                         {!space.isPublic && (
-                          <Lock className="h-3 w-3 text-gray-400 ml-2" />
+                          <Lock className="h-3 w-3 text-red-500 ml-2" />
                         )}
                         {space.isPublic && (
                           <Unlock className="h-3 w-3 text-green-500 ml-2" />
@@ -183,7 +183,7 @@ export default function PublicSidebar({ activeTab, onTabChange }: PublicSidebarP
                       <div className="flex-1 flex items-center justify-between">
                         <span>{item.label}</span>
                         {!item.isPublic && (
-                          <Lock className="h-3 w-3 text-gray-400 ml-2" />
+                          <Lock className="h-3 w-3 text-red-500 ml-2" />
                         )}
                         {item.isPublic && (
                           <Unlock className="h-3 w-3 text-green-500 ml-2" />

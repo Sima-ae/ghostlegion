@@ -13,7 +13,7 @@ function ErrorContent() {
         return {
           title: 'Configuration Error',
           message: 'There is a problem with the server configuration. Please check the environment variables.',
-          details: 'Missing or incorrect NEXTAUTH_SECRET or NEXTAUTH_URL environment variables.'
+          details: 'The sign-in service is not configured correctly. Please try again later.'
         };
       case 'AccessDenied':
         return {
@@ -79,21 +79,6 @@ function ErrorContent() {
             Go Home
           </button>
         </div>
-
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-            <h3 className="text-sm font-medium text-yellow-800">Development Debug Info:</h3>
-            <p className="mt-1 text-xs text-yellow-700">
-              Error: {error || 'No error parameter'}
-            </p>
-            <p className="mt-1 text-xs text-yellow-700">
-              NEXTAUTH_URL: {process.env.NEXT_PUBLIC_NEXTAUTH_URL || 'Not set'}
-            </p>
-            <p className="mt-1 text-xs text-yellow-700">
-              NODE_ENV: {process.env.NODE_ENV}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

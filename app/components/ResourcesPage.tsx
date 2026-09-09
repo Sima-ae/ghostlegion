@@ -135,11 +135,9 @@ export default function ResourcesPage() {
         const data = await response.json();
         setResources(data);
       } else {
-        console.error('Failed to load resources:', response.status);
         setResources([]);
       }
-    } catch (error) {
-      console.error('Error loading resources:', error);
+    } catch {
       setResources([]);
     } finally {
       setIsLoading(false);

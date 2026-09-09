@@ -152,9 +152,11 @@ export default function PeopleGrid({ people, onPeopleSelect }: PeopleGridProps) 
 
               {/* Contact & Last Seen */}
               <div className="space-y-2 text-xs text-gray-500">
-                <div className="flex items-center justify-between">
-                  <span>Contact: {person.contact}</span>
-                </div>
+                {person.contact ? (
+                  <div className="flex items-center justify-between">
+                    <span>Contact: {person.contact}</span>
+                  </div>
+                ) : null}
                 <div className="flex items-center justify-between">
                   <span>Laatst gezien: {formatTimeAgo(person.lastSeen)}</span>
                   <span className={`px-2 py-1 rounded text-xs ${

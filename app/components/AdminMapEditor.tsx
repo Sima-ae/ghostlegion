@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, Circle, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
+import { getLocationTypeIcon } from '../lib/utils';
 import { 
   MapPin, 
   Square, 
@@ -19,13 +21,7 @@ import {
 } from 'lucide-react';
 import { Location } from '../types';
 
-// Fix for default Leaflet icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'leaflet/images/marker-icon-2x.png',
-  iconUrl: 'leaflet/images/marker-icon.png',
-  shadowUrl: 'leaflet/images/marker-shadow.png',
-});
+fixLeafletDefaultIcons();
 
 interface DrawingTool {
   type: 'marker' | 'polygon' | 'polyline' | 'circle' | 'arrow';
@@ -115,10 +111,10 @@ export default function AdminMapEditor({
         }));
         setMapElements(convertedElements);
       } else {
-        console.error('AdminMapEditor: Failed to load map elements:', response.status);
+        setMapElements([]);
       }
-    } catch (error) {
-      console.error('AdminMapEditor: Error loading map elements:', error);
+    } catch {
+      setMapElements([]);
     }
   };
 
@@ -427,6 +423,7 @@ export default function AdminMapEditor({
             <Marker
               key={location.id}
               position={[location.coordinates[0], location.coordinates[1]]}
+              icon={locationMarkerIcon(getLocationTypeIcon(location.type))}
             >
               <Popup>
                 <div className="p-2">

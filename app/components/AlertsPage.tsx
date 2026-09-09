@@ -47,11 +47,9 @@ export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
         const data = await response.json();
         setAlerts(data);
       } else {
-        console.error('Failed to load alerts');
         setAlerts([]);
       }
-    } catch (error) {
-      console.error('Error loading alerts:', error);
+    } catch {
       setAlerts([]);
     } finally {
       setIsLoading(false);

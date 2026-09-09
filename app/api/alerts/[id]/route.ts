@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
+import { requireStaff } from '@/app/lib/require-auth';
 
 // PUT /api/alerts/[id] - Update an alert
 export async function PUT(
@@ -7,6 +8,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
+
     const { id } = await params;
     const body = await request.json();
     const { 
@@ -66,6 +70,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
+
     const { id } = await params;
 
     await prisma.alert.delete({

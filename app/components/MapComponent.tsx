@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, Circle } from 'react-leaflet';
 import { Location } from '../types';
 import { getLocationTypeIcon, getStatusColor } from '../lib/utils';
+import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
 
 interface MapElement {
   id: string;
@@ -32,6 +33,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
   const [mapKey, setMapKey] = useState(0);
 
   useEffect(() => {
+    fixLeafletDefaultIcons();
     setIsClient(true);
   }, []);
 
@@ -59,13 +61,9 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
           }));
           setMapElements(convertedElements);
         } else {
-          console.error('Failed to load map elements:', response.status, response.statusText);
-          // Set empty array on error to prevent map rendering issues
           setMapElements([]);
         }
-      } catch (error) {
-        console.error('Error loading map elements:', error);
-        // Set empty array on error to prevent map rendering issues
+      } catch {
         setMapElements([]);
       }
     };
@@ -104,6 +102,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
           <Marker
             key={location.id}
             position={[location.coordinates[0], location.coordinates[1]]}
+            icon={locationMarkerIcon(getLocationTypeIcon(location.type))}
             eventHandlers={{
               click: () => onLocationSelect?.(location),
             }}
@@ -142,7 +141,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                 <div className="mt-2">
                   <h4 className="text-xs font-medium mb-1">Faciliteiten:</h4>
                   <div className="flex flex-wrap gap-1">
-                    {location.facilities.map((facility, index) => (
+                    {(Array.isArray(location.facilities) ? location.facilities : []).map((facility, index) => (
                       <span
                         key={index}
                         className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"

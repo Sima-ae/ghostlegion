@@ -31,7 +31,6 @@ import RoutesManagement from '../components/RoutesManagement';
 import ResourcesManagement from '../components/ResourcesManagement';
 import AlertsManagement from '../components/AlertsManagement';
 import NotificationManagement from '../components/NotificationManagement';
-import { sampleLocations } from '../data/sampleData';
 import { Location } from '../types';
 
 // Error Boundary Component
@@ -158,24 +157,14 @@ export default function AdminDashboard() {
       
       if (response.ok) {
         const locationsData = await response.json();
-        setLocations(locationsData);
+        setLocations(Array.isArray(locationsData) ? locationsData : []);
       } else {
-        let detail = '';
-        try {
-          const errBody = await response.json();
-          if (errBody?.message) detail = ` ${errBody.message}`;
-          else if (errBody?.error) detail = ` ${errBody.error}`;
-        } catch {
-          /* non-JSON body */
-        }
-        console.error('Failed to load locations:', response.status, detail);
-        // Fallback to sample data if API fails
-        setLocations(sampleLocations);
+        console.error('Failed to load locations:', response.status);
+        setLocations([]);
       }
     } catch (error) {
-      console.error('Error loading locations:', error);
-      // Fallback to sample data if API fails
-      setLocations(sampleLocations);
+      console.error('Failed to load locations:', error);
+      setLocations([]);
     }
   };
 
@@ -225,9 +214,7 @@ export default function AdminDashboard() {
           routesStatus: 'All operational'
         });
       }
-    } catch (error: unknown) {
-      console.error('Error loading admin stats:', error);
-
+    } catch {
       setStats({
         totalUsers: 156,
         totalLocations: locations.length,

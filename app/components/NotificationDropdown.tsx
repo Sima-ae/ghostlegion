@@ -63,11 +63,9 @@ export default function NotificationDropdown({
         const data = await response.json();
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount);
-      } else {
-        console.error('Failed to load notifications:', response.status);
       }
-    } catch (error) {
-      console.error('Error loading notifications:', error);
+    } catch {
+      /* notifications stay empty */
     } finally {
       setIsLoading(false);
     }

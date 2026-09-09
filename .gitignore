@@ -30,13 +30,21 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (keep committed examples)
+# env files — never commit real secrets (examples only)
 .env
-.env.local
-.env.production
-.env*.local
+.env.*
+.envrc
 !.env.example
 !.env.vps.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.vps.example
+
+# SQL dumps — credentials + seed data. Generate locally; do not commit.
+# Allowed later: prisma/migrations/**/*.sql
+/database/*.sql
+**/*mariadb-full.sql
 
 # vercel (legacy — app now deploys to VPS)
 .vercel

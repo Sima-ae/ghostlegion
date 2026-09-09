@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
+import { requireStaff } from '@/app/lib/require-auth';
 
 // PUT /api/resources/[id] - Update a resource
 export async function PUT(
@@ -9,14 +8,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
 
     const { id } = await params;
     const body = await request.json();
@@ -64,14 +57,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
 
     const { id } = await params;
 

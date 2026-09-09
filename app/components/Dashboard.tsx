@@ -1,69 +1,111 @@
 'use client';
 
-import { useState } from 'react';
-import { MapPin, Users, Route, Package, AlertTriangle, Activity, Shield, Heart } from 'lucide-react';
-import { sampleLocations, samplePeople, sampleEvacuationRoutes, sampleResources, sampleAlerts, sampleCommunityMembers } from '../data/sampleData';
+import { useEffect, useState } from 'react';
+import { MapPin, Users, Route, Package, AlertTriangle, Shield } from 'lucide-react';
 import { getStatusColor, getSeverityColor, formatTimeAgo } from '../lib/utils';
 
+type LocationRow = { id: string; status: string };
+type PersonRow = { id: string; name: string; role: string; department: string; status: string };
+type RouteRow = { id: string; status: string };
+type AlertRow = { id: string; title: string; message: string; severity: string; location?: string; createdAt: string };
+type ResourceRow = { id: string; name: string; location: string; quantity: number; unit: string; status: string };
+
+async function loadJson<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const response = await fetch(url, { credentials: 'include' });
+    if (!response.ok) return fallback;
+    const data = await response.json();
+    return data as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function Dashboard() {
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [locations, setLocations] = useState<LocationRow[]>([]);
+  const [people, setPeople] = useState<PersonRow[]>([]);
+  const [routes, setRoutes] = useState<RouteRow[]>([]);
+  const [alerts, setAlerts] = useState<AlertRow[]>([]);
+  const [resources, setResources] = useState<ResourceRow[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [locs, ppl, rts, alrts, res] = await Promise.all([
+        loadJson<LocationRow[]>('/api/locations', []),
+        loadJson<PersonRow[]>('/api/people', []),
+        loadJson<RouteRow[]>('/api/routes', []),
+        loadJson<AlertRow[]>('/api/alerts', []),
+        loadJson<ResourceRow[]>('/api/resources', []),
+      ]);
+      if (cancelled) return;
+      setLocations(Array.isArray(locs) ? locs : []);
+      setPeople(Array.isArray(ppl) ? ppl : []);
+      setRoutes(Array.isArray(rts) ? rts : []);
+      setAlerts(Array.isArray(alrts) ? alrts : []);
+      setResources(Array.isArray(res) ? res : []);
+      setLoaded(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const stats = [
     {
       title: 'Actieve Locaties',
-      value: sampleLocations.filter(l => l.status === 'active').length,
-      total: sampleLocations.length,
+      value: locations.filter((l) => String(l.status).toUpperCase() === 'ACTIVE').length,
+      total: locations.length,
       icon: MapPin,
       color: 'text-green-600 bg-green-100',
-      change: '+2 deze week'
     },
     {
       title: 'Personeel Online',
-      value: samplePeople.filter(p => p.status === 'active').length,
-      total: samplePeople.length,
+      value: people.filter((p) => String(p.status).toUpperCase() === 'ACTIVE').length,
+      total: people.length,
       icon: Users,
       color: 'text-blue-600 bg-blue-100',
-      change: '+5 vandaag'
     },
     {
       title: 'Evacuation Routes',
-      value: sampleEvacuationRoutes.filter(r => r.status === 'open').length,
-      total: sampleEvacuationRoutes.length,
+      value: routes.filter((r) => String(r.status).toUpperCase() === 'OPEN').length,
+      total: routes.length,
       icon: Route,
       color: 'text-purple-600 bg-purple-100',
-      change: 'Alle operationeel'
     },
     {
       title: 'Critical Alerts',
-      value: sampleAlerts.filter(a => a.severity === 'CRITICAL' || a.severity === 'HIGH').length,
-      total: sampleAlerts.length,
+      value: alerts.filter((a) => a.severity === 'CRITICAL' || a.severity === 'HIGH').length,
+      total: alerts.length,
       icon: AlertTriangle,
       color: 'text-red-600 bg-red-100',
-      change: '-1 sinds gisteren'
-    }
+    },
   ];
 
-  const recentAlerts = sampleAlerts
+  const recentAlerts = [...alerts]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
-  const onlinePeople = sampleCommunityMembers
-    .filter(p => p.status === 'online')
+  const onlinePeople = people
+    .filter((p) => String(p.status).toUpperCase() === 'ACTIVE')
     .slice(0, 8);
 
-  const lowStockResources = sampleResources
-    .filter(r => r.status === 'low_stock' || r.status === 'out_of_stock')
+  const lowStockResources = resources
+    .filter((r) => {
+      const status = String(r.status).toUpperCase();
+      return status === 'LOW_STOCK' || status === 'OUT_OF_STOCK';
+    })
     .slice(0, 5);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Ghost Legion Dashboard</h1>
         <p className="text-gray-600">Overview of military preparedness and community management for the Netherlands</p>
+        {!loaded && <p className="text-sm text-gray-500 mt-2">Loading live MariaDB data…</p>}
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
@@ -79,17 +121,12 @@ export default function Dashboard() {
                   <Icon className="h-6 w-6" />
                 </div>
               </div>
-              <div className="mt-4">
-                <span className="text-sm text-green-600 font-medium">{stat.change}</span>
-              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Alerts */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -115,20 +152,14 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <button className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Alle waarschuwingen bekijken
-              </button>
-            </div>
           </div>
         </div>
 
-        {/* Online People */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Online People</h2>
-              <span className="text-sm text-gray-500">{onlinePeople.length} online</span>
+              <span className="text-sm text-gray-500">{onlinePeople.length} active</span>
             </div>
           </div>
           <div className="p-6">
@@ -137,13 +168,13 @@ export default function Dashboard() {
                 <div key={person.id} className="flex items-center space-x-3">
                   <div className="flex-shrink-0">
                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                      <span className="text-sm">{person.avatar}</span>
+                      <Users className="h-4 w-4 text-gray-500" />
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{person.name}</p>
                     <p className="text-xs text-gray-500 capitalize">
-                      {person.role.replace('_', ' ')} • {person.department}
+                      {String(person.role).replace('_', ' ')} • {person.department}
                     </p>
                   </div>
                   <div className="flex-shrink-0">
@@ -152,15 +183,9 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <button className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Alle personeel bekijken
-              </button>
-            </div>
           </div>
         </div>
 
-        {/* Resource Status */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
@@ -187,16 +212,10 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <button className="w-full text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Alle voorraden bekijken
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

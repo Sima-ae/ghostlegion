@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
+import { jsonMissingDatabase } from '@/app/lib/api-response';
+import { requireStaff } from '@/app/lib/require-auth';
 
 // GET /api/alerts - Get all alerts
 export async function GET() {
   try {
+    const missingDb = jsonMissingDatabase([]);
+    if (missingDb) return missingDb;
+
     const alerts = await db.alert.findMany({
       orderBy: { createdAt: 'desc' }
     });
@@ -23,14 +26,8 @@ export async function GET() {
 // POST /api/alerts - Create a new alert
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const auth = await requireStaff();
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const { 

@@ -19,11 +19,9 @@ systemctl restart ghostlegion
 
 ## Database
 
-Import `database/ghostlegion-mariadb-full.sql` into MariaDB database `ghos_t_legion_online` before the first start.
+Generate a local dump (`npm run db:sql`) and import it privately into MariaDB database `ghos_t_legion_online` before the first start. Do not commit or publish `database/ghostlegion-mariadb-full.sql`.
 
-Default admin after import:
-- email: `admin@ghostlegion.online`
-- password: `ChangeMe!GhostLegion`
+Create the admin after import with `ADMIN_EMAIL` / `ADMIN_PASSWORD` and `node scripts/seed-admin.js`. Do not publish a default password.
 
 ## Logs
 

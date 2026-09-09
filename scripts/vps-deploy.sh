@@ -70,6 +70,14 @@ mkdir -p "$STAGE/public"
 if [ -d public ]; then
   cp -a public/. "$STAGE/public/"
 fi
+
+# Never ship env files from the build tree into public/ or the standalone bundle.
+find "$STAGE" \( -name '.env' -o -name '.env.*' \) \
+  ! -name '.env.example' ! -name '.env.vps.example' -delete 2>/dev/null || true
+find "$STAGE/public" \( -name '.env' -o -name '.env.*' -o -name '*.pem' -o -name '*.key' \) \
+  -delete 2>/dev/null || true
+
+chmod 600 "$SHARED_ENV"
 ln -sfn "$SHARED_ENV" "$STAGE/.env"
 ln -sfn "$SHARED_ENV" "$STAGE/.env.local"
 

@@ -35,7 +35,12 @@
 ### 1. Environment Variables
 - ✅ All secrets moved to environment variables
 - ✅ No hardcoded passwords or API keys in codebase
-- ✅ `.env*` files are in `.gitignore`
+- ✅ `.env` and `.env.local` are gitignored (only `.env.example` / `.env.vps.example` are committed)
+- ✅ SQL dumps (`database/*.sql`) are gitignored and blocked from HTTP
+- ✅ CI fails if a real `.env` file or SQL dump is tracked (`scripts/check-env-not-committed.sh`)
+- ✅ HTTP requests for `/.env*`, `/database/*`, and `*.sql` return 404 (middleware + nginx)
+- ✅ API errors never include connection strings or secrets
+- ✅ Never prefix secrets with `NEXT_PUBLIC_` (that would expose them in the browser)
 - ✅ Seed scripts require environment variables for admin credentials
 
 ### 2. Security Headers
