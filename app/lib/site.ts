@@ -14,7 +14,7 @@ export function getSiteUrl(): string {
 
 export const SITE_NAME = 'Ghost Legion';
 
-export const SITE_TAGLINE = '';
+export const SITE_TAGLINE = 'Online';
 
 export const DEFAULT_DESCRIPTION =
   'Ghost Legion is a preparedness and community management platform: strategic location mapping, evacuation routes, alerts, resources, personnel coordination, and crisis checklists. Built for resilience, coordination, and public safety.';
