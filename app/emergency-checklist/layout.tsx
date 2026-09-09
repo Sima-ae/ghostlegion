@@ -1,21 +1,21 @@
 import type { Metadata } from 'next';
 import { getSiteUrl } from '@/app/lib/site';
 
-const title = 'Emergency Checklist — Netherlands War & Crisis Guide';
+const title = 'Emergency Checklist — War & Crisis Guide';
 const description =
-  'Step-by-step emergency checklist for residents of the Netherlands: stay informed, prepare supplies, evacuation awareness, communication plans, and safety during conflict or major crisis. From Ghost Legion.';
+  'Step-by-step emergency checklist: stay informed, prepare supplies, evacuation awareness, communication plans, and safety during conflict or major crisis. From Ghost Legion.';
 
 export const metadata: Metadata = {
   title,
   description,
   keywords: [
-    'Netherlands emergency checklist',
-    'war preparation Netherlands',
-    'crisis checklist Netherlands',
-    'Dutch civil defense',
-    'emergency supplies Netherlands',
+    'emergency checklist',
+    'war preparation',
+    'crisis checklist',
+    'civil defense',
+    'emergency supplies',
     'evacuation awareness',
-    'NL crisis planning',
+    'crisis planning',
   ],
   alternates: {
     canonical: `${getSiteUrl()}/emergency-checklist`,
@@ -25,7 +25,6 @@ export const metadata: Metadata = {
     description,
     url: '/emergency-checklist',
     type: 'article',
-    locale: 'en_NL',
   },
   twitter: {
     card: 'summary_large_image',
@@ -44,15 +43,6 @@ function EmergencyChecklistJsonLd() {
     url,
     inLanguage: 'en',
     isPartOf: { '@type': 'WebSite', name: 'Ghost Legion', url: getSiteUrl() },
-    spatialCoverage: {
-      '@type': 'Place',
-      name: 'Netherlands',
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: 52.1326,
-        longitude: 5.2913,
-      },
-    },
     about: {
       '@type': 'Thing',
       name: 'Emergency preparedness and civil safety',

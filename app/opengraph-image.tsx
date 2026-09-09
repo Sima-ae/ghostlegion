@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { SITE_NAME, SITE_TAGLINE } from '@/app/lib/site';
 
 export const alt =
-  'Ghost Legion — Netherlands military preparedness and community coordination platform';
+  'Ghost Legion — preparedness and community coordination platform';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -78,7 +78,7 @@ export default function OpenGraphImage() {
           }}
         >
           Evacuation routes · Strategic mapping · Alerts · Resources · Emergency
-          checklist — focused on the Netherlands.
+          checklist.
         </div>
       </div>
     ),

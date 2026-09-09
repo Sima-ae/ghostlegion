@@ -310,7 +310,7 @@ export default function RoutesManagement({ isDemoMode = false }: RoutesManagemen
                       <div className="absolute inset-0 pointer-events-none">
                         <img
                           src="/demo.png"
-                          alt="Ghost Legion demo: evacuation route editor and strategic path planning for the Netherlands"
+                          alt="Ghost Legion demo: evacuation route editor and strategic path planning"
                           width={640}
                           height={360}
                           loading="lazy"

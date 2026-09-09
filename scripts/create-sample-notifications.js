@@ -18,7 +18,7 @@ async function createSampleNotifications() {
       },
       {
         title: "Emergency Alert: Severe Weather Warning",
-        message: "A severe weather warning has been issued for Northern Netherlands. High winds and heavy rainfall are expected. Please stay indoors and avoid unnecessary travel. Emergency services are on standby.",
+        message: "A severe weather warning has been issued for the northern region. High winds and heavy rainfall are expected. Please stay indoors and avoid unnecessary travel. Emergency services are on standby.",
         type: "EMERGENCY",
         priority: "CRITICAL",
         isPublic: true,

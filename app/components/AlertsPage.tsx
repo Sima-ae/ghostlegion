@@ -125,7 +125,7 @@ export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
         <div className="mb-6">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Alert Center</h2>
           <p className="text-gray-700">
-            Stay informed about current alerts, warnings, and emergency notifications across the Netherlands.
+            Stay informed about current alerts, warnings, and emergency notifications.
           </p>
         </div>
 
@@ -255,7 +255,7 @@ export default function AlertsPage({ isDemoMode = false }: AlertsPageProps) {
                       <div className="absolute inset-0 pointer-events-none">
                         <img
                           src="/demo.png"
-                          alt="Ghost Legion demo: illustrative map view for emergency alerts and regional monitoring in the Netherlands"
+                          alt="Ghost Legion demo: illustrative map view for emergency alerts and regional monitoring"
                           width={640}
                           height={360}
                           loading="lazy"

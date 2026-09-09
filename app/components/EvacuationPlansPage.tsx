@@ -52,7 +52,7 @@ export default function EvacuationPlansPage() {
 
   const evacuationRoutes = {
     north: {
-      name: 'Northern Netherlands',
+      name: 'North',
       routes: routes.filter(route => 
         route.startLocation.toLowerCase().includes('groningen') || 
         route.startLocation.toLowerCase().includes('leeuwarden') ||
@@ -62,7 +62,7 @@ export default function EvacuationPlansPage() {
       )
     },
     central: {
-      name: 'Central Netherlands',
+      name: 'Central',
       routes: routes.filter(route => 
         route.startLocation.toLowerCase().includes('amsterdam') || 
         route.startLocation.toLowerCase().includes('rotterdam') ||
@@ -74,7 +74,7 @@ export default function EvacuationPlansPage() {
       )
     },
     south: {
-      name: 'Southern Netherlands',
+      name: 'South',
       routes: routes.filter(route => 
         route.startLocation.toLowerCase().includes('eindhoven') || 
         route.startLocation.toLowerCase().includes('tilburg') ||
@@ -138,7 +138,7 @@ export default function EvacuationPlansPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Evacuation Plans</h1>
           <p className="text-gray-600">
-            Comprehensive evacuation routes and procedures for the Netherlands during crisis situations.
+            Comprehensive evacuation routes and procedures during crisis situations.
           </p>
         </div>
 
@@ -212,7 +212,7 @@ export default function EvacuationPlansPage() {
                 <div className="absolute inset-0 pointer-events-none">
                   <img
                     src="/demo.png"
-                    alt="Ghost Legion evacuation planning demo: routes and waypoints for Netherlands crisis evacuation scenarios"
+                    alt="Ghost Legion evacuation planning demo: routes and waypoints"
                     width={640}
                     height={360}
                     loading="lazy"

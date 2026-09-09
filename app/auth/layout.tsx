@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Sign in',
   description:
-    'Secure sign-in to Ghost Legion — Netherlands preparedness and community coordination platform.',
+    'Secure sign-in to Ghost Legion — preparedness and community coordination platform.',
   robots: { index: false, follow: false },
 };
 

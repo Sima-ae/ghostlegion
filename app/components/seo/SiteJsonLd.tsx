@@ -17,15 +17,6 @@ export default function SiteJsonLd() {
     url,
     logo: { '@type': 'ImageObject', url: logo, width: 512, height: 512 },
     description: DEFAULT_DESCRIPTION,
-    areaServed: {
-      '@type': 'Country',
-      name: 'Netherlands',
-      sameAs: 'https://en.wikipedia.org/wiki/Netherlands',
-    },
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'NL',
-    },
     geo: {
       '@type': 'GeoCoordinates',
       latitude: GEO.latitude,

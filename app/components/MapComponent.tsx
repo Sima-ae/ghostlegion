@@ -88,7 +88,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
     <div className="w-full h-full min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
       <MapContainer
         key={mapKey}
-        center={[52.1326, 5.2913]} // Center of Netherlands
+        center={[52.1326, 5.2913]}
         zoom={7}
         style={{ height: '100%', width: '100%' }}
         className="w-full h-full"

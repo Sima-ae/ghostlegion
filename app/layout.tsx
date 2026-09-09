@@ -80,7 +80,7 @@ export const metadata: Metadata = {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Ghost Legion — Netherlands military preparedness and community coordination platform",
+        alt: "Ghost Legion — preparedness and community coordination platform",
         type: "image/png",
       },
     ],
@@ -110,8 +110,6 @@ export const metadata: Metadata = {
     },
   },
   other: {
-    "geo.region": GEO.regionIso,
-    "geo.placename": GEO.placename,
     "geo.position": `${GEO.latitude};${GEO.longitude}`,
     ICBM: `${GEO.latitude}, ${GEO.longitude}`,
     "apple-mobile-web-app-title": SITE_NAME,

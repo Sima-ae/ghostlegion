@@ -42,7 +42,7 @@ export default function EvacuationPlan({ routes }: EvacuationPlanProps) {
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Netherlands Evacuation Plans</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Evacuation Plans</h2>
             <p className="text-gray-600">Overview of all available evacuation routes during crisis</p>
           </div>
           <div className="flex space-x-2">

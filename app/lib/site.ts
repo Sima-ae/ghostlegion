@@ -14,17 +14,15 @@ export function getSiteUrl(): string {
 
 export const SITE_NAME = 'Ghost Legion';
 
-export const SITE_TAGLINE =
-  'Military preparedness & community coordination for the Netherlands';
+export const SITE_TAGLINE = 'Preparedness & community coordination';
 
 export const DEFAULT_DESCRIPTION =
-  'Ghost Legion is a preparedness and community management platform for the Netherlands: strategic location mapping, evacuation routes, alerts, resources, personnel coordination, and crisis checklists. Built for resilience, coordination, and public safety.';
+  'Ghost Legion is a preparedness and community management platform: strategic location mapping, evacuation routes, alerts, resources, personnel coordination, and crisis checklists. Built for resilience, coordination, and public safety.';
 
 export const SEO_KEYWORDS = [
-  'Netherlands preparedness',
-  'military preparedness Netherlands',
-  'crisis management Netherlands',
-  'emergency planning Netherlands',
+  'preparedness',
+  'crisis management',
+  'emergency planning',
   'evacuation planning',
   'community resilience',
   'civil defense',
@@ -37,18 +35,15 @@ export const SEO_KEYWORDS = [
   'crisis coordination',
   'NATO preparedness',
   'European security',
-  'Benelux emergency',
-  'Dutch crisis checklist',
+  'crisis checklist',
   'war preparedness checklist',
   'emergency supplies tracking',
   'community management platform',
   'Ghost Legion',
 ] as const;
 
-/** Geographic hints for meta tags & structured data (Netherlands centroid). */
+/** Default map / structured-data centroid. */
 export const GEO = {
-  regionIso: 'NL',
-  placename: 'Netherlands',
   latitude: 52.1326,
   longitude: 5.2913,
 } as const;

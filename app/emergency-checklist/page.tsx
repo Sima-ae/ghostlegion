@@ -12,7 +12,7 @@ export default function EmergencyChecklistPage() {
             <h1 className="text-3xl font-bold text-gray-900">Emergency Checklist</h1>
           </div>
           <p className="text-lg text-gray-600">
-            What to do when war starts in The Netherlands
+            What to do when war starts
           </p>
         </div>
 

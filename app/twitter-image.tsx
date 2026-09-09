@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og';
 import { SITE_NAME, SITE_TAGLINE } from '@/app/lib/site';
 
 export const alt =
-  'Ghost Legion — Netherlands preparedness, mapping, and community coordination';
+  'Ghost Legion — preparedness, mapping, and community coordination';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -49,7 +49,7 @@ export default function TwitterImage() {
             color: 'rgba(255,255,255,0.55)',
           }}
         >
-          Netherlands · Crisis preparedness · PWA-ready
+          Crisis preparedness · PWA-ready
         </span>
       </div>
     ),

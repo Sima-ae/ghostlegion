@@ -1,6 +1,6 @@
-# Ghost Legion - Military Preparedness & Community Management Platform
+# Ghost Legion - Preparedness & Community Management Platform
 
-A comprehensive military preparedness and community management platform designed specifically for the Netherlands during crisis situations. This application provides real-time mapping, personnel management, evacuation planning, and community coordination tools.
+A comprehensive preparedness and community management platform designed for crisis situations. This application provides real-time mapping, personnel management, evacuation planning, and community coordination tools.
 
 ## 🚀 Features
 
@@ -8,7 +8,7 @@ A comprehensive military preparedness and community management platform designed
 - **Real-time Location Tracking**: Interactive map with pins for all critical locations
 - **Location Types**: Bunkers, fortresses, hiding places, evacuation centers, medical facilities, command centers, and supply depots
 - **Detailed Information**: Each location includes capacity, facilities, contact information, and status updates
-- **Geographic Coverage**: Complete coverage of the Netherlands with strategic positioning
+- **Geographic Coverage**: Strategic positioning of critical locations
 
 ### 👥 Comprehensive Personnel Management
 - **Multi-Department Support**: Military, government, humanitarian, medical, logistics, communication, law enforcement, civilian, and volunteer personnel
@@ -199,7 +199,7 @@ A comprehensive military preparedness and community management platform designed
 - Tech and software developers
 - Farmers and food producers
 
-## 🗺️ Sample Locations (Netherlands)
+## 🗺️ Sample Locations
 
 - **Fort Pampus**: Historical fort in IJmeer, suitable as command center
 - **Bunkercomplex Den Haag**: Underground complex under Binnenhof
@@ -306,4 +306,4 @@ For technical support or questions, please contact the development team through 
 
 ---
 
-**Ghost Legion** - Preparing the Netherlands for any crisis situation with comprehensive military preparedness and community management tools.
+**Ghost Legion** - Preparing for any crisis situation with comprehensive preparedness and community management tools.

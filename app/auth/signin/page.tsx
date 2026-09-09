@@ -58,7 +58,7 @@ export default function SignIn() {
           Ghost Legion
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Military Preparedness Platform
+          Preparedness Platform
         </p>
       </div>
 

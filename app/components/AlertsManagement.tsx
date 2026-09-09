@@ -356,7 +356,7 @@ export default function AlertsManagement({ isDemoMode = false }: AlertsManagemen
                       <div className="absolute inset-0 pointer-events-none">
                         <img
                           src="/demo.png"
-                          alt="Ghost Legion admin demo: alert management and map preview for Netherlands preparedness operations"
+                          alt="Ghost Legion admin demo: alert management and map preview"
                           width={640}
                           height={360}
                           loading="lazy"

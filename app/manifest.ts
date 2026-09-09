@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Ghost Legion — Preparedness & Community',
     short_name: 'Ghost Legion',
     description:
-      'Military preparedness and community management: mapping, evacuation plans, alerts, and coordination.',
+      'Preparedness and community management: mapping, evacuation plans, alerts, and coordination.',
     start_url: '/',
     scope: '/',
     display: 'standalone',
