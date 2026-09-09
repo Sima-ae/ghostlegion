@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn, getSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shield, Eye, EyeOff } from 'lucide-react';
-import PwaInstallButton from '../../components/pwa/PwaInstallButton';
+import Link from 'next/link';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -45,8 +45,13 @@ export default function SignIn() {
 
   return (
     <div className="relative min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute top-4 right-4 z-10">
-        <PwaInstallButton />
+      <div className="absolute top-4 left-4 z-10">
+        <Link
+          href="/"
+          className="text-sm text-gray-600 hover:text-gray-900 underline-offset-2 hover:underline"
+        >
+          ← Back to map
+        </Link>
       </div>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">

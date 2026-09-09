@@ -50,9 +50,21 @@ export function PwaProvider({ children }: { children: ReactNode }) {
       window.matchMedia('(display-mode: standalone)'),
       window.matchMedia('(display-mode: window-controls-overlay)'),
     ];
-    mqs.forEach((mq) => mq.addEventListener('change', onChange));
+    mqs.forEach((mq) => {
+      if (typeof mq.addEventListener === 'function') {
+        mq.addEventListener('change', onChange);
+      } else {
+        mq.addListener(onChange);
+      }
+    });
     return () =>
-      mqs.forEach((mq) => mq.removeEventListener('change', onChange));
+      mqs.forEach((mq) => {
+        if (typeof mq.removeEventListener === 'function') {
+          mq.removeEventListener('change', onChange);
+        } else {
+          mq.removeListener(onChange);
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -145,10 +157,14 @@ export function PwaProvider({ children }: { children: ReactNode }) {
   return <PwaContext.Provider value={value}>{children}</PwaContext.Provider>;
 }
 
+const PWA_FALLBACK: PwaContextValue = {
+  isStandalone: false,
+  canUseNativePrompt: false,
+  justInstalled: false,
+  registerComplete: false,
+  runNativeInstall: async () => {},
+};
+
 export function usePwa() {
-  const ctx = useContext(PwaContext);
-  if (!ctx) {
-    throw new Error('usePwa must be used within PwaProvider');
-  }
-  return ctx;
+  return useContext(PwaContext) ?? PWA_FALLBACK;
 }
