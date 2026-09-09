@@ -1,4 +1,6 @@
 import { getServerSession } from 'next-auth';
+import type { Session } from 'next-auth';
+import type { NextResponse } from 'next/server';
 import { authOptions } from '@/app/lib/auth';
 import { jsonError } from '@/app/lib/api-response';
 
@@ -8,7 +10,10 @@ export function isStaffRole(role?: string | null) {
   return Boolean(role && STAFF_ROLES.has(role));
 }
 
-export async function requireStaff() {
+type StaffOk = { session: Session; error: null };
+type StaffFail = { session: null; error: NextResponse };
+
+export async function requireStaff(): Promise<StaffOk | StaffFail> {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return {
@@ -18,7 +23,7 @@ export async function requireStaff() {
   }
   if (!isStaffRole(session.user.role)) {
     return {
-      session,
+      session: null,
       error: jsonError(403, { error: 'Forbidden', code: 'FORBIDDEN' }),
     };
   }

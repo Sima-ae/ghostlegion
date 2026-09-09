@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
         description,
         risk: risk ? risk.toUpperCase() : 'LOW',
         category,
-        createdBy: session.user.id
+        createdBy: auth.session.user.id
       }
     });
 
