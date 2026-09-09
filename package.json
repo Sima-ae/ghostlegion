@@ -2,13 +2,19 @@
   "name": "nextjs",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "prisma generate && next build --turbopack",
-    "start": "next start",
+    "build": "prisma generate && next build",
+    "start": "next start -H 127.0.0.1 -p ${PORT:-3017}",
     "postinstall": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma migrate reset --force && npm run db:seed"
+    "db:reset": "prisma db push --force-reset && npm run db:seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@auth/core": "^0.34.3",

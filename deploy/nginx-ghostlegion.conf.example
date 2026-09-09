@@ -1,0 +1,19 @@
+# Nginx: serve Ghost Legion at https://ghostlegion.online/
+# Place inside your server { } block and proxy to port 3017.
+
+root /home/ghostlegion.online/public_html;
+
+location /.well-known/acme-challenge/ {
+    alias /home/ghostlegion.online/public_html/.well-known/acme-challenge/;
+}
+
+location / {
+    proxy_pass http://127.0.0.1:3017/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
+import { asStringArray } from '@/app/lib/json-array';
 import { getClientIP, getNotificationReadCookie, setNotificationReadCookie } from '@/app/lib/notification-utils';
 
 // GET /api/notifications/[id] - Get specific notification
@@ -60,12 +61,16 @@ export async function GET(
       );
     }
 
-    // Add read status based on user, IP, or cookies
+    const readByUsers = asStringArray(notification.readByUsers);
+    const readByIPs = asStringArray(notification.readByIPs);
     const notificationWithReadStatus = {
       ...notification,
-      isRead: session?.user?.id 
-        ? notification.readByUsers.includes(session.user.id)
-        : notification.readByIPs.includes(ip) || cookieReadNotifications.includes(notification.id)
+      targetUsers: asStringArray(notification.targetUsers),
+      readByUsers,
+      readByIPs,
+      isRead: session?.user?.id
+        ? readByUsers.includes(session.user.id)
+        : readByIPs.includes(ip) || cookieReadNotifications.includes(notification.id)
     };
 
     return NextResponse.json(notificationWithReadStatus);
@@ -197,15 +202,18 @@ export async function PUT(
       let updateData: any = {};
       let response: NextResponse = NextResponse.json({});
       
+      const currentReadByUsers = asStringArray(notification.readByUsers);
+      const currentReadByIPs = asStringArray(notification.readByIPs);
+
       if (session?.user?.id) {
         // For logged-in users, add to readByUsers array
-        if (!notification.readByUsers.includes(session.user.id)) {
-          updateData.readByUsers = [...notification.readByUsers, session.user.id];
+        if (!currentReadByUsers.includes(session.user.id)) {
+          updateData.readByUsers = [...currentReadByUsers, session.user.id];
         }
       } else {
         // For anonymous users, add to readByIPs array and update cookies
-        if (!notification.readByIPs.includes(ip)) {
-          updateData.readByIPs = [...notification.readByIPs, ip];
+        if (!currentReadByIPs.includes(ip)) {
+          updateData.readByIPs = [...currentReadByIPs, ip];
         }
         
         // Update cookie with read notification
@@ -222,11 +230,16 @@ export async function PUT(
           data: updateData
         });
 
+        const updatedReadByUsers = asStringArray(updatedNotification.readByUsers);
+        const updatedReadByIPs = asStringArray(updatedNotification.readByIPs);
         const notificationWithReadStatus = {
           ...updatedNotification,
-          isRead: session?.user?.id 
-            ? updatedNotification.readByUsers.includes(session.user.id)
-            : updatedNotification.readByIPs.includes(ip) || cookieReadNotifications.includes(updatedNotification.id)
+          targetUsers: asStringArray(updatedNotification.targetUsers),
+          readByUsers: updatedReadByUsers,
+          readByIPs: updatedReadByIPs,
+          isRead: session?.user?.id
+            ? updatedReadByUsers.includes(session.user.id)
+            : updatedReadByIPs.includes(ip) || cookieReadNotifications.includes(updatedNotification.id)
         };
 
         return NextResponse.json(notificationWithReadStatus, { 
@@ -238,9 +251,12 @@ export async function PUT(
       // Return current notification if already read
       const notificationWithReadStatus = {
         ...notification,
-        isRead: session?.user?.id 
-          ? notification.readByUsers.includes(session.user.id)
-          : notification.readByIPs.includes(ip) || cookieReadNotifications.includes(notification.id)
+        targetUsers: asStringArray(notification.targetUsers),
+        readByUsers: currentReadByUsers,
+        readByIPs: currentReadByIPs,
+        isRead: session?.user?.id
+          ? currentReadByUsers.includes(session.user.id)
+          : currentReadByIPs.includes(ip) || cookieReadNotifications.includes(notification.id)
       };
 
       return NextResponse.json(notificationWithReadStatus, { 

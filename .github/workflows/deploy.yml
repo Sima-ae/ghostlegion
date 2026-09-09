@@ -1,0 +1,176 @@
+# Deploy ghostlegion.online to VPS on push to main (same pattern as catalogus / toyotas).
+#
+# GitHub secrets → Settings → Secrets → Actions:
+#   VPS_HOST          89.116.38.197  (IPv4 — not IPv6)
+#   VPS_USER          root
+#   VPS_SSH_KEY       full private key (same as catalogus / toyotas / inkoop.autos)
+#   VPS_SSH_PASSPHRASE  only if key is encrypted (optional)
+#   VPS_APP_PATH      /var/www/ghostlegion/app  (optional)
+#
+# If SSH times out from GitHub Actions, on VPS run:
+#   bash scripts/vps-allow-github-actions-ssh.sh
+
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip_build:
+        description: "Skip npm build (git pull + restart only)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-vps-ghostlegion
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Deploy over SSH
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_APP_PATH: ${{ secrets.VPS_APP_PATH }}
+          VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
+          SKIP_BUILD: ${{ github.event_name == 'workflow_dispatch' && inputs.skip_build || false }}
+        run: |
+          set -euo pipefail
+          SKIP_BUILD="${SKIP_BUILD:-false}"
+          SSH_PORT="${VPS_SSH_PORT:-22}"
+          echo "SKIP_BUILD=${SKIP_BUILD}"
+
+          missing=()
+          [[ -z "${VPS_HOST// }" ]] && missing+=("VPS_HOST")
+          [[ -z "${VPS_USER// }" ]] && missing+=("VPS_USER")
+          [[ -z "${SSH_KEY// }" ]] && missing+=("VPS_SSH_KEY")
+          if ((${#missing[@]})); then
+            echo "ERROR: Missing GitHub Actions secrets: ${missing[*]}"
+            echo "Add them at: https://github.com/${{ github.repository }}/settings/secrets/actions"
+            exit 1
+          fi
+
+          install -m 700 -d ~/.ssh
+          KEY_FILE=~/.ssh/id_ed25519_deploy
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+
+          if ! grep -q 'BEGIN.*PRIVATE KEY' "$KEY_FILE"; then
+            echo "ERROR: VPS_SSH_KEY does not look like a PEM private key."
+            exit 1
+          fi
+
+          SSH_BASE=(
+            -T
+            -p "$SSH_PORT"
+            -o StrictHostKeyChecking=accept-new
+            -o BatchMode=yes
+            -o ConnectTimeout=30
+            -o ServerAliveInterval=15
+            -o ServerAliveCountMax=4
+            -o IdentitiesOnly=yes
+            -i "$KEY_FILE"
+          )
+
+          if [[ -n "${SSH_PASSPHRASE// }" ]]; then
+            eval "$(ssh-agent -s)"
+            ASKPASS="$(mktemp)"
+            { echo '#!/bin/sh'; printf 'echo %q\n' "$SSH_PASSPHRASE"; } > "$ASKPASS"
+            chmod 700 "$ASKPASS"
+            DISPLAY=:0 SSH_ASKPASS="$ASKPASS" SSH_ASKPASS_REQUIRE=force \
+              ssh-add "$KEY_FILE" </dev/null || {
+              echo "ERROR: ssh-add failed — check VPS_SSH_KEY and VPS_SSH_PASSPHRASE"
+              exit 1
+            }
+            rm -f "$ASKPASS"
+            SSH_OPTS=(-T -p "$SSH_PORT" -o StrictHostKeyChecking=accept-new -o BatchMode=yes \
+              -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=4)
+          else
+            if ! ssh-keygen -y -f "$KEY_FILE" >/dev/null 2>&1; then
+              echo "ERROR: Private key is encrypted but VPS_SSH_PASSPHRASE is empty."
+              exit 1
+            fi
+            SSH_OPTS=("${SSH_BASE[@]}")
+          fi
+
+          APP_DIR="${VPS_APP_PATH:-/var/www/ghostlegion/app}"
+          SHARED_ENV="/var/www/ghostlegion/shared/.env"
+          REPO="https://github.com/${{ github.repository }}.git"
+
+          echo "Target: ${VPS_USER}@${VPS_HOST}:${SSH_PORT} → ${APP_DIR}"
+
+          if ! timeout 15 bash -c "echo >/dev/tcp/${VPS_HOST}/${SSH_PORT}" 2>/dev/null; then
+            echo "ERROR: Cannot reach ${VPS_HOST}:${SSH_PORT} (connection timed out)."
+            echo "On VPS as root run: bash scripts/vps-allow-github-actions-ssh.sh"
+            echo "Also open TCP ${SSH_PORT} in Hostinger hPanel firewall."
+            echo "Use IPv4 in VPS_HOST: 89.116.38.197"
+            exit 1
+          fi
+
+          SSH_OK=0
+          for attempt in 1 2 3 4 5; do
+            echo "SSH connect attempt ${attempt}/5..."
+            if ssh "${SSH_OPTS[@]}" "${VPS_USER}@${VPS_HOST}" "echo SSH_OK"; then
+              SSH_OK=1
+              break
+            fi
+            echo "SSH connect attempt ${attempt} failed; waiting 20s..."
+            sleep 20
+          done
+          if [[ "$SSH_OK" -ne 1 ]]; then
+            echo "ERROR: Could not SSH after 5 attempts."
+            echo "On VPS: bash scripts/vps-allow-github-actions-ssh.sh"
+            exit 1
+          fi
+
+          ssh "${SSH_OPTS[@]}" "${VPS_USER}@${VPS_HOST}" "set -e
+            export TERM=dumb
+            export CI=1
+            export SKIP_BUILD='${SKIP_BUILD}'
+            APP_DIR='${APP_DIR}'
+            SHARED_ENV='${SHARED_ENV}'
+            REPO='${REPO}'
+
+            echo \"=== GHOSTLEGION DEPLOY \$(date -u +%H:%M:%S) SKIP_BUILD=\$SKIP_BUILD ===\"
+
+            mkdir -p /var/www/ghostlegion/shared /home/ghostlegion.online/public_html
+
+            if [ ! -d \"\$APP_DIR/.git\" ]; then
+              git clone \"\$REPO\" \"\$APP_DIR\"
+            fi
+
+            if [ ! -f \"\$SHARED_ENV\" ]; then
+              echo \"ERROR: \$SHARED_ENV missing — copy .env.vps.example\"
+              exit 1
+            fi
+
+            cd \"\$APP_DIR\"
+            git config --global --add safe.directory \"\$APP_DIR\"
+            git fetch origin main
+            git reset --hard origin/main
+            chmod +x scripts/*.sh
+
+            if [ \"\$SKIP_BUILD\" = \"true\" ]; then
+              echo '=== SKIP_BUILD: restart only ==='
+              systemctl restart ghostlegion
+              sleep 2
+              systemctl is-active --quiet ghostlegion
+            else
+              APP_DIR=\"\$APP_DIR\" SHARED_ENV=\"\$SHARED_ENV\" PORT=3017 bash scripts/vps-deploy.sh
+            fi
+
+            code=\$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1:3017/ || echo 000)
+            echo \"smoke / → \${code}\"
+            case \"\$code\" in 200|301|302|307|308) ;; *)
+              echo \"ERROR: smoke failed (HTTP \${code})\"
+              journalctl -u ghostlegion -n 40 --no-pager || true
+              exit 1
+            esac
+            echo DEPLOY_SSH_DONE
+          "

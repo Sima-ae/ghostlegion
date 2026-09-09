@@ -86,7 +86,7 @@ async function seedAdmin() {
     // Create sample personnel
     console.log('🌱 Creating sample personnel...');
     
-    const personnel = await prisma.personnel.createMany({
+    const personnel = await prisma.people.createMany({
       data: [
         {
           name: 'Generaal van der Berg',

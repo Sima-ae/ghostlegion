@@ -80,11 +80,12 @@ A comprehensive military preparedness and community management platform designed
 
 3. **Set up environment variables**
    
-   Create a `.env.local` file in the root directory:
+   Copy `.env.example` to `.env.local`:
    ```bash
-   DATABASE_URL="postgresql://user:password@localhost:5432/ghostlegion?schema=public"
+   DATABASE_URL="mysql://ghos_t_legion_online:PASSWORD@127.0.0.1:3306/ghos_t_legion_online"
    NEXTAUTH_URL="http://localhost:3000"
    NEXTAUTH_SECRET="generate-using-openssl-rand-base64-32"
+   NEXT_PUBLIC_SITE_URL="http://localhost:3000"
    ```
    
    Generate NEXTAUTH_SECRET:
@@ -92,14 +93,13 @@ A comprehensive military preparedness and community management platform designed
    openssl rand -base64 32
    ```
 
-4. **Set up database**
+4. **Set up MariaDB**
    ```bash
-   # Create database (PostgreSQL)
-   createdb ghostlegion
-   
-   # Run migrations
-   npx prisma db push
+   mysql -u ghos_t_legion_online -p ghos_t_legion_online < database/ghostlegion-mariadb-full.sql
+   # or: npx prisma db push && npm run db:seed
    ```
+
+   Production deploys to **https://ghostlegion.online** on the VPS (see `DEPLOYMENT_CHECKLIST.md`). Vercel is not used.
 
 5. **Start the development server**
    ```bash
@@ -270,8 +270,8 @@ The application is fully responsive and works on:
 See `SECURITY.md` for detailed security documentation.
 
 **Required for production:**
-- `DATABASE_URL` - Database connection string
-- `NEXTAUTH_URL` - Application URL (e.g., https://your-domain.com)
+- `DATABASE_URL` - MariaDB URL (`mysql://ghos_t_legion_online:...@127.0.0.1:3306/ghos_t_legion_online`)
+- `NEXTAUTH_URL` - `https://ghostlegion.online`
 - `NEXTAUTH_SECRET` - Generate with: `openssl rand -base64 32`
 
 **For development seeding:**

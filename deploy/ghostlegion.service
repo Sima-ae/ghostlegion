@@ -1,0 +1,31 @@
+# systemd unit for ghostlegion.online on VPS 89.116.38.197
+# Install:
+#   sudo cp deploy/ghostlegion.service /etc/systemd/system/ghostlegion.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now ghostlegion
+#
+# Listens on PORT 3017 (locked for this app). Do not expose publicly — OLS proxies to it.
+
+[Unit]
+Description=Ghost Legion Next.js (ghostlegion.online)
+After=network.target mariadb.service mysql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/var/www/ghostlegion/app/.next/standalone
+Environment=NODE_ENV=production
+Environment=PORT=3017
+Environment=HOSTNAME=127.0.0.1
+EnvironmentFile=-/var/www/ghostlegion/shared/.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ghostlegion
+
+[Install]
+WantedBy=multi-user.target

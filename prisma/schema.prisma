@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -57,14 +57,14 @@ model User {
 model Notification {
   id          String             @id @default(cuid())
   title       String
-  message     String
+  message     String             @db.Text
   type        NotificationType    @default(INFO)
   priority    NotificationPriority @default(MEDIUM)
   isRead      Boolean            @default(false)
   isPublic    Boolean            @default(true)
-  targetUsers String[]           // Array of user IDs for targeted notifications
-  readByUsers String[]           // Array of user IDs who have read this notification
-  readByIPs   String[]           // Array of IP addresses that have read this notification
+  targetUsers Json               @default("[]") // Array of user IDs for targeted notifications
+  readByUsers Json               @default("[]") // Array of user IDs who have read this notification
+  readByIPs   Json               @default("[]") // Array of IP addresses that have read this notification
   expiresAt   DateTime?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
@@ -102,10 +102,10 @@ model Location {
   name        String
   type        LocationType
   coordinates Json         // [latitude, longitude]
-  description String
+  description String       @db.Text
   capacity    Int?
   status      LocationStatus @default(ACTIVE)
-  facilities  String[]
+  facilities  Json           @default("[]")
   contact     String?
   isPublic    Boolean      @default(true)
   createdAt   DateTime     @default(now())
@@ -136,7 +136,7 @@ model People {
   department    PersonnelDepartment
   status        PersonnelStatus @default(ACTIVE)
   location      String?
-  skills        String[]
+  skills        Json           @default("[]")
   contact       String
   clearanceLevel ClearanceLevel @default(PUBLIC)
   userId        String?        @unique
@@ -302,12 +302,12 @@ enum ResourceStatus {
 model Alert {
   id                    String      @id @default(cuid())
   title                 String
-  message               String
+  message               String      @db.Text
   severity              Severity
   type                  AlertType
   location              String?
   expiresAt             DateTime?
-  acknowledgedBy        String[]    // Array of user IDs
+  acknowledgedBy        Json        @default("[]") // Array of user IDs
   notifyUsers           Boolean     @default(false)
   isUrgent              Boolean     @default(false)
   autoResolve           Boolean     @default(false)
@@ -339,7 +339,7 @@ model MapElement {
   color       String
   size        Int?          // Line width or circle radius
   label       String?
-  description String?
+  description String?       @db.Text
   risk        RiskLevel?    @default(LOW)
   category    String?
   createdBy   String?       // User ID who created the element

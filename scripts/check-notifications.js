@@ -23,8 +23,10 @@ async function checkNotifications() {
         console.log(`   Public: ${notification.isPublic}`);
         console.log(`   Created: ${notification.createdAt.toLocaleString()}`);
         console.log(`   Expires: ${notification.expiresAt ? notification.expiresAt.toLocaleString() : 'Never'}`);
-        console.log(`   Read by Users: ${notification.readByUsers.length}`);
-        console.log(`   Read by IPs: ${notification.readByIPs.length}`);
+        const readByUsers = Array.isArray(notification.readByUsers) ? notification.readByUsers : [];
+        const readByIPs = Array.isArray(notification.readByIPs) ? notification.readByIPs : [];
+        console.log(`   Read by Users: ${readByUsers.length}`);
+        console.log(`   Read by IPs: ${readByIPs.length}`);
         console.log(`   Message: ${notification.message.substring(0, 100)}${notification.message.length > 100 ? '...' : ''}`);
       });
     } else {

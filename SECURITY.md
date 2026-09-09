@@ -61,14 +61,14 @@
 
 ## Required Environment Variables
 
-Create a `.env` file (or set in Vercel) with:
+Create `/var/www/ghostlegion/shared/.env` on the VPS (see `.env.vps.example`):
 
 ```bash
-# Database
-DATABASE_URL="your-database-connection-string"
+# Database (MariaDB on the VPS)
+DATABASE_URL="mysql://ghos_t_legion_online:PASSWORD@127.0.0.1:3306/ghos_t_legion_online"
 
 # NextAuth Configuration
-NEXTAUTH_URL="https://your-domain.com"
+NEXTAUTH_URL="https://ghostlegion.online"
 NEXTAUTH_SECRET="generate-using-openssl-rand-base64-32"
 
 # Admin Seeding (development only)

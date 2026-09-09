@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/lib/auth';
 import { db } from '@/app/lib/db';
-import { getClientIP, getNotificationReadCookie, setNotificationReadCookie } from '@/app/lib/notification-utils';
+import { asStringArray } from '@/app/lib/json-array';
+import { getClientIP, getNotificationReadCookie } from '@/app/lib/notification-utils';
 
 // GET /api/notifications - Get notifications for current user or public notifications
 export async function GET(request: NextRequest) {
@@ -66,47 +67,44 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    let unreadCount = 0;
-    if (session?.user?.id) {
-      unreadCount = await db.notification.count({
-        where: {
-          status: 'APPROVED',
-          OR: [
-            { expiresAt: null },
-            { expiresAt: { gt: new Date() } },
-          ],
-          NOT: { readByUsers: { has: session.user.id } },
-        },
-      });
-    } else {
-      const anonBase = {
-        status: 'APPROVED' as const,
-        isPublic: true,
-        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-      };
-      unreadCount = await db.notification.count({
-        where:
-          cookieReadNotifications.length > 0
-            ? {
-                AND: [
-                  anonBase,
-                  { NOT: { readByIPs: { has: ip } } },
-                  { NOT: { id: { in: cookieReadNotifications } } },
-                ],
-              }
-            : {
-                AND: [anonBase, { NOT: { readByIPs: { has: ip } } }],
-              },
-      });
-    }
+    const unreadRows = await db.notification.findMany({
+      where: session?.user?.id
+        ? {
+            status: 'APPROVED',
+            OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+          }
+        : {
+            status: 'APPROVED',
+            isPublic: true,
+            OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+          },
+      select: { id: true, readByUsers: true, readByIPs: true },
+    });
+
+    const unreadCount = unreadRows.filter((row) => {
+      if (session?.user?.id) {
+        return !asStringArray(row.readByUsers).includes(session.user.id);
+      }
+      return (
+        !asStringArray(row.readByIPs).includes(ip) &&
+        !cookieReadNotifications.includes(row.id)
+      );
+    }).length;
 
     // Add read status to each notification
-    const notificationsWithReadStatus = notifications.map(notification => ({
-      ...notification,
-      isRead: session?.user?.id 
-        ? notification.readByUsers.includes(session.user.id)
-        : notification.readByIPs.includes(ip) || cookieReadNotifications.includes(notification.id)
-    }));
+    const notificationsWithReadStatus = notifications.map(notification => {
+      const readByUsers = asStringArray(notification.readByUsers);
+      const readByIPs = asStringArray(notification.readByIPs);
+      return {
+        ...notification,
+        targetUsers: asStringArray(notification.targetUsers),
+        readByUsers,
+        readByIPs,
+        isRead: session?.user?.id
+          ? readByUsers.includes(session.user.id)
+          : readByIPs.includes(ip) || cookieReadNotifications.includes(notification.id),
+      };
+    });
 
     return NextResponse.json(
       {
