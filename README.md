@@ -1,4 +1,4 @@
-# Ghost Legion - Preparedness & Community Management Platform
+# Ghost Legion
 
 A comprehensive preparedness and community management platform designed for crisis situations. This application provides real-time mapping, personnel management, evacuation planning, and community coordination tools.
 
