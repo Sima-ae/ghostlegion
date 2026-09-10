@@ -14,6 +14,7 @@ type Draft = {
   latitude: number;
   longitude: number;
   body: string;
+  createdBy?: string | null;
   createdByName?: string | null;
 };
 
@@ -27,10 +28,19 @@ export default function MapMemos() {
   const icon = useMemo(() => memoMarkerIcon(), []);
   const isPublisher =
     session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
+  const canEditAll =
+    session?.user?.role === 'ADMIN' ||
+    session?.user?.role === 'SUPER_ADMIN' ||
+    session?.user?.role === 'COMMANDER';
   const canPlace = status !== 'loading';
-  const canEdit = Boolean(session?.user?.id);
-  const canDelete =
-    session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
+  const canDelete = isPublisher;
+
+  const canEditDraft = (draft: Draft | null) => {
+    if (!draft) return false;
+    if (!draft.id) return true;
+    if (canEditAll) return true;
+    return Boolean(session?.user?.id && draft.createdBy === session.user.id);
+  };
 
   const [memos, setMemos] = useState<MapMemo[]>([]);
   const [placing, setPlacing] = useState(false);
@@ -140,13 +150,14 @@ export default function MapMemos() {
       latitude: memo.latitude,
       longitude: memo.longitude,
       body: memo.body,
+      createdBy: memo.createdBy,
       createdByName: memo.createdByName,
     });
   };
 
   const saveDraft = async () => {
     if (!draft || saving) return;
-    if (draft.id && !canEdit) return;
+    if (draft.id && !canEditDraft(draft)) return;
     const body = draft.body.trim();
     if (!body) {
       setError('Write a memo before saving.');
@@ -284,7 +295,7 @@ export default function MapMemos() {
                 <MemoCard
                   map={map}
                   draft={draft}
-                  canWrite={draft.id ? canEdit : true}
+                  canWrite={canEditDraft(draft)}
                   needsReview={!draft.id && !isPublisher}
                   canDelete={canDelete}
                   saving={saving}
@@ -413,7 +424,7 @@ function MemoCard({
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
             <p className="text-sm font-medium text-gray-800">
-              {draft.id ? 'Edit memo' : 'Add a memo to the map'}
+              {draft.id ? (canWrite ? 'Edit memo' : 'Memo') : 'Add a memo to the map'}
             </p>
             {draft.createdByName ? (
               <p className="text-xs text-gray-500 mt-0.5">{draft.createdByName}</p>
@@ -444,7 +455,18 @@ function MemoCard({
             autoFocus
           />
         ) : (
-          <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{draft.body}</p>
+          <>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{draft.body}</p>
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-md bg-gray-100 text-gray-800 text-sm font-medium hover:bg-gray-200"
+              >
+                Close
+              </button>
+            </div>
+          </>
         )}
         {error ? <p className="text-xs text-red-600 mt-2">{error}</p> : null}
         {canWrite ? (

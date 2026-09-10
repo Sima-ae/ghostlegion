@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
-import { jsonUnknownFailure } from '@/app/lib/api-response';
-import { requireAdmin, requireStaff, requireUser } from '@/app/lib/require-auth';
+import { jsonUnknownFailure, jsonError } from '@/app/lib/api-response';
+import { isStaffRole, requireAdmin, requireStaff, requireUser } from '@/app/lib/require-auth';
 
 const MAX_BODY = 2000;
 
@@ -34,6 +34,11 @@ export async function PUT(
 
     const auth = await requireUser();
     if (auth.error) return auth.error;
+
+    const isOwner = existing.createdBy === auth.session.user.id;
+    if (!isStaffRole(auth.session.user.role) && !isOwner) {
+      return jsonError(403, { error: 'Forbidden', code: 'FORBIDDEN' });
+    }
 
     const text = typeof payload?.body === 'string' ? payload.body.trim() : '';
     if (!text || text.length > MAX_BODY) {

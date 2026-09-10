@@ -1,7 +1,7 @@
 'use client';
 
 import { Bell, Search, User, Settings, LogOut, Shield, Send, Menu, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import NotificationDropdown from './NotificationDropdown';
@@ -35,6 +35,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
   const [unreadCount, setUnreadCount] = useState(0);
   const { data: session } = useSession();
   const router = useRouter();
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Check if user is admin or super admin
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
@@ -78,7 +79,24 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
     setIsNotificationSenderOpen(false);
   };
 
+  useEffect(() => {
+    if (!isProfileOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!profileMenuRef.current?.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [isProfileOpen]);
+
+  const goTo = (path: string) => {
+    setIsProfileOpen(false);
+    router.push(path);
+  };
+
   const handleSignOut = async () => {
+    setIsProfileOpen(false);
     await signOut({ callbackUrl: '/auth/signin' });
   };
 
@@ -159,14 +177,20 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
             </div>
 
             {/* Settings */}
-            <button className="hidden md:inline-flex p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md">
+            <button
+              type="button"
+              onClick={() => router.push(session ? '/settings' : '/auth/signin')}
+              className="hidden md:inline-flex p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+              title="Settings"
+            >
               <Settings className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
 
             {/* Login/Profile */}
             {session ? (
-              <div className="relative">
+              <div className="relative" ref={profileMenuRef}>
                 <button
+                  type="button"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                 >
@@ -176,20 +200,26 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
 
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999]">
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => goTo('/profile')}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
                       Profile
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goTo('/settings')}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
                       Settings
-                    </a>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      Help
-                    </a>
+                    </button>
                     {(session?.user?.role === 'ADMIN' || session?.user?.role === 'COMMANDER' || session?.user?.role === 'SUPER_ADMIN') && (
                       <>
                         <hr className="my-1" />
                         <button
-                          onClick={() => router.push('/admin')}
+                          type="button"
+                          onClick={() => goTo('/admin')}
                           className="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
                         >
                           <Shield className="h-4 w-4 mr-2" />
@@ -199,6 +229,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                     )}
                     <hr className="my-1" />
                     <button
+                      type="button"
                       onClick={handleSignOut}
                       className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
