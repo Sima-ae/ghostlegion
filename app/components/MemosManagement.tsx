@@ -24,7 +24,7 @@ export default function MemosManagement() {
     session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
   const [memos, setMemos] = useState<MapMemo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('PENDING');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [selected, setSelected] = useState<MapMemo | null>(null);
   const [pendingDelete, setPendingDelete] = useState<MapMemo | null>(null);
   const [workingId, setWorkingId] = useState<string | null>(null);
@@ -49,10 +49,17 @@ export default function MemosManagement() {
     loadMemos();
   }, []);
 
-  const filtered = useMemo(
-    () => memos.filter((memo) => statusFilter === 'all' || memo.status === statusFilter),
-    [memos, statusFilter]
-  );
+  const filtered = useMemo(() => {
+    const rows =
+      statusFilter === 'all'
+        ? [...memos]
+        : memos.filter((memo) => memo.status === statusFilter);
+    return rows.sort((a, b) => {
+      const byTime = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      if (byTime !== 0) return byTime;
+      return b.id.localeCompare(a.id);
+    });
+  }, [memos, statusFilter]);
 
   const setStatus = async (memo: MapMemo, action: 'approve' | 'reject') => {
     setWorkingId(memo.id);
@@ -106,10 +113,10 @@ export default function MemosManagement() {
           onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
           className="border border-gray-300 rounded-md px-3 py-2 text-sm"
         >
+          <option value="all">All</option>
           <option value="PENDING">Pending</option>
           <option value="APPROVED">Approved</option>
           <option value="REJECTED">Declined</option>
-          <option value="all">All</option>
         </select>
       </div>
 
