@@ -109,6 +109,7 @@ export interface MapMemo {
   status?: 'PENDING' | 'APPROVED' | 'REJECTED';
   reviewedBy?: string | null;
   reviewedAt?: string | null;
+  createdIp?: string | null;
   createdAt: string;
   updatedAt: string;
 }

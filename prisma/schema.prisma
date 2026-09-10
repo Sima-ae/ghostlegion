@@ -372,6 +372,7 @@ model MapMemo {
   status        MapMemoStatus  @default(APPROVED)
   reviewedBy    String?
   reviewedAt    DateTime?
+  createdIp     String?        @db.VarChar(45)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 

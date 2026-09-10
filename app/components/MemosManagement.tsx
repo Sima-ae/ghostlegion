@@ -131,6 +131,7 @@ export default function MemosManagement() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Memo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Author</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -147,6 +148,9 @@ export default function MemosManagement() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
                     {memo.createdByName || (memo.createdBy === 'visitor' ? 'Visitor' : 'Member')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap font-mono text-xs text-gray-700">
+                    {memo.createdIp || '—'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusClass(memo.status)}`}>
@@ -221,6 +225,10 @@ export default function MemosManagement() {
               <p>
                 <span className="font-medium">Author:</span>{' '}
                 {selected.createdByName || (selected.createdBy === 'visitor' ? 'Visitor' : 'Member')}
+              </p>
+              <p>
+                <span className="font-medium">IP:</span>{' '}
+                <span className="font-mono text-xs">{selected.createdIp || '—'}</span>
               </p>
               <p>
                 <span className="font-medium">Location:</span> {selected.latitude.toFixed(5)}, {selected.longitude.toFixed(5)}

@@ -5,6 +5,27 @@ import { jsonMissingDatabase, jsonDbFailure, jsonUnknownFailure, jsonError } fro
 import { authOptions } from '@/app/lib/auth';
 import { isAdminRole, requireStaff } from '@/app/lib/require-auth';
 import { MAX_MEMO_BODY } from '@/app/types';
+import { getClientIP } from '@/app/lib/notification-utils';
+
+const PUBLIC_MEMO_SELECT = {
+  id: true,
+  body: true,
+  latitude: true,
+  longitude: true,
+  createdBy: true,
+  createdByName: true,
+  updatedBy: true,
+  status: true,
+  reviewedBy: true,
+  reviewedAt: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+function creatorIp(request: NextRequest): string {
+  const ip = getClientIP(request).trim().replace(/^::ffff:/i, '').slice(0, 45);
+  return ip || 'unknown';
+}
 
 function parseMemoInput(body: unknown) {
   if (!body || typeof body !== 'object') return null;
@@ -52,6 +73,7 @@ export async function GET(request: NextRequest) {
     const memos = await db.mapMemo.findMany({
       where: { status: 'APPROVED' },
       orderBy: { createdAt: 'desc' },
+      select: PUBLIC_MEMO_SELECT,
     });
 
     return NextResponse.json(memos, {
@@ -88,6 +110,7 @@ export async function POST(request: NextRequest) {
         status: publishNow ? 'APPROVED' : 'PENDING',
         reviewedBy: publishNow ? session?.user?.id : null,
         reviewedAt: publishNow ? new Date() : null,
+        createdIp: creatorIp(request),
       },
     });
 
