@@ -125,8 +125,8 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
               />
             </div>
             <div className="min-w-0 overflow-hidden">
-              <h1 className="text-sm sm:text-lg md:text-xl font-bold truncate">Ghost Legion</h1>
-              <p className="text-xs text-gray-400 truncate hidden md:block">WE ARE UNITED!</p>
+              <h1 className="text-sm sm:text-lg md:text-xl font-bold truncate">GHOST LEGION</h1>
+              <p className="text-xs text-gray-400 truncate hidden md:block">WE ARE UNITED</p>
             </div>
           </div>
 
