@@ -74,6 +74,11 @@ export async function PATCH(request: NextRequest) {
       },
     });
 
+    await db.mapMemo.updateMany({
+      where: { createdBy: auth.session.user.id },
+      data: { createdByName: name },
+    });
+
     return NextResponse.json(user);
   } catch (error) {
     console.error('Error updating account:', error);

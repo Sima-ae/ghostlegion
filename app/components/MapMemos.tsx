@@ -16,6 +16,7 @@ type Draft = {
   body: string;
   createdBy?: string | null;
   createdByName?: string | null;
+  isPrivate?: boolean;
 };
 
 function stopMapEvent(event: { stopPropagation: () => void }) {
@@ -129,6 +130,7 @@ export default function MapMemos() {
         latitude: Number(latlng.lat.toFixed(7)),
         longitude: Number(latlng.lng.toFixed(7)),
         body: '',
+        isPrivate: false,
       });
       setPlacing(false);
       setError('');
@@ -152,6 +154,7 @@ export default function MapMemos() {
       body: memo.body,
       createdBy: memo.createdBy,
       createdByName: memo.createdByName,
+      isPrivate: Boolean(memo.isPrivate),
     });
   };
 
@@ -179,6 +182,7 @@ export default function MapMemos() {
           body,
           latitude: draft.latitude,
           longitude: draft.longitude,
+          isPrivate: Boolean(draft.isPrivate),
         }),
       });
       const saved = await response.json().catch(() => null);
@@ -299,6 +303,11 @@ export default function MapMemos() {
                 <MemoCard
                   map={map}
                   draft={draft}
+                  authorName={
+                    draft.createdBy && session?.user?.id === draft.createdBy
+                      ? session.user.name || draft.createdByName
+                      : draft.createdByName
+                  }
                   canWrite={canEditDraft(draft)}
                   needsReview={!draft.id && !isPublisher}
                   canDelete={canDelete}
@@ -309,6 +318,9 @@ export default function MapMemos() {
                       current ? { ...current, body: body.slice(0, MAX_MEMO_BODY) } : current
                     );
                     setError('');
+                  }}
+                  onPrivateChange={(isPrivate) => {
+                    setDraft((current) => (current ? { ...current, isPrivate } : current));
                   }}
                   onSave={saveDraft}
                   onClose={() => {
@@ -375,24 +387,28 @@ export default function MapMemos() {
 function MemoCard({
   map,
   draft,
+  authorName,
   canWrite,
   needsReview,
   canDelete,
   saving,
   error,
   onChange,
+  onPrivateChange,
   onSave,
   onClose,
   onDelete,
 }: {
   map: L.Map;
   draft: Draft;
+  authorName?: string | null;
   canWrite: boolean;
   needsReview?: boolean;
   canDelete: boolean;
   saving: boolean;
   error: string;
   onChange: (body: string) => void;
+  onPrivateChange: (isPrivate: boolean) => void;
   onSave: () => void;
   onClose: () => void;
   onDelete: () => void;
@@ -432,8 +448,8 @@ function MemoCard({
             <p className="text-sm font-medium text-gray-800">
               {draft.id ? (canWrite ? 'Edit memo' : 'Memo') : 'Add a memo to the map'}
             </p>
-            {draft.createdByName ? (
-              <p className="text-xs text-gray-500 mt-0.5">{draft.createdByName}</p>
+            {authorName ? (
+              <p className="text-xs text-gray-500 mt-0.5">{authorName}</p>
             ) : null}
             {needsReview ? (
               <p className="text-xs text-amber-700 mt-1">
@@ -464,10 +480,27 @@ function MemoCard({
             <p className="mt-1 text-right text-xs text-gray-400">
               {draft.body.length}/{MAX_MEMO_BODY}
             </p>
+            <label className="mt-2 flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={Boolean(draft.isPrivate)}
+                onChange={(event) => onPrivateChange(event.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+              />
+              Private
+            </label>
+            <p className="mt-1 text-xs text-gray-500">
+              {draft.isPrivate
+                ? 'Only staff and you can see this memo on the map.'
+                : 'This memo is visible on the public map when approved.'}
+            </p>
           </>
         ) : (
           <>
             <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{draft.body}</p>
+            {draft.isPrivate ? (
+              <p className="mt-2 text-xs text-gray-500">Private memo</p>
+            ) : null}
             <div className="mt-3 flex justify-end">
               <button
                 type="button"

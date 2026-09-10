@@ -373,11 +373,13 @@ model MapMemo {
   reviewedBy    String?
   reviewedAt    DateTime?
   createdIp     String?        @db.VarChar(45)
+  isPrivate     Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
   @@index([createdAt])
   @@index([status])
+  @@index([isPrivate])
 }
 
 enum MapMemoStatus {

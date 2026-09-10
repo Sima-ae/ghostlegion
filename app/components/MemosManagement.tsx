@@ -79,6 +79,24 @@ export default function MemosManagement() {
     }
   };
 
+  const setPrivate = async (memo: MapMemo, isPrivate: boolean) => {
+    setWorkingId(memo.id);
+    try {
+      const response = await fetch(`/api/map-memos/${memo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'set-private', isPrivate }),
+      });
+      if (!response.ok) return;
+      const updated = await response.json();
+      setMemos((prev) => prev.map((row) => (row.id === memo.id ? updated : row)));
+      setSelected((current) => (current?.id === memo.id ? updated : current));
+    } finally {
+      setWorkingId(null);
+    }
+  };
+
   const confirmDelete = async () => {
     if (!pendingDelete) return;
     setWorkingId(pendingDelete.id);
@@ -105,7 +123,7 @@ export default function MemosManagement() {
             Map memos
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            Approve or decline memos submitted by visitors and members. Approved memos appear on the map.
+            Approve or decline memos submitted by visitors and members. Approved public memos appear on the map.
           </p>
         </div>
         <select
@@ -132,6 +150,7 @@ export default function MemosManagement() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Memo</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Author</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Private</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -151,6 +170,18 @@ export default function MemosManagement() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap font-mono text-xs text-gray-700">
                     {memo.createdIp || '—'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(memo.isPrivate)}
+                        onChange={() => setPrivate(memo, !memo.isPrivate)}
+                        disabled={workingId === memo.id}
+                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 disabled:opacity-50"
+                        title={memo.isPrivate ? 'Private — click to make public' : 'Public — click to make private'}
+                      />
+                    </label>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusClass(memo.status)}`}>
@@ -235,6 +266,9 @@ export default function MemosManagement() {
               </p>
               <p>
                 <span className="font-medium">Status:</span> {selected.status === 'REJECTED' ? 'Declined' : selected.status}
+              </p>
+              <p>
+                <span className="font-medium">Visibility:</span> {selected.isPrivate ? 'Private' : 'Public'}
               </p>
             </div>
             <div className="mt-6 flex justify-end gap-2">

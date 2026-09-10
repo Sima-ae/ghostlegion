@@ -110,6 +110,7 @@ export interface MapMemo {
   reviewedBy?: string | null;
   reviewedAt?: string | null;
   createdIp?: string | null;
+  isPrivate?: boolean;
   createdAt: string;
   updatedAt: string;
 }

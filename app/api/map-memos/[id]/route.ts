@@ -3,6 +3,7 @@ import { db } from '@/app/lib/db';
 import { jsonUnknownFailure, jsonError } from '@/app/lib/api-response';
 import { isStaffRole, requireAdmin, requireStaff, requireUser } from '@/app/lib/require-auth';
 import { MAX_MEMO_BODY } from '@/app/types';
+import { attachCurrentAuthorNames } from '@/app/lib/map-memo-authors';
 
 export async function PUT(
   request: NextRequest,
@@ -28,7 +29,22 @@ export async function PUT(
           reviewedAt: new Date(),
         },
       });
-      return NextResponse.json(memo);
+      const [named] = await attachCurrentAuthorNames([memo]);
+      return NextResponse.json(named);
+    }
+
+    if (payload?.action === 'set-private') {
+      const auth = await requireStaff();
+      if (auth.error) return auth.error;
+      const memo = await db.mapMemo.update({
+        where: { id },
+        data: {
+          isPrivate: payload.isPrivate === true,
+          updatedBy: auth.session.user.id,
+        },
+      });
+      const [named] = await attachCurrentAuthorNames([memo]);
+      return NextResponse.json(named);
     }
 
     const auth = await requireUser();
@@ -54,11 +70,13 @@ export async function PUT(
       where: { id },
       data: {
         body: text,
+        isPrivate: typeof payload?.isPrivate === 'boolean' ? payload.isPrivate : existing.isPrivate,
         updatedBy: auth.session.user.id,
       },
     });
 
-    return NextResponse.json(memo);
+    const [named] = await attachCurrentAuthorNames([memo]);
+    return NextResponse.json(named);
   } catch (error) {
     console.error('Error updating map memo:', error);
     return jsonUnknownFailure(error);
