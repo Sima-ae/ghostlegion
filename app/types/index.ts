@@ -97,6 +97,7 @@ export interface CommunityMember {
 }
 
 export const MAX_MEMO_BODY = 1000;
+export const ANONYMOUS_LABEL = 'Anonymous';
 
 export interface MapMemo {
   id: string;
@@ -111,6 +112,7 @@ export interface MapMemo {
   reviewedAt?: string | null;
   createdIp?: string | null;
   isPrivate?: boolean;
+  isAnonymous?: boolean;
   createdAt: string;
   updatedAt: string;
 }

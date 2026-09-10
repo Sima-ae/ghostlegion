@@ -3,7 +3,7 @@ import { db } from '@/app/lib/db';
 import { jsonUnknownFailure, jsonError } from '@/app/lib/api-response';
 import { isStaffRole, requireAdmin, requireStaff, requireUser } from '@/app/lib/require-auth';
 import { MAX_MEMO_BODY } from '@/app/types';
-import { attachCurrentAuthorNames } from '@/app/lib/map-memo-authors';
+import { attachCurrentAuthorNames, withPublicAuthorNames } from '@/app/lib/map-memo-authors';
 
 export async function PUT(
   request: NextRequest,
@@ -47,6 +47,20 @@ export async function PUT(
       return NextResponse.json(named);
     }
 
+    if (payload?.action === 'set-anonymous') {
+      const auth = await requireStaff();
+      if (auth.error) return auth.error;
+      const memo = await db.mapMemo.update({
+        where: { id },
+        data: {
+          isAnonymous: payload.isAnonymous === true,
+          updatedBy: auth.session.user.id,
+        },
+      });
+      const [named] = await attachCurrentAuthorNames([memo]);
+      return NextResponse.json(named);
+    }
+
     const auth = await requireUser();
     if (auth.error) return auth.error;
 
@@ -71,11 +85,12 @@ export async function PUT(
       data: {
         body: text,
         isPrivate: typeof payload?.isPrivate === 'boolean' ? payload.isPrivate : existing.isPrivate,
+        isAnonymous: typeof payload?.isAnonymous === 'boolean' ? payload.isAnonymous : existing.isAnonymous,
         updatedBy: auth.session.user.id,
       },
     });
 
-    const [named] = await attachCurrentAuthorNames([memo]);
+    const [named] = withPublicAuthorNames(await attachCurrentAuthorNames([memo]));
     return NextResponse.json(named);
   } catch (error) {
     console.error('Error updating map memo:', error);

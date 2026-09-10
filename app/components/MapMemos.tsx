@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import L from 'leaflet';
 import { StickyNote, X, AlertTriangle } from 'lucide-react';
 import { memoMarkerIcon } from '../lib/leaflet-icons';
-import { MapMemo, MAX_MEMO_BODY } from '../types';
+import { MapMemo, MAX_MEMO_BODY, ANONYMOUS_LABEL } from '../types';
 
 type Draft = {
   id?: string;
@@ -17,10 +17,21 @@ type Draft = {
   createdBy?: string | null;
   createdByName?: string | null;
   isPrivate?: boolean;
+  isAnonymous?: boolean;
 };
 
 function stopMapEvent(event: { stopPropagation: () => void }) {
   event.stopPropagation();
+}
+
+function expectedAnswerFromQuestion(question: string): number | null {
+  const match = question.replace(/−/g, '-').match(/(\d+)\s*([+-])\s*(\d+)/);
+  if (!match) return null;
+  const a = Number(match[1]);
+  const b = Number(match[3]);
+  if (match[2] === '+') return a + b;
+  if (match[2] === '-') return a - b;
+  return null;
 }
 
 export default function MapMemos() {
@@ -51,6 +62,14 @@ export default function MapMemos() {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const [submittedNotice, setSubmittedNotice] = useState('');
+  const [captchaQuestion, setCaptchaQuestion] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const isVisitor = status === 'unauthenticated';
+  const captchaExpected = expectedAnswerFromQuestion(captchaQuestion);
+  const captchaOk =
+    captchaExpected !== null && captchaAnswer.trim() === String(captchaExpected);
+  const requiresCaptcha = Boolean(draft && !draft.id && isVisitor);
 
   const loadMemos = useCallback(async () => {
     try {
@@ -63,6 +82,24 @@ export default function MapMemos() {
       if (Array.isArray(rows)) setMemos(rows);
     } catch {
       /* keep current pins if reload fails */
+    }
+  }, []);
+
+  const loadCaptcha = useCallback(async () => {
+    setCaptchaQuestion('');
+    setCaptchaToken('');
+    setCaptchaAnswer('');
+    try {
+      const response = await fetch('/api/map-memos/captcha', { cache: 'no-store' });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data?.question || !data?.token) {
+        setError('Could not load the math question. Close and try again.');
+        return;
+      }
+      setCaptchaQuestion(data.question);
+      setCaptchaToken(data.token);
+    } catch {
+      setError('Could not load the math question. Close and try again.');
     }
   }, []);
 
@@ -111,6 +148,11 @@ export default function MapMemos() {
   }, [saving, deleting]);
 
   useEffect(() => {
+    if (!requiresCaptcha) return;
+    loadCaptcha();
+  }, [requiresCaptcha, draft?.latitude, draft?.longitude, loadCaptcha]);
+
+  useEffect(() => {
     if (!placing || !canPlace) return;
     const container = map.getContainer();
     map.dragging.disable();
@@ -131,6 +173,7 @@ export default function MapMemos() {
         longitude: Number(latlng.lng.toFixed(7)),
         body: '',
         isPrivate: false,
+        isAnonymous: false,
       });
       setPlacing(false);
       setError('');
@@ -155,6 +198,7 @@ export default function MapMemos() {
       createdBy: memo.createdBy,
       createdByName: memo.createdByName,
       isPrivate: Boolean(memo.isPrivate),
+      isAnonymous: Boolean(memo.isAnonymous),
     });
   };
 
@@ -170,6 +214,10 @@ export default function MapMemos() {
       setError(`Memo is too long (max ${MAX_MEMO_BODY} characters).`);
       return;
     }
+    if (requiresCaptcha && !captchaOk) {
+      setError('Solve the math question to save.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -183,11 +231,16 @@ export default function MapMemos() {
           latitude: draft.latitude,
           longitude: draft.longitude,
           isPrivate: Boolean(draft.isPrivate),
+          isAnonymous: Boolean(draft.isAnonymous),
+          ...(requiresCaptcha
+            ? { captchaToken, captchaAnswer: captchaAnswer.trim() }
+            : {}),
         }),
       });
       const saved = await response.json().catch(() => null);
       if (!response.ok) {
         setError(saved?.error || 'Could not save this memo.');
+        if (requiresCaptcha) await loadCaptcha();
         return;
       }
       setDraft(null);
@@ -304,14 +357,20 @@ export default function MapMemos() {
                   map={map}
                   draft={draft}
                   authorName={
-                    draft.createdBy && session?.user?.id === draft.createdBy
-                      ? session.user.name || draft.createdByName
-                      : draft.createdByName
+                    draft.isAnonymous
+                      ? ANONYMOUS_LABEL
+                      : draft.createdBy && session?.user?.id === draft.createdBy
+                        ? session.user.name || draft.createdByName
+                        : draft.createdByName
                   }
                   canWrite={canEditDraft(draft)}
                   needsReview={!draft.id && !isPublisher}
                   canDelete={canDelete}
                   saving={saving}
+                  saveDisabled={requiresCaptcha && !captchaOk}
+                  requiresCaptcha={requiresCaptcha}
+                  captchaQuestion={captchaQuestion}
+                  captchaAnswer={captchaAnswer}
                   error={error}
                   onChange={(body) => {
                     setDraft((current) =>
@@ -322,6 +381,10 @@ export default function MapMemos() {
                   onPrivateChange={(isPrivate) => {
                     setDraft((current) => (current ? { ...current, isPrivate } : current));
                   }}
+                  onAnonymousChange={(isAnonymous) => {
+                    setDraft((current) => (current ? { ...current, isAnonymous } : current));
+                  }}
+                  onCaptchaAnswer={setCaptchaAnswer}
                   onSave={saveDraft}
                   onClose={() => {
                     if (!saving) setDraft(null);
@@ -392,9 +455,15 @@ function MemoCard({
   needsReview,
   canDelete,
   saving,
+  saveDisabled,
+  requiresCaptcha,
+  captchaQuestion,
+  captchaAnswer,
   error,
   onChange,
   onPrivateChange,
+  onAnonymousChange,
+  onCaptchaAnswer,
   onSave,
   onClose,
   onDelete,
@@ -406,9 +475,15 @@ function MemoCard({
   needsReview?: boolean;
   canDelete: boolean;
   saving: boolean;
+  saveDisabled?: boolean;
+  requiresCaptcha?: boolean;
+  captchaQuestion?: string;
+  captchaAnswer?: string;
   error: string;
   onChange: (body: string) => void;
   onPrivateChange: (isPrivate: boolean) => void;
+  onAnonymousChange: (isAnonymous: boolean) => void;
+  onCaptchaAnswer: (answer: string) => void;
   onSave: () => void;
   onClose: () => void;
   onDelete: () => void;
@@ -494,12 +569,45 @@ function MemoCard({
                 ? 'Only staff and you can see this memo on the map.'
                 : 'This memo is visible on the public map when approved.'}
             </p>
+            <label className="mt-2 flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={Boolean(draft.isAnonymous)}
+                onChange={(event) => onAnonymousChange(event.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+              />
+              Anonymous
+            </label>
+            <p className="mt-1 text-xs text-gray-500">
+              {draft.isAnonymous
+                ? 'Your name is hidden. This memo shows as Anonymous.'
+                : 'Your name is shown on this memo.'}
+            </p>
+            {requiresCaptcha ? (
+              <div className="mt-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+                <label className="block text-sm font-medium text-gray-800">
+                  {captchaQuestion || 'Loading question…'}
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={captchaAnswer || ''}
+                  onChange={(event) => onCaptchaAnswer(event.target.value)}
+                  placeholder="Your answer"
+                  className="mt-2 w-full rounded-md border border-gray-200 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            ) : null}
           </>
         ) : (
           <>
             <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{draft.body}</p>
             {draft.isPrivate ? (
               <p className="mt-2 text-xs text-gray-500">Private memo</p>
+            ) : null}
+            {draft.isAnonymous ? (
+              <p className="mt-2 text-xs text-gray-500">Posted as Anonymous</p>
             ) : null}
             <div className="mt-3 flex justify-end">
               <button
@@ -527,7 +635,7 @@ function MemoCard({
               <button
                 type="button"
                 onClick={onSave}
-                disabled={saving}
+                disabled={saving || Boolean(saveDisabled)}
                 className="flex-1 rounded-md bg-green-600 text-white py-2 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
               >
                 {saving ? 'Saving…' : 'Save'}

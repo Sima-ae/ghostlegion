@@ -6,7 +6,8 @@ import { authOptions } from '@/app/lib/auth';
 import { isAdminRole, isStaffRole, requireStaff } from '@/app/lib/require-auth';
 import { MAX_MEMO_BODY } from '@/app/types';
 import { getClientIP } from '@/app/lib/notification-utils';
-import { attachCurrentAuthorNames, authorDisplayName } from '@/app/lib/map-memo-authors';
+import { attachCurrentAuthorNames, authorDisplayName, withPublicAuthorNames } from '@/app/lib/map-memo-authors';
+import { verifyMemoCaptcha } from '@/app/lib/memo-captcha';
 
 const PUBLIC_MEMO_SELECT = {
   id: true,
@@ -22,6 +23,7 @@ const PUBLIC_MEMO_SELECT = {
   createdAt: true,
   updatedAt: true,
   isPrivate: true,
+  isAnonymous: true,
 } as const;
 
 function creatorIp(request: NextRequest): string {
@@ -46,12 +48,14 @@ function parseMemoInput(body: unknown) {
     return { error: 'Invalid map location.' } as const;
   }
   const isPrivate = data.isPrivate === true;
+  const isAnonymous = data.isAnonymous === true;
   return {
     value: {
       body: text,
       latitude: Number(latitude.toFixed(7)),
       longitude: Number(longitude.toFixed(7)),
       isPrivate,
+      isAnonymous,
     },
   } as const;
 }
@@ -79,19 +83,21 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     const staff = isStaffRole(session?.user?.role);
     const userId = session?.user?.id;
-    const memos = await attachCurrentAuthorNames(
-      await db.mapMemo.findMany({
-        where: staff
-          ? { status: 'APPROVED' }
-          : userId
-            ? {
-                status: 'APPROVED',
-                OR: [{ isPrivate: false }, { createdBy: userId }],
-              }
-            : { status: 'APPROVED', isPrivate: false },
-        orderBy: { createdAt: 'desc' },
-        select: PUBLIC_MEMO_SELECT,
-      })
+    const memos = withPublicAuthorNames(
+      await attachCurrentAuthorNames(
+        await db.mapMemo.findMany({
+          where: staff
+            ? { status: 'APPROVED' }
+            : userId
+              ? {
+                  status: 'APPROVED',
+                  OR: [{ isPrivate: false }, { createdBy: userId }],
+                }
+              : { status: 'APPROVED', isPrivate: false },
+          orderBy: { createdAt: 'desc' },
+          select: PUBLIC_MEMO_SELECT,
+        })
+      )
     );
 
     return NextResponse.json(memos, {
@@ -113,12 +119,19 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const parsed = parseMemoInput(await request.json());
+    const payload = await request.json();
+    const parsed = parseMemoInput(payload);
     if (!parsed || 'error' in parsed) {
       return jsonError(400, { error: parsed?.error || 'Invalid memo', code: 'INVALID_MEMO' });
     }
 
     const session = await getServerSession(authOptions);
+    if (!session?.user?.id && !verifyMemoCaptcha(payload.captchaToken, payload.captchaAnswer)) {
+      return jsonError(400, {
+        error: 'Solve the math question to save.',
+        code: 'CAPTCHA',
+      });
+    }
     const publishNow = isAdminRole(session?.user?.role);
     const account = session?.user?.id
       ? await db.user.findUnique({
@@ -129,7 +142,7 @@ export async function POST(request: NextRequest) {
     const createdByName = session?.user?.id
       ? authorDisplayName(account, session.user.name || session.user.email || 'Member')
       : 'Visitor';
-    const memo = await db.mapMemo.create({
+    const created = await db.mapMemo.create({
       data: {
         ...parsed.value,
         createdBy: session?.user?.id || 'visitor',
@@ -140,6 +153,7 @@ export async function POST(request: NextRequest) {
         createdIp: creatorIp(request),
       },
     });
+    const [memo] = withPublicAuthorNames(await attachCurrentAuthorNames([created]));
 
     return NextResponse.json(memo, { status: 201 });
   } catch (error) {

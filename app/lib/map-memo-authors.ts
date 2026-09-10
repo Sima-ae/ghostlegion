@@ -1,4 +1,5 @@
 import { db } from './db';
+import { ANONYMOUS_LABEL } from '@/app/types';
 
 export function authorDisplayName(
   user: { name?: string | null; email?: string | null } | null | undefined,
@@ -11,9 +12,9 @@ export function authorDisplayName(
   return fallback;
 }
 
-export async function attachCurrentAuthorNames<T extends { createdBy: string; createdByName: string | null }>(
-  memos: T[]
-): Promise<T[]> {
+export async function attachCurrentAuthorNames<
+  T extends { createdBy: string; createdByName: string | null; isAnonymous?: boolean },
+>(memos: T[]): Promise<T[]> {
   const ids = [
     ...new Set(memos.map((memo) => memo.createdBy).filter((id) => id && id !== 'visitor')),
   ];
@@ -29,4 +30,12 @@ export async function attachCurrentAuthorNames<T extends { createdBy: string; cr
     const live = names.get(memo.createdBy);
     return live ? { ...memo, createdByName: live } : memo;
   });
+}
+
+export function withPublicAuthorNames<
+  T extends { isAnonymous?: boolean; createdByName: string | null },
+>(memos: T[]): T[] {
+  return memos.map((memo) =>
+    memo.isAnonymous ? { ...memo, createdByName: ANONYMOUS_LABEL } : memo
+  );
 }

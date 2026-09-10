@@ -97,6 +97,24 @@ export default function MemosManagement() {
     }
   };
 
+  const setAnonymous = async (memo: MapMemo, isAnonymous: boolean) => {
+    setWorkingId(memo.id);
+    try {
+      const response = await fetch(`/api/map-memos/${memo.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'set-anonymous', isAnonymous }),
+      });
+      if (!response.ok) return;
+      const updated = await response.json();
+      setMemos((prev) => prev.map((row) => (row.id === memo.id ? updated : row)));
+      setSelected((current) => (current?.id === memo.id ? updated : current));
+    } finally {
+      setWorkingId(null);
+    }
+  };
+
   const confirmDelete = async () => {
     if (!pendingDelete) return;
     setWorkingId(pendingDelete.id);
@@ -151,6 +169,7 @@ export default function MemosManagement() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Author</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Private</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Anonymous</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
@@ -166,7 +185,16 @@ export default function MemosManagement() {
                     </p>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700 whitespace-nowrap">
-                    {memo.createdByName || (memo.createdBy === 'visitor' ? 'Visitor' : 'Member')}
+                    {memo.isAnonymous ? (
+                      <div>
+                        <p>Anonymous</p>
+                        <p className="text-xs text-gray-500">
+                          {memo.createdByName || (memo.createdBy === 'visitor' ? 'Visitor' : 'Member')}
+                        </p>
+                      </div>
+                    ) : (
+                      memo.createdByName || (memo.createdBy === 'visitor' ? 'Visitor' : 'Member')
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap font-mono text-xs text-gray-700">
                     {memo.createdIp || '—'}
@@ -180,6 +208,22 @@ export default function MemosManagement() {
                         disabled={workingId === memo.id}
                         className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 disabled:opacity-50"
                         title={memo.isPrivate ? 'Private — click to make public' : 'Public — click to make private'}
+                      />
+                    </label>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(memo.isAnonymous)}
+                        onChange={() => setAnonymous(memo, !memo.isAnonymous)}
+                        disabled={workingId === memo.id}
+                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 disabled:opacity-50"
+                        title={
+                          memo.isAnonymous
+                            ? 'Anonymous — click to show the name'
+                            : 'Named — click to hide as Anonymous'
+                        }
                       />
                     </label>
                   </td>
@@ -255,7 +299,9 @@ export default function MemosManagement() {
             <div className="mt-4 text-sm text-gray-600 space-y-1">
               <p>
                 <span className="font-medium">Author:</span>{' '}
-                {selected.createdByName || (selected.createdBy === 'visitor' ? 'Visitor' : 'Member')}
+                {selected.isAnonymous
+                  ? `Anonymous (${selected.createdByName || (selected.createdBy === 'visitor' ? 'Visitor' : 'Member')})`
+                  : selected.createdByName || (selected.createdBy === 'visitor' ? 'Visitor' : 'Member')}
               </p>
               <p>
                 <span className="font-medium">IP:</span>{' '}
@@ -269,6 +315,7 @@ export default function MemosManagement() {
               </p>
               <p>
                 <span className="font-medium">Visibility:</span> {selected.isPrivate ? 'Private' : 'Public'}
+                {selected.isAnonymous ? ' · Anonymous' : ''}
               </p>
             </div>
             <div className="mt-6 flex justify-end gap-2">
