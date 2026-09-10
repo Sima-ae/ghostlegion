@@ -6,7 +6,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
 import { getLocationTypeIcon } from '../lib/utils';
-import { getPolygonParts, isCountryOutline } from '../lib/map-geometry';
+import { getPolygonParts, isCountryOutline, mainlandPolygonParts } from '../lib/map-geometry';
+import CetTodayDate from './CetTodayDate';
 import { 
   MapPin, 
   Square, 
@@ -700,7 +701,10 @@ export default function AdminMapEditor({
           {mapElements.map((element) => {
             const elementType = element.type.toLowerCase();
             if (elementType === 'polygon') {
-              return getPolygonParts(element.coordinates).map((positions, partIndex) => (
+              return (isCountryOutline(element)
+                ? mainlandPolygonParts(element.coordinates)
+                : getPolygonParts(element.coordinates)
+              ).map((positions, partIndex) => (
                 <Polygon
                   key={`${element.id}-${partIndex}`}
                   positions={positions}
@@ -740,22 +744,19 @@ export default function AdminMapEditor({
                           <span className="text-xs">{element.category || 'Uncategorized'}</span>
                         </div>
                       ) : null}
-                      {(isCountryOutline(element)
-                        ? element.updatedAt || element.createdAt
-                        : element.createdAt) && (
+                      {isCountryOutline(element) ? (
                         <div className="flex items-center">
-                          <span className="text-xs font-medium mr-2">
-                            {isCountryOutline(element) ? 'Updated:' : 'Created:'}
-                          </span>
+                          <span className="text-xs font-medium mr-2">Updated:</span>
                           <span className="text-xs">
-                            {new Date(
-                              (isCountryOutline(element)
-                                ? element.updatedAt || element.createdAt
-                                : element.createdAt) || ''
-                            ).toLocaleDateString()}
+                            <CetTodayDate />
                           </span>
                         </div>
-                      )}
+                      ) : element.createdAt ? (
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Created:</span>
+                          <span className="text-xs">{new Date(element.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      ) : null}
                       </div>
                       <div className="mt-3 flex space-x-1">
                         <button

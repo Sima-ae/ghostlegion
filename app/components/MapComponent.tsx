@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, Circle } from 'react-leaflet';
+import L from 'leaflet';
 import { Location } from '../types';
 import { getLocationTypeIcon, getStatusColor } from '../lib/utils';
 import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
-import { getPolygonParts, isCountryOutline } from '../lib/map-geometry';
+import { getPolygonParts, isCountryOutline, mainlandPolygonParts } from '../lib/map-geometry';
 import MapResizeFix from './MapResizeFix';
 import MapMemos from './MapMemos';
+import MapFocusFly from './MapFocusFly';
+import CetTodayDate from './CetTodayDate';
 
 interface MapElement {
   id: string;
@@ -34,6 +37,7 @@ interface MapComponentProps {
 export default function MapComponent({ locations, selectedLocation, onLocationSelect }: MapComponentProps) {
   const [mapElements, setMapElements] = useState<MapElement[]>([]);
   const [isClient, setIsClient] = useState(false);
+  const layerRefs = useRef<Record<string, L.Layer | null>>({});
 
   useEffect(() => {
     fixLeafletDefaultIcons();
@@ -92,6 +96,11 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapMemos />
+        <MapFocusFly
+          locations={locations}
+          layerRefs={layerRefs}
+          onLocationSelect={onLocationSelect}
+        />
         
         {locations.map((location) => (
           <Marker
@@ -100,6 +109,12 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
             icon={locationMarkerIcon(getLocationTypeIcon(location.type))}
             eventHandlers={{
               click: () => onLocationSelect?.(location),
+              add: (event) => {
+                layerRefs.current[location.id] = event.target;
+              },
+              remove: () => {
+                delete layerRefs.current[location.id];
+              },
             }}
           >
             <Popup>
@@ -156,7 +171,10 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
           if (element.visible === false) return null;
           const elementType = element.type.toLowerCase();
           if (elementType === 'polygon') {
-            return getPolygonParts(element.coordinates).map((positions, partIndex) => (
+            return (isCountryOutline(element)
+              ? mainlandPolygonParts(element.coordinates)
+              : getPolygonParts(element.coordinates)
+            ).map((positions, partIndex) => (
               <Polygon
                 key={`${element.id}-${partIndex}`}
                 positions={positions}
@@ -164,6 +182,14 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                 weight={element.size || 3}
                 fillColor={element.color}
                 fillOpacity={0.3}
+                eventHandlers={{
+                  add: (event) => {
+                    if (partIndex === 0) layerRefs.current[element.id] = event.target;
+                  },
+                  remove: () => {
+                    if (partIndex === 0) delete layerRefs.current[element.id];
+                  },
+                }}
               >
                 <Popup>
                   <div className="p-2 min-w-[200px]">
@@ -196,22 +222,19 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                           <span className="text-xs">{element.category || 'Uncategorized'}</span>
                         </div>
                       ) : null}
-                      {(isCountryOutline(element)
-                        ? element.updatedAt || element.createdAt
-                        : element.createdAt) && (
+                      {isCountryOutline(element) ? (
                         <div className="flex items-center">
-                          <span className="text-xs font-medium mr-2">
-                            {isCountryOutline(element) ? 'Updated:' : 'Created:'}
-                          </span>
+                          <span className="text-xs font-medium mr-2">Updated:</span>
                           <span className="text-xs">
-                            {new Date(
-                              (isCountryOutline(element)
-                                ? element.updatedAt || element.createdAt
-                                : element.createdAt) || ''
-                            ).toLocaleDateString()}
+                            <CetTodayDate />
                           </span>
                         </div>
-                      )}
+                      ) : element.createdAt ? (
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">Created:</span>
+                          <span className="text-xs">{new Date(element.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 </Popup>
@@ -224,6 +247,14 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                 positions={element.coordinates as [number, number][]}
                 color={element.color}
                 weight={element.size || 3}
+                eventHandlers={{
+                  add: (event) => {
+                    layerRefs.current[element.id] = event.target;
+                  },
+                  remove: () => {
+                    delete layerRefs.current[element.id];
+                  },
+                }}
               >
                 <Popup>
                   <div className="p-2 min-w-[200px]">
@@ -271,6 +302,14 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                 weight={element.size || 3}
                 fillColor={element.color}
                 fillOpacity={0.3}
+                eventHandlers={{
+                  add: (event) => {
+                    layerRefs.current[element.id] = event.target;
+                  },
+                  remove: () => {
+                    delete layerRefs.current[element.id];
+                  },
+                }}
               >
                 <Popup>
                   <div className="p-2 min-w-[200px]">

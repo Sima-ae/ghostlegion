@@ -11,6 +11,7 @@ import ResourcesPage from './components/ResourcesPage';
 import AlertsPage from './components/AlertsPage';
 import EmergencyChecklistPage from './emergency-checklist/page';
 import { Location } from './types';
+import { MAP_FOCUS_EVENT, hasStoredMapFocus } from './lib/map-focus';
 
 // Dynamically import MapComponent to prevent SSR issues
 const MapComponent = dynamic(() => import('./components/MapComponent'), {
@@ -64,6 +65,13 @@ export default function Home() {
   useEffect(() => {
     loadLocations();
   }, [session]);
+
+  useEffect(() => {
+    const showMap = () => setActiveTab('map');
+    if (hasStoredMapFocus()) showMap();
+    window.addEventListener(MAP_FOCUS_EVENT, showMap);
+    return () => window.removeEventListener(MAP_FOCUS_EVENT, showMap);
+  }, []);
 
   // Filter locations based on authentication status
   const filteredLocations = locations; // No need to filter here since API handles it

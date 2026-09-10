@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireStaff } from '@/app/lib/require-auth';
-import { flattenRings, geoJsonToLatLngRings } from '@/app/lib/map-geometry';
+import { flattenRings, geoJsonToLatLngRings, mainlandPolygonParts } from '@/app/lib/map-geometry';
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org';
 const UA = 'GhostLegion/1.0 (https://ghostlegion.online; country outline search)';
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const rings = geoJsonToLatLngRings(row.geojson);
+  const rings = mainlandPolygonParts(geoJsonToLatLngRings(row.geojson));
   if (rings.length === 0) {
     return NextResponse.json(
       { error: 'No border outline found for this country' },

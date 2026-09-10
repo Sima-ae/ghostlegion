@@ -8,6 +8,7 @@ import NotificationDropdown from './NotificationDropdown';
 import NotificationPopup from './NotificationPopup';
 import NotificationSender from './NotificationSender';
 import PwaInstallButton from './pwa/PwaInstallButton';
+import HeaderSearch from './HeaderSearch';
 
 interface Notification {
   id: string;
@@ -33,6 +34,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [isNotificationPopupOpen, setIsNotificationPopupOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -103,9 +105,9 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
   return (
     <header className="bg-gray-900 text-white shadow-lg w-full relative z-[1000] flex-shrink-0 pt-[env(safe-area-inset-top)]">
       <div className="w-full px-2 sm:px-4 lg:px-6">
-        <div className="flex items-center justify-between h-14 sm:h-16 w-full gap-1 sm:gap-2 min-w-0">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] sm:grid-cols-[minmax(0,1fr)_minmax(14rem,32rem)_minmax(0,1fr)] items-center h-14 sm:h-16 w-full gap-1 sm:gap-2 min-w-0">
           {/* Logo and Title - Left Side */}
-          <div className="flex items-center flex-shrink min-w-0">
+          <div className="flex items-center min-w-0 justify-self-start">
             {onMenuToggle ? (
               <button
                 type="button"
@@ -130,22 +132,22 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
             </div>
           </div>
 
-          {/* Search Bar - Center */}
-          <div className="hidden sm:block flex-1 max-w-md mx-2 sm:mx-4 lg:mx-8">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="block w-full pl-8 sm:pl-10 pr-3 py-1.5 sm:py-2 text-sm border border-gray-600 rounded-md leading-5 bg-gray-800 placeholder-gray-400 focus:outline-none focus:placeholder-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Search..."
-              />
-            </div>
+          {/* Search Bar - truly centered between logo and actions */}
+          <div className="hidden sm:block w-full min-w-0">
+            <HeaderSearch />
           </div>
 
           {/* Right side icons and login - Right Side */}
-          <div className="flex items-center gap-0.5 sm:gap-2 lg:gap-4 flex-shrink-0 ml-auto">
+          <div className="flex items-center gap-0.5 sm:gap-2 lg:gap-4 flex-shrink-0 justify-self-end sm:col-start-3">
+            <button
+              type="button"
+              onClick={() => setMobileSearchOpen((open) => !open)}
+              className="sm:hidden p-1.5 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+              aria-label={mobileSearchOpen ? 'Close search' : 'Open search'}
+              aria-expanded={mobileSearchOpen}
+            >
+              {mobileSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+            </button>
             <PwaInstallButton />
             {/* Send Notification (All logged-in users) */}
             {session && (
@@ -254,6 +256,11 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
             )}
           </div>
         </div>
+        {mobileSearchOpen ? (
+          <div className="sm:hidden pb-2">
+            <HeaderSearch autoFocus onSettled={() => setMobileSearchOpen(false)} />
+          </div>
+        ) : null}
       </div>
 
       {/* Notification Components */}

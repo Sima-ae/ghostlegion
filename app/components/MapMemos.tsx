@@ -8,6 +8,7 @@ import L from 'leaflet';
 import { StickyNote, X, AlertTriangle } from 'lucide-react';
 import { memoMarkerIcon } from '../lib/leaflet-icons';
 import { MapMemo, MAX_MEMO_BODY, ANONYMOUS_LABEL } from '../types';
+import { MAP_FOCUS_SETTLED_EVENT, type MapFocusTarget } from '../lib/map-focus';
 
 type Draft = {
   id?: string;
@@ -65,6 +66,7 @@ export default function MapMemos() {
   const [captchaQuestion, setCaptchaQuestion] = useState('');
   const [captchaToken, setCaptchaToken] = useState('');
   const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [focusMemoId, setFocusMemoId] = useState<string | null>(null);
   const isVisitor = status === 'unauthenticated';
   const captchaExpected = expectedAnswerFromQuestion(captchaQuestion);
   const captchaOk =
@@ -201,6 +203,23 @@ export default function MapMemos() {
       isAnonymous: Boolean(memo.isAnonymous),
     });
   };
+
+  useLayoutEffect(() => {
+    const onFocus = (event: Event) => {
+      const target = (event as CustomEvent<MapFocusTarget>).detail;
+      if (target?.type === 'memo') setFocusMemoId(target.id);
+    };
+    window.addEventListener(MAP_FOCUS_SETTLED_EVENT, onFocus);
+    return () => window.removeEventListener(MAP_FOCUS_SETTLED_EVENT, onFocus);
+  }, []);
+
+  useEffect(() => {
+    if (!focusMemoId) return;
+    const memo = memos.find((item) => item.id === focusMemoId);
+    if (!memo) return;
+    openMemo(memo);
+    setFocusMemoId(null);
+  }, [focusMemoId, memos]);
 
   const saveDraft = async () => {
     if (!draft || saving) return;
