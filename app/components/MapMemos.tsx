@@ -606,9 +606,6 @@ function MemoCard({
             {draft.isPrivate ? (
               <p className="mt-2 text-xs text-gray-500">Private memo</p>
             ) : null}
-            {draft.isAnonymous ? (
-              <p className="mt-2 text-xs text-gray-500">Posted as Anonymous</p>
-            ) : null}
             <div className="mt-3 flex justify-end">
               <button
                 type="button"

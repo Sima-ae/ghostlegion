@@ -117,12 +117,16 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                 {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             ) : null}
-            <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center mr-1 sm:mr-2">
-              <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+            <div className="w-9 h-9 sm:w-12 sm:h-12 mr-1 sm:mr-2 flex items-center justify-center flex-shrink-0">
+              <img
+                src="/LOGO-GHOST-LEGION.png"
+                alt=""
+                className="h-full w-full object-contain brightness-0 invert"
+              />
             </div>
             <div className="min-w-0 overflow-hidden">
               <h1 className="text-sm sm:text-lg md:text-xl font-bold truncate">Ghost Legion</h1>
-              <p className="text-xs text-gray-400 truncate hidden md:block">We analyze, we hunt, we strike!</p>
+              <p className="text-xs text-gray-400 truncate hidden md:block">WE ARE UNITED!</p>
             </div>
           </div>
 

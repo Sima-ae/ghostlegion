@@ -6,7 +6,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
 import { getLocationTypeIcon } from '../lib/utils';
-import { getPolygonParts } from '../lib/map-geometry';
+import { getPolygonParts, isCountryOutline } from '../lib/map-geometry';
 import { 
   MapPin, 
   Square, 
@@ -712,34 +712,50 @@ export default function AdminMapEditor({
                   <Popup>
                     <div className="p-2 min-w-[200px]">
                       <div className="flex items-center mb-2">
-                        <div
-                          className="w-4 h-4 rounded mr-2"
-                          style={{ backgroundColor: element.color }}
-                        />
-                        <h3 className="font-bold text-sm">{element.label || 'Polygon'}</h3>
-                      </div>
+                        {!isCountryOutline(element) ? (
+                          <div
+                            className="w-4 h-4 rounded mr-2"
+                            style={{ backgroundColor: element.color }}
+                          />
+                        ) : null}
+                      <h3 className="font-bold text-sm">{element.label || 'Polygon'}</h3>
+                    </div>
+                    {!isCountryOutline(element) ? (
                       <p className="text-xs text-gray-600 mb-2">{element.description || 'No description provided'}</p>
-                      <div className="space-y-1">
-                        <div className="flex items-center">
-                          <span className="text-xs font-medium mr-2">Risk:</span>
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            element.risk === 'High' ? 'bg-red-100 text-red-800' :
-                            element.risk === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}>
-                            {element.risk || 'Low'}
-                          </span>
-                        </div>
+                    ) : null}
+                    <div className="space-y-1">
+                      <div className="flex items-center">
+                        <span className="text-xs font-medium mr-2">Risk:</span>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          element.risk === 'High' ? 'bg-red-100 text-red-800' :
+                          element.risk === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {element.risk || 'Low'}
+                        </span>
+                      </div>
+                      {!isCountryOutline(element) ? (
                         <div className="flex items-center">
                           <span className="text-xs font-medium mr-2">Category:</span>
                           <span className="text-xs">{element.category || 'Uncategorized'}</span>
                         </div>
-                        {element.createdAt && (
-                          <div className="flex items-center">
-                            <span className="text-xs font-medium mr-2">Created:</span>
-                            <span className="text-xs">{new Date(element.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        )}
+                      ) : null}
+                      {(isCountryOutline(element)
+                        ? element.updatedAt || element.createdAt
+                        : element.createdAt) && (
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">
+                            {isCountryOutline(element) ? 'Updated:' : 'Created:'}
+                          </span>
+                          <span className="text-xs">
+                            {new Date(
+                              (isCountryOutline(element)
+                                ? element.updatedAt || element.createdAt
+                                : element.createdAt) || ''
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
                       </div>
                       <div className="mt-3 flex space-x-1">
                         <button

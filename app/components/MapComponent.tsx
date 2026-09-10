@@ -5,7 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline, Circle } fro
 import { Location } from '../types';
 import { getLocationTypeIcon, getStatusColor } from '../lib/utils';
 import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
-import { getPolygonParts } from '../lib/map-geometry';
+import { getPolygonParts, isCountryOutline } from '../lib/map-geometry';
 import MapResizeFix from './MapResizeFix';
 import MapMemos from './MapMemos';
 
@@ -168,13 +168,17 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                 <Popup>
                   <div className="p-2 min-w-[200px]">
                     <div className="flex items-center mb-2">
-                      <div
-                        className="w-4 h-4 rounded mr-2"
-                        style={{ backgroundColor: element.color }}
-                      />
+                      {!isCountryOutline(element) ? (
+                        <div
+                          className="w-4 h-4 rounded mr-2"
+                          style={{ backgroundColor: element.color }}
+                        />
+                      ) : null}
                       <h3 className="font-bold text-sm">{element.label || 'Polygon'}</h3>
                     </div>
-                    <p className="text-xs text-gray-600 mb-2">{element.description || 'No description provided'}</p>
+                    {!isCountryOutline(element) ? (
+                      <p className="text-xs text-gray-600 mb-2">{element.description || 'No description provided'}</p>
+                    ) : null}
                     <div className="space-y-1">
                       <div className="flex items-center">
                         <span className="text-xs font-medium mr-2">Risk:</span>
@@ -186,14 +190,26 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
                           {element.risk || 'Low'}
                         </span>
                       </div>
-                      <div className="flex items-center">
-                        <span className="text-xs font-medium mr-2">Category:</span>
-                        <span className="text-xs">{element.category || 'Uncategorized'}</span>
-                      </div>
-                      {element.createdAt && (
+                      {!isCountryOutline(element) ? (
                         <div className="flex items-center">
-                          <span className="text-xs font-medium mr-2">Created:</span>
-                          <span className="text-xs">{new Date(element.createdAt).toLocaleDateString()}</span>
+                          <span className="text-xs font-medium mr-2">Category:</span>
+                          <span className="text-xs">{element.category || 'Uncategorized'}</span>
+                        </div>
+                      ) : null}
+                      {(isCountryOutline(element)
+                        ? element.updatedAt || element.createdAt
+                        : element.createdAt) && (
+                        <div className="flex items-center">
+                          <span className="text-xs font-medium mr-2">
+                            {isCountryOutline(element) ? 'Updated:' : 'Created:'}
+                          </span>
+                          <span className="text-xs">
+                            {new Date(
+                              (isCountryOutline(element)
+                                ? element.updatedAt || element.createdAt
+                                : element.createdAt) || ''
+                            ).toLocaleDateString()}
+                          </span>
                         </div>
                       )}
                     </div>

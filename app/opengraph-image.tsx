@@ -1,4 +1,6 @@
 import { ImageResponse } from 'next/og';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { SITE_NAME, SITE_TAGLINE } from '@/app/lib/site';
 
 export const alt =
@@ -6,7 +8,9 @@ export const alt =
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const logo = await readFile(join(process.cwd(), 'public/icon-512.png'));
+
   return new ImageResponse(
     (
       <div
@@ -29,22 +33,13 @@ export default function OpenGraphImage() {
             marginBottom: 32,
           }}
         >
-          <div
-            style={{
-              width: 88,
-              height: 88,
-              borderRadius: 20,
-              border: '4px solid rgba(255,255,255,0.95)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 36,
-              fontWeight: 800,
-              color: 'white',
-            }}
-          >
-            GL
-          </div>
+          <img
+            src={`data:image/png;base64,${logo.toString('base64')}`}
+            width={96}
+            height={96}
+            alt=""
+            style={{ objectFit: 'contain' }}
+          />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <span
               style={{

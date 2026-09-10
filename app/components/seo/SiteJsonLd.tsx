@@ -8,7 +8,7 @@ import {
 
 export default function SiteJsonLd() {
   const url = getSiteUrl();
-  const logo = `${url}/pwa-icons/icon-512`;
+  const logo = `${url}/icon-512.png`;
 
   const organization = {
     '@type': 'Organization',

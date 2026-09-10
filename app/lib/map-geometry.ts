@@ -1,5 +1,12 @@
 export type LatLng = [number, number];
 
+export function isCountryOutline(element: { category?: string; description?: string }) {
+  return (
+    element.category === 'Country' ||
+    Boolean(element.description?.startsWith('Country outline:'))
+  );
+}
+
 /** Leaflet rings: one ring, or several outer rings (islands). */
 export function getPolygonParts(coordinates: unknown): LatLng[][] {
   if (!Array.isArray(coordinates) || coordinates.length === 0) return [];
