@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import L from 'leaflet';
 import { StickyNote, X, AlertTriangle } from 'lucide-react';
 import { memoMarkerIcon } from '../lib/leaflet-icons';
-import { MapMemo } from '../types';
+import { MapMemo, MAX_MEMO_BODY } from '../types';
 
 type Draft = {
   id?: string;
@@ -163,6 +163,10 @@ export default function MapMemos() {
       setError('Write a memo before saving.');
       return;
     }
+    if (body.length > MAX_MEMO_BODY) {
+      setError(`Memo is too long (max ${MAX_MEMO_BODY} characters).`);
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -301,7 +305,9 @@ export default function MapMemos() {
                   saving={saving}
                   error={error}
                   onChange={(body) => {
-                    setDraft((current) => (current ? { ...current, body } : current));
+                    setDraft((current) =>
+                      current ? { ...current, body: body.slice(0, MAX_MEMO_BODY) } : current
+                    );
                     setError('');
                   }}
                   onSave={saveDraft}
@@ -445,15 +451,20 @@ function MemoCard({
           </button>
         </div>
         {canWrite ? (
-          <textarea
-            value={draft.body}
-            onChange={(event) => onChange(event.target.value)}
-            maxLength={2000}
-            rows={3}
-            placeholder="Write your memo"
-            className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
-            autoFocus
-          />
+          <>
+            <textarea
+              value={draft.body}
+              onChange={(event) => onChange(event.target.value)}
+              maxLength={MAX_MEMO_BODY}
+              rows={4}
+              placeholder="Write your memo"
+              className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-500"
+              autoFocus
+            />
+            <p className="mt-1 text-right text-xs text-gray-400">
+              {draft.body.length}/{MAX_MEMO_BODY}
+            </p>
+          </>
         ) : (
           <>
             <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">{draft.body}</p>

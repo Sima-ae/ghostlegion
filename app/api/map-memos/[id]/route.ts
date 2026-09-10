@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/app/lib/db';
 import { jsonUnknownFailure, jsonError } from '@/app/lib/api-response';
 import { isStaffRole, requireAdmin, requireStaff, requireUser } from '@/app/lib/require-auth';
-
-const MAX_BODY = 2000;
+import { MAX_MEMO_BODY } from '@/app/types';
 
 export async function PUT(
   request: NextRequest,
@@ -41,8 +40,14 @@ export async function PUT(
     }
 
     const text = typeof payload?.body === 'string' ? payload.body.trim() : '';
-    if (!text || text.length > MAX_BODY) {
-      return NextResponse.json({ error: 'Invalid memo' }, { status: 400 });
+    if (!text) {
+      return jsonError(400, { error: 'Write a memo before saving.', code: 'INVALID_MEMO' });
+    }
+    if (text.length > MAX_MEMO_BODY) {
+      return jsonError(400, {
+        error: `Memo is too long (max ${MAX_MEMO_BODY} characters).`,
+        code: 'INVALID_MEMO',
+      });
     }
 
     const memo = await db.mapMemo.update({

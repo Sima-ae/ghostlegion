@@ -4,8 +4,7 @@ import { db } from '@/app/lib/db';
 import { jsonMissingDatabase, jsonDbFailure, jsonUnknownFailure, jsonError } from '@/app/lib/api-response';
 import { authOptions } from '@/app/lib/auth';
 import { isAdminRole, requireStaff } from '@/app/lib/require-auth';
-
-const MAX_BODY = 2000;
+import { MAX_MEMO_BODY } from '@/app/types';
 
 function parseMemoInput(body: unknown) {
   if (!body || typeof body !== 'object') return null;
@@ -14,7 +13,9 @@ function parseMemoInput(body: unknown) {
   const latitude = Number(data.latitude);
   const longitude = Number(data.longitude);
   if (!text) return { error: 'Write a memo before saving.' } as const;
-  if (text.length > MAX_BODY) return { error: 'Memo is too long.' } as const;
+  if (text.length > MAX_MEMO_BODY) {
+    return { error: `Memo is too long (max ${MAX_MEMO_BODY} characters).` } as const;
+  }
   if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
     return { error: 'Invalid map location.' } as const;
   }

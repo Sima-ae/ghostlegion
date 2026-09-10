@@ -96,6 +96,8 @@ export interface CommunityMember {
   avatar?: string;
 }
 
+export const MAX_MEMO_BODY = 1000;
+
 export interface MapMemo {
   id: string;
   body: string;
