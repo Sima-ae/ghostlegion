@@ -37,7 +37,7 @@
 - ✅ No hardcoded passwords or API keys in codebase
 - ✅ `.env` and `.env.local` are gitignored (only `.env.example` / `.env.vps.example` are committed)
 - ✅ SQL dumps (`database/*.sql`) are gitignored and blocked from HTTP
-- ✅ CI fails if a real `.env` file or SQL dump is tracked (`scripts/check-env-not-committed.sh`)
+- ✅ `npm run check:env` rejects tracked `.env` files, SQL dumps, and hardcoded credentials
 - ✅ HTTP requests for `/.env*`, `/database/*`, and `*.sql` return 404 (middleware + nginx)
 - ✅ API errors never include connection strings or secrets
 - ✅ Never prefix secrets with `NEXT_PUBLIC_` (that would expose them in the browser)

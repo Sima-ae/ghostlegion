@@ -27,7 +27,7 @@ if [[ -n "$tracked_sql" ]]; then
   fi
 fi
 
-leaked="$(git grep -nE 'ChangeMe!GhostLegion|\$2[aby]\$[0-9]{2}\$' -- . ':!package-lock.json' ':!package.json' || true)"
+leaked="$(git grep -nE 'ChangeMe!GhostLegion|\$2[aby]\$[0-9]{2}\$' -- . ':!package-lock.json' ':!package.json' ':!scripts/check-env-not-committed.sh' || true)"
 if [[ -n "$leaked" ]]; then
   echo "ERROR: hardcoded password or bcrypt hash found in tracked files:"
   printf '%s\n' "$leaked"
