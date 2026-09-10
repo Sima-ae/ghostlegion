@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { db } from '@/app/lib/db';
-import { jsonMissingDatabase, jsonDbFailure, jsonUnknownFailure, jsonError } from '@/app/lib/api-response';
+import { jsonMissingDatabase, jsonDbFailure, jsonUnknownFailure, jsonError, isDatabaseUnreachable } from '@/app/lib/api-response';
 import { authOptions } from '@/app/lib/auth';
 import { isAdminRole, isStaffRole, requireStaff } from '@/app/lib/require-auth';
 import { MAX_MEMO_BODY } from '@/app/types';
@@ -105,14 +105,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching map memos:', error);
-    if (error instanceof Error) {
-      if (
-        error.message.includes('DATABASE_URL') ||
-        error.message.includes('connection')
-      ) {
-        return jsonDbFailure();
-      }
-    }
+    if (isDatabaseUnreachable(error)) return jsonDbFailure();
     return jsonUnknownFailure(error);
   }
 }
@@ -158,6 +151,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(memo, { status: 201 });
   } catch (error) {
     console.error('Error creating map memo:', error);
+    if (isDatabaseUnreachable(error)) return jsonDbFailure();
     return jsonUnknownFailure(error);
   }
 }

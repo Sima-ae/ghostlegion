@@ -30,7 +30,11 @@ echo "Set .env.local DATABASE_URL host 127.0.0.1 port ${LOCAL_PORT}"
 echo ""
 
 if $BACKGROUND; then
-  ssh -f -N -o ExitOnForwardFailure=yes \
+  ssh -f -N \
+    -o ExitOnForwardFailure=yes \
+    -o ServerAliveInterval=30 \
+    -o ServerAliveCountMax=6 \
+    -o TCPKeepAlive=yes \
     -L "${LOCAL_PORT}:127.0.0.1:${REMOTE_PORT}" \
     "${SSH_USER}@${VPS_HOST}"
   sleep 1
@@ -43,7 +47,11 @@ if $BACKGROUND; then
 else
   echo "Keep this terminal open while developing. Press Ctrl+C to stop."
   echo ""
-  exec ssh -N -o ExitOnForwardFailure=yes \
+  exec ssh -N \
+    -o ExitOnForwardFailure=yes \
+    -o ServerAliveInterval=30 \
+    -o ServerAliveCountMax=6 \
+    -o TCPKeepAlive=yes \
     -L "${LOCAL_PORT}:127.0.0.1:${REMOTE_PORT}" \
     "${SSH_USER}@${VPS_HOST}"
 fi

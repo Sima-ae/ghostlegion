@@ -29,13 +29,41 @@ export function jsonMissingDatabase<T>(_devFallback?: T) {
 }
 
 export function jsonDbFailure() {
-  return jsonError(500, {
-    error: 'Service temporarily unavailable',
+  return jsonError(503, {
+    error:
+      process.env.NODE_ENV === 'development'
+        ? 'Database is not connected. Keep npm run db:tunnel running, then try again.'
+        : 'Could not reach the database. Please try again in a moment.',
     code: 'DB_ERROR',
   });
 }
 
-export function jsonUnknownFailure(_err: unknown) {
-  // Never send Prisma / connection strings / secrets to the client.
-  return jsonError(500, { error: 'Service temporarily unavailable', code: 'INTERNAL' });
+function errorText(err: unknown) {
+  if (err instanceof Error) return `${err.name} ${err.message}`;
+  return String(err);
+}
+
+export function isDatabaseUnreachable(err: unknown) {
+  const text = errorText(err);
+  return /PrismaClientInitializationError|can't reach database|P1001|P1017|ECONNREFUSED|Server has closed the connection/i.test(
+    text
+  );
+}
+
+export function jsonUnknownFailure(err: unknown) {
+  if (isDatabaseUnreachable(err)) return jsonDbFailure();
+  const text = errorText(err);
+  if (/PrismaClientValidationError|Unknown argument|Unknown column|P2022/i.test(text)) {
+    return jsonError(500, {
+      error:
+        process.env.NODE_ENV === 'development'
+          ? 'The app is out of sync with the database. Run prisma db push, restart npm run dev, then try again.'
+          : 'Could not save. Please try again.',
+      code: 'DB_SCHEMA',
+    });
+  }
+  return jsonError(500, {
+    error: 'Could not complete that request. Please try again.',
+    code: 'INTERNAL',
+  });
 }
