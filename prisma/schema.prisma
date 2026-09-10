@@ -361,6 +361,30 @@ enum RiskLevel {
   LOW
 }
 
+model MapMemo {
+  id            String         @id @default(cuid())
+  body          String         @db.Text
+  latitude      Float
+  longitude     Float
+  createdBy     String
+  createdByName String?
+  updatedBy     String?
+  status        MapMemoStatus  @default(APPROVED)
+  reviewedBy    String?
+  reviewedAt    DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+enum MapMemoStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum NotificationType {
   INFO
   WARNING

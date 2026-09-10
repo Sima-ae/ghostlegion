@@ -7,6 +7,7 @@ import { getLocationTypeIcon, getStatusColor } from '../lib/utils';
 import { fixLeafletDefaultIcons, locationMarkerIcon } from '../lib/leaflet-icons';
 import { getPolygonParts } from '../lib/map-geometry';
 import MapResizeFix from './MapResizeFix';
+import MapMemos from './MapMemos';
 
 interface MapElement {
   id: string;
@@ -90,6 +91,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+        <MapMemos />
         
         {locations.map((location) => (
           <Marker

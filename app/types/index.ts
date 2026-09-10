@@ -95,3 +95,18 @@ export interface CommunityMember {
   contact: string;
   avatar?: string;
 }
+
+export interface MapMemo {
+  id: string;
+  body: string;
+  latitude: number;
+  longitude: number;
+  createdBy: string;
+  createdByName?: string | null;
+  updatedBy?: string | null;
+  status?: 'PENDING' | 'APPROVED' | 'REJECTED';
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

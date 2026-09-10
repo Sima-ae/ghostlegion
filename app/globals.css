@@ -101,7 +101,7 @@ body {
 }
 
 .leaflet-container {
-  --gl-pin-scale: 0.32;
+  --gl-pin-scale: 0.41;
 }
 
 .ghostlegion-pin {
@@ -137,6 +137,30 @@ body {
   transform: rotate(45deg);
   font-size: 16px;
   line-height: 1;
+}
+
+.ghostlegion-memo-pin .ghostlegion-pin-body {
+  background: #ecfdf5;
+  border-color: #16a34a;
+}
+
+.leaflet-container.gl-placing-memo,
+.leaflet-container.gl-placing-memo.leaflet-grab,
+.leaflet-container.gl-placing-memo.leaflet-dragging,
+.leaflet-container.gl-placing-memo .leaflet-tile-pane,
+.leaflet-container.gl-placing-memo .leaflet-overlay-pane,
+.leaflet-container.gl-placing-memo .leaflet-overlay-pane svg,
+.leaflet-container.gl-placing-memo .leaflet-overlay-pane path,
+.leaflet-container.gl-placing-memo .leaflet-marker-pane,
+.leaflet-container.gl-placing-memo .leaflet-marker-icon,
+.leaflet-container.gl-placing-memo .leaflet-interactive,
+.leaflet-container.gl-placing-memo .leaflet-pane {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' stroke='%23111827' stroke-width='1.4' stroke-linejoin='round' d='M3.2 2.6 3.2 18.4 8.1 13.6 11.4 21.2 14.1 20.1 10.8 12.4 18.5 12.4Z'/%3E%3C/svg%3E") 3 2, default !important;
+}
+
+.leaflet-container.gl-placing-memo .leaflet-control,
+.leaflet-container.gl-placing-memo .leaflet-control * {
+  cursor: pointer !important;
 }
 
 @media (max-width: 640px) {

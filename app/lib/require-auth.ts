@@ -5,13 +5,29 @@ import { authOptions } from '@/app/lib/auth';
 import { jsonError } from '@/app/lib/api-response';
 
 const STAFF_ROLES = new Set(['ADMIN', 'COMMANDER', 'SUPER_ADMIN']);
+const ADMIN_ROLES = new Set(['ADMIN', 'SUPER_ADMIN']);
 
 export function isStaffRole(role?: string | null) {
   return Boolean(role && STAFF_ROLES.has(role));
 }
 
+export function isAdminRole(role?: string | null) {
+  return Boolean(role && ADMIN_ROLES.has(role));
+}
+
 type StaffOk = { session: Session; error: null };
 type StaffFail = { session: null; error: NextResponse };
+
+export async function requireUser(): Promise<StaffOk | StaffFail> {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return {
+      session: null,
+      error: jsonError(401, { error: 'Unauthorized', code: 'UNAUTHORIZED' }),
+    };
+  }
+  return { session, error: null };
+}
 
 export async function requireStaff(): Promise<StaffOk | StaffFail> {
   const session = await getServerSession(authOptions);
@@ -28,4 +44,16 @@ export async function requireStaff(): Promise<StaffOk | StaffFail> {
     };
   }
   return { session, error: null };
+}
+
+export async function requireAdmin(): Promise<StaffOk | StaffFail> {
+  const auth = await requireUser();
+  if (auth.error) return auth;
+  if (!isAdminRole(auth.session.user.role)) {
+    return {
+      session: null,
+      error: jsonError(403, { error: 'Forbidden', code: 'FORBIDDEN' }),
+    };
+  }
+  return auth;
 }

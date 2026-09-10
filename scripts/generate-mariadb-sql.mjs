@@ -213,6 +213,7 @@ lines.push('DROP TABLE IF EXISTS `EvacuationRoute`;');
 lines.push('DROP TABLE IF EXISTS `Resource`;');
 lines.push('DROP TABLE IF EXISTS `Alert`;');
 lines.push('DROP TABLE IF EXISTS `MapElement`;');
+lines.push('DROP TABLE IF EXISTS `MapMemo`;');
 lines.push('DROP TABLE IF EXISTS `User`;');
 lines.push('');
 lines.push(schema.trim());

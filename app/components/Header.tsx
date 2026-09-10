@@ -185,7 +185,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                       Help
                     </a>
-                    {(session?.user?.role === 'ADMIN' || session?.user?.role === 'COMMANDER') && (
+                    {(session?.user?.role === 'ADMIN' || session?.user?.role === 'COMMANDER' || session?.user?.role === 'SUPER_ADMIN') && (
                       <>
                         <hr className="my-1" />
                         <button

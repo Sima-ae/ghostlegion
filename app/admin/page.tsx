@@ -21,7 +21,8 @@ import {
   Layers,
   X,
   Check,
-  Bell
+  Bell,
+  StickyNote
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -31,6 +32,7 @@ import RoutesManagement from '../components/RoutesManagement';
 import ResourcesManagement from '../components/ResourcesManagement';
 import AlertsManagement from '../components/AlertsManagement';
 import NotificationManagement from '../components/NotificationManagement';
+import MemosManagement from '../components/MemosManagement';
 import { Location } from '../types';
 
 // Error Boundary Component
@@ -136,7 +138,7 @@ export default function AdminDashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'map' | 'locations' | 'people' | 'routes' | 'resources' | 'alerts' | 'notifications'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'map' | 'locations' | 'people' | 'routes' | 'resources' | 'alerts' | 'notifications' | 'memos'>('overview');
   
   // Modal states
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -255,7 +257,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    if (session.user?.role !== 'ADMIN' && session.user?.role !== 'COMMANDER') {
+    if (session.user?.role !== 'ADMIN' && session.user?.role !== 'COMMANDER' && session.user?.role !== 'SUPER_ADMIN') {
       router.push('/');
       return;
     }
@@ -277,7 +279,7 @@ export default function AdminDashboard() {
   }
 
   // Redirect if not authenticated or not admin/commander
-  if (!session || (session.user?.role !== 'ADMIN' && session.user?.role !== 'COMMANDER')) {
+  if (!session || (session.user?.role !== 'ADMIN' && session.user?.role !== 'COMMANDER' && session.user?.role !== 'SUPER_ADMIN')) {
     return null;
   }
 
@@ -558,6 +560,7 @@ export default function AdminDashboard() {
                 { id: 'routes', label: 'Routes', icon: Route },
                 { id: 'resources', label: 'Resources', icon: Package },
                 { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
+                { id: 'memos', label: 'Memos', icon: StickyNote },
                 { id: 'notifications', label: 'Notifications', icon: Bell },
               ].map((tab) => {
                 const Icon = tab.icon;
@@ -940,6 +943,10 @@ export default function AdminDashboard() {
         {/* Alerts Management */}
         {activeTab === 'alerts' && (
           <AlertsManagement isDemoMode={isDemoMode} />
+        )}
+
+        {activeTab === 'memos' && (
+          <MemosManagement />
         )}
 
         {activeTab === 'notifications' && (
