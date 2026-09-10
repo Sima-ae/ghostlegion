@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import type { LocationType, Prisma } from '@prisma/client';
 import { db } from '@/app/lib/db';
 import { jsonMissingDatabase, jsonUnknownFailure } from '@/app/lib/api-response';
 import { authOptions } from '@/app/lib/auth';
@@ -70,18 +71,26 @@ export async function GET(request: NextRequest) {
     const userId = session?.user?.id;
     const results: SearchHit[] = [];
 
+    const locationOr: Prisma.LocationWhereInput[] = needles.flatMap((needle) => [
+      { name: { contains: needle } },
+      { description: { contains: needle } },
+      { contact: { contains: needle } },
+    ]);
+    if (matchedTypes.length) {
+      locationOr.push({ type: { in: [...matchedTypes] as LocationType[] } });
+    }
+
+    const elementOr: Prisma.MapElementWhereInput[] = needles.flatMap((needle) => [
+      { label: { contains: needle } },
+      { description: { contains: needle } },
+    ]);
+
     const [locations, elements, memos] = await Promise.all([
       db.location.findMany({
         where: {
           AND: [
             session?.user ? {} : { isPublic: true },
-            {
-              OR: needles.flatMap((needle) => [
-                { name: { contains: needle } },
-                { description: { contains: needle } },
-                { contact: { contains: needle } },
-              ]).concat(matchedTypes.length ? [{ type: { in: [...matchedTypes] } }] : []),
-            },
+            { OR: locationOr },
           ],
         },
         take: 20,
@@ -91,12 +100,7 @@ export async function GET(request: NextRequest) {
         where: {
           AND: [
             staff ? {} : { visible: true },
-            {
-              OR: needles.flatMap((needle) => [
-                { label: { contains: needle } },
-                { description: { contains: needle } },
-              ]),
-            },
+            { OR: elementOr },
           ],
         },
         take: 60,

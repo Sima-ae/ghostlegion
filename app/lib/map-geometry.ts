@@ -1,6 +1,9 @@
 export type LatLng = [number, number];
 
-export function isCountryOutline(element: { category?: string; description?: string }) {
+export function isCountryOutline(element: {
+  category?: string | null;
+  description?: string | null;
+}) {
   return (
     element.category === 'Country' ||
     Boolean(element.description?.startsWith('Country outline:'))

@@ -13,7 +13,7 @@ import {
 } from '../lib/map-focus';
 
 type PopupLayer = L.Layer & {
-  openPopup: (latlng?: L.LatLngExpression) => this;
+  openPopup: (latlng?: L.LatLngExpression) => void;
   getPopup?: () => L.Popup | undefined;
 };
 

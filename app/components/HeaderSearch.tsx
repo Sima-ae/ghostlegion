@@ -172,7 +172,7 @@ export default function HeaderSearch({
     }
   };
 
-  const showPanel = open && (trimmed.length >= 1 || loading || error);
+  const showPanel = Boolean(open && (trimmed.length >= 1 || loading || error));
   let activeOffset = 0;
 
   return (
