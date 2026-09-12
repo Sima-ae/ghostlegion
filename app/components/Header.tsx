@@ -252,10 +252,14 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => router.push('/auth/signin')}
-                className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap"
+                className="p-1.5 sm:px-4 sm:py-2 text-gray-300 hover:text-white hover:bg-gray-800 sm:text-sm sm:bg-blue-600 sm:text-white sm:hover:bg-blue-700 sm:hover:text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={t('header.login')}
+                title={t('header.login')}
               >
-                {t('header.login')}
+                <User className="h-5 w-5 sm:hidden" />
+                <span className="hidden sm:inline whitespace-nowrap">{t('header.login')}</span>
               </button>
             )}
           </div>
