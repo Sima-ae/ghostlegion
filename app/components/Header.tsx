@@ -194,75 +194,82 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
               <Settings className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
 
-            <LanguageSwitcher />
+            {/* Mobile: account then language; sm+: language then account */}
+            <div className="order-2 sm:order-1">
+              <LanguageSwitcher />
+            </div>
 
             {/* Login/Profile */}
-            {session ? (
-              <div className="relative" ref={profileMenuRef}>
+            <div className="order-1 sm:order-2">
+              {session ? (
+                <div className="relative" ref={profileMenuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                  >
+                    <User className="h-5 w-5 sm:h-6 sm:w-6" />
+                    <span className="hidden sm:inline text-sm truncate max-w-20">{session.user?.name || session.user?.email || t('header.user')}</span>
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999]">
+                      <button
+                        type="button"
+                        onClick={() => goTo('/profile')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        {t('header.profile')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => goTo('/settings')}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        {t('header.settings')}
+                      </button>
+                      {(session?.user?.role === 'ADMIN' || session?.user?.role === 'COMMANDER' || session?.user?.role === 'SUPER_ADMIN') && (
+                        <>
+                          <hr className="my-1" />
+                          <button
+                            type="button"
+                            onClick={() => goTo('/admin')}
+                            className="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
+                          >
+                            <Shield className="h-4 w-4 mr-2" />
+                            {t('header.admin')}
+                          </button>
+                        </>
+                      )}
+                      <hr className="my-1" />
+                      <button
+                        type="button"
+                        onClick={handleSignOut}
+                        className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        {t('header.signOut')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                  onClick={() => router.push('/auth/signin')}
+                  className="p-1.5 sm:px-4 sm:py-2 text-gray-300 hover:text-white hover:bg-gray-800 sm:text-sm sm:bg-blue-600 sm:text-white sm:hover:bg-blue-700 sm:hover:text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  aria-label={t('header.login')}
+                  title={t('header.login')}
                 >
-                  <User className="h-5 w-5 sm:h-6 sm:w-6" />
-                  <span className="hidden sm:inline text-sm truncate max-w-20">{session.user?.name || session.user?.email || t('header.user')}</span>
+                  <User className="h-5 w-5 sm:hidden" />
+                  <span className="hidden sm:inline whitespace-nowrap">{t('header.login')}</span>
                 </button>
+              )}
+            </div>
 
-                {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-[9999]">
-                    <button
-                      type="button"
-                      onClick={() => goTo('/profile')}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      {t('header.profile')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => goTo('/settings')}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      {t('header.settings')}
-                    </button>
-                    {(session?.user?.role === 'ADMIN' || session?.user?.role === 'COMMANDER' || session?.user?.role === 'SUPER_ADMIN') && (
-                      <>
-                        <hr className="my-1" />
-                        <button
-                          type="button"
-                          onClick={() => goTo('/admin')}
-                          className="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
-                        >
-                          <Shield className="h-4 w-4 mr-2" />
-                          {t('header.admin')}
-                        </button>
-                      </>
-                    )}
-                    <hr className="my-1" />
-                    <button
-                      type="button"
-                      onClick={handleSignOut}
-                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      {t('header.signOut')}
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => router.push('/auth/signin')}
-                className="p-1.5 sm:px-4 sm:py-2 text-gray-300 hover:text-white hover:bg-gray-800 sm:text-sm sm:bg-blue-600 sm:text-white sm:hover:bg-blue-700 sm:hover:text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={t('header.login')}
-                title={t('header.login')}
-              >
-                <User className="h-5 w-5 sm:hidden" />
-                <span className="hidden sm:inline whitespace-nowrap">{t('header.login')}</span>
-              </button>
-            )}
-
-            <PwaInstallButton />
+            <div className="order-3">
+              <PwaInstallButton />
+            </div>
           </div>
         </div>
         {mobileSearchOpen ? (
