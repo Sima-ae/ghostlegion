@@ -151,7 +151,6 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
             >
               {mobileSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
             </button>
-            <PwaInstallButton />
             {/* Send Notification (All logged-in users) */}
             {session && (
               <button 
@@ -262,6 +261,8 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                 <span className="hidden sm:inline whitespace-nowrap">{t('header.login')}</span>
               </button>
             )}
+
+            <PwaInstallButton />
           </div>
         </div>
         {mobileSearchOpen ? (
