@@ -24,8 +24,9 @@ import {
   Unlock,
   X
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
+import { useI18n } from '../lib/i18n/I18nProvider';
 
 interface PublicSidebarProps {
   activeTab: string;
@@ -41,36 +42,46 @@ export default function PublicSidebar({
   onMobileClose,
 }: PublicSidebarProps) {
   const { data: session } = useSession();
+  const { t } = useI18n();
   const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN';
 
-  const emergencyItems = [
-    { id: 'alerts', label: 'Alerts', icon: AlertTriangle, isPublic: true },
-    { id: 'emergency-checklist', label: 'Emergency Checklist', icon: AlertTriangle, isPublic: true },
-    { id: 'evacuation', label: 'Evacuation Plans', icon: Route, isPublic: true },
-  ];
+  const emergencyItems = useMemo(
+    () => [
+      { id: 'alerts', label: t('nav.alerts'), icon: AlertTriangle, isPublic: true },
+      { id: 'emergency-checklist', label: t('nav.checklist'), icon: AlertTriangle, isPublic: true },
+      { id: 'evacuation', label: t('nav.evacuation'), icon: Route, isPublic: true },
+    ],
+    [t]
+  );
 
-  const mainMenuItems = [
-    { id: 'map', label: 'Map', icon: Map, isPublic: true },
-    { id: 'security', label: 'Defense and Security', icon: Shield, isPublic: false },
-    { id: 'shelter', label: 'Shelter and Housing', icon: Home, isPublic: false },
-    { id: 'food-water', label: 'Food and Water Supply', icon: Utensils, isPublic: false },
-    { id: 'medical', label: 'Medical Assistance', icon: Cross, isPublic: false },
-    { id: 'medicines', label: 'Medicines Supply', icon: Syringe, isPublic: false },
-    { id: 'sanitation', label: 'Sanitation and Cleanliness', icon: Sparkles, isPublic: false },
-    { id: 'transportation', label: 'Transportation', icon: Train, isPublic: false },
-    { id: 'distribution', label: 'Distribution', icon: Truck, isPublic: false },
-    { id: 'communication', label: 'Communication and IT', icon: Monitor, isPublic: false },
-    { id: 'animal-rescue', label: 'Animal Rescue and Care', icon: Heart, isPublic: false },
-    { id: 'rebuilding', label: 'Rebuilding and Infrastructure', icon: Building, isPublic: false },
-    { id: 'childcare', label: 'Childcare and Education', icon: BookOpen, isPublic: false },
-    { id: 'mental-health', label: 'Mental and Emotional Support', icon: Users, isPublic: false },
-    { id: 'legal', label: 'Legal and Administrative', icon: Gavel, isPublic: false },
-  ];
+  const mainMenuItems = useMemo(
+    () => [
+      { id: 'map', label: t('nav.map'), icon: Map, isPublic: true },
+      { id: 'security', label: t('nav.security'), icon: Shield, isPublic: false },
+      { id: 'shelter', label: t('nav.shelter'), icon: Home, isPublic: false },
+      { id: 'food-water', label: t('nav.foodWater'), icon: Utensils, isPublic: false },
+      { id: 'medical', label: t('nav.medical'), icon: Cross, isPublic: false },
+      { id: 'medicines', label: t('nav.medicines'), icon: Syringe, isPublic: false },
+      { id: 'sanitation', label: t('nav.sanitation'), icon: Sparkles, isPublic: false },
+      { id: 'transportation', label: t('nav.transportation'), icon: Train, isPublic: false },
+      { id: 'distribution', label: t('nav.distribution'), icon: Truck, isPublic: false },
+      { id: 'communication', label: t('nav.communication'), icon: Monitor, isPublic: false },
+      { id: 'animal-rescue', label: t('nav.animalRescue'), icon: Heart, isPublic: false },
+      { id: 'rebuilding', label: t('nav.rebuilding'), icon: Building, isPublic: false },
+      { id: 'childcare', label: t('nav.childcare'), icon: BookOpen, isPublic: false },
+      { id: 'mental-health', label: t('nav.mentalHealth'), icon: Users, isPublic: false },
+      { id: 'legal', label: t('nav.legal'), icon: Gavel, isPublic: false },
+    ],
+    [t]
+  );
 
-  const communitySpaces = [
-    { id: 'join-us', label: 'Join Us Today!', icon: MessageSquare, isPublic: true },
-    { id: 'resources', label: 'Resources', icon: Package, isPublic: false, requiresAdmin: true },
-  ];
+  const communitySpaces = useMemo(
+    () => [
+      { id: 'join-us', label: t('nav.joinUs'), icon: MessageSquare, isPublic: true },
+      { id: 'resources', label: t('nav.resources'), icon: Package, isPublic: false, requiresAdmin: true },
+    ],
+    [t]
+  );
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -143,15 +154,15 @@ export default function PublicSidebar({
           transform transition-transform duration-300 ease-out
           ${mobileOpen ? 'translate-x-0 w-72 border-r border-gray-200' : '-translate-x-full w-0 overflow-hidden border-0 pointer-events-none'}
           lg:static lg:inset-auto lg:top-auto lg:bottom-auto lg:z-auto lg:translate-x-0 lg:w-72 lg:max-w-none lg:flex-shrink-0 lg:overflow-visible lg:border-r lg:border-gray-200 lg:pointer-events-auto`}
-        aria-label="Main navigation"
+        aria-label={t('nav.mainNav')}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 lg:hidden">
-          <span className="font-semibold text-gray-900">Menu</span>
+          <span className="font-semibold text-gray-900">{t('nav.menu')}</span>
           <button
             type="button"
             onClick={onMobileClose}
             className="p-2 rounded-md text-gray-500 hover:bg-gray-200 hover:text-gray-800"
-            aria-label="Close menu"
+            aria-label={t('nav.closeMenu')}
           >
             <X className="h-5 w-5" />
           </button>
@@ -159,7 +170,7 @@ export default function PublicSidebar({
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <div className="space-y-1">
-            <div className="text-sm font-medium text-gray-500 mb-3">Community</div>
+            <div className="text-sm font-medium text-gray-500 mb-3">{t('nav.community')}</div>
             {communitySpaces.map((space) => {
               if (space.id === 'resources' && !isAdmin) return null;
               const tab = space.id === 'join-us' ? 'community' : space.id;
@@ -172,7 +183,7 @@ export default function PublicSidebar({
           </div>
 
           <div className="space-y-1">
-            <div className="text-sm font-medium text-gray-500 mb-3">Information</div>
+            <div className="text-sm font-medium text-gray-500 mb-3">{t('nav.information')}</div>
             {emergencyItems.map((item) =>
               navButton(item.id, item.label, item.icon, item.isPublic, activeTab === item.id)
             )}
@@ -183,7 +194,7 @@ export default function PublicSidebar({
           </div>
 
           <div className="space-y-1">
-            <div className="text-sm font-medium text-gray-500 mb-3">Menu</div>
+            <div className="text-sm font-medium text-gray-500 mb-3">{t('nav.menu')}</div>
             {mainMenuItems.map((item) =>
               navButton(item.id, item.label, item.icon, item.isPublic, activeTab === item.id)
             )}

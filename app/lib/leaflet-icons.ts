@@ -41,9 +41,9 @@ function safeEmoji(emoji: string) {
   return String(emoji).replace(/[<>&"'`]/g, '');
 }
 
-/** Pins grow as you zoom in and shrink as you zoom out. Default map zoom is 7. */
+/** Pins grow as you zoom in and shrink as you zoom out. Default map zoom is 8. */
 export function locationPinScale(zoom: number) {
-  const defaultZoom = 7;
+  const defaultZoom = 8;
   const defaultScale = 0.41;
   const zoomOutFactor = 0.72;
   const zoomInFactor = 1.24;
@@ -89,5 +89,98 @@ export function memoMarkerIcon() {
     iconSize: [36, 44],
     iconAnchor: [18, 44],
     popupAnchor: [0, -38],
+  });
+}
+
+/** Presence-colored heritage markers: circle (military/WW2) or triangle (civil KO). */
+export function heritagePointIcon(
+  color: string,
+  shape: 'circle' | 'triangle' = 'circle',
+  outlined = false
+) {
+  fixLeafletDefaultIcons();
+  const stroke = outlined || color === '#e5e7eb' ? '#111827' : '#ffffff';
+  const fill = color;
+  const svg =
+    shape === 'triangle'
+      ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+          <path d="M9 2 L16 15 H2 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        </svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+          <circle cx="8" cy="8" r="6.2" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        </svg>`;
+  return L.divIcon({
+    className: 'ghostlegion-heritage-pin',
+    html: `<div style="line-height:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${svg}</div>`,
+    iconSize: shape === 'triangle' ? [18, 18] : [16, 16],
+    iconAnchor: shape === 'triangle' ? [9, 14] : [8, 8],
+    popupAnchor: [0, -10],
+  });
+}
+
+/** Koude Oorlog specialty pins (MUD, luchtwacht, netwerk, object). */
+export function data2ColdWarPinIcon(
+  kind: 'mud' | 'luchtwacht' | 'netwerk_post' | 'netwerk_groep' | 'object',
+  mark = ''
+) {
+  fixLeafletDefaultIcons();
+  const green = '#1b5e20';
+  const letter = String(mark || '')
+    .slice(0, 2)
+    .replace(/[<>&"'`]/g, '');
+
+  if (kind === 'object') {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
+      <rect x="1.5" y="1.5" width="9" height="9" fill="#111827" stroke="#fff" stroke-width="1"/>
+    </svg>`;
+    return L.divIcon({
+      className: 'ghostlegion-heritage-pin',
+      html: `<div style="line-height:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${svg}</div>`,
+      iconSize: [12, 12],
+      iconAnchor: [6, 6],
+      popupAnchor: [0, -8],
+    });
+  }
+
+  if (kind === 'netwerk_groep') {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28">
+      <circle cx="14" cy="14" r="11" fill="none" stroke="${green}" stroke-width="2" stroke-dasharray="3 3"/>
+      <text x="14" y="18" text-anchor="middle" font-size="10" font-family="Arial,sans-serif" font-weight="700" fill="${green}">${letter || '·'}</text>
+    </svg>`;
+    return L.divIcon({
+      className: 'ghostlegion-heritage-pin',
+      html: `<div style="line-height:0">${svg}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+      popupAnchor: [0, -12],
+    });
+  }
+
+  if (kind === 'netwerk_post') {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22">
+      <path d="M11 3 L19 18 H3 Z" fill="${green}" stroke="#fff" stroke-width="1.2"/>
+      <text x="11" y="16" text-anchor="middle" font-size="7" font-family="Arial,sans-serif" font-weight="700" fill="#fff">${letter || ''}</text>
+    </svg>`;
+    return L.divIcon({
+      className: 'ghostlegion-heritage-pin',
+      html: `<div style="line-height:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))">${svg}</div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 18],
+      popupAnchor: [0, -14],
+    });
+  }
+
+  // MUD / Luchtwacht teardrop pin with letter
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="34" viewBox="0 0 24 34">
+    <path d="M12 1.5C6.7 1.5 2.5 5.7 2.5 11c0 7.2 9.5 20.5 9.5 20.5S21.5 18.2 21.5 11C21.5 5.7 17.3 1.5 12 1.5z" fill="${green}" stroke="#fff" stroke-width="1.4"/>
+    <circle cx="12" cy="11" r="6.2" fill="${green}"/>
+    <text x="12" y="14.5" text-anchor="middle" font-size="10" font-family="Arial,sans-serif" font-weight="700" fill="#fff">${letter || (kind === 'mud' ? 'M' : 'L')}</text>
+  </svg>`;
+  return L.divIcon({
+    className: 'ghostlegion-heritage-pin',
+    html: `<div style="line-height:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))">${svg}</div>`,
+    iconSize: [24, 34],
+    iconAnchor: [12, 33],
+    popupAnchor: [0, -30],
   });
 }

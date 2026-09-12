@@ -116,3 +116,43 @@ export interface MapMemo {
   createdAt: string;
   updatedAt: string;
 }
+
+export type HeritageEra = 'WW1' | 'WW2' | 'COLD_WAR';
+export type HeritageGeometry = 'POINT' | 'LINE' | 'AREA';
+export type HeritagePresence =
+  | 'PRESENT'
+  | 'POSSIBLE'
+  | 'ABSENT'
+  | 'REMNANT'
+  | 'GONE'
+  | 'UNKNOWN';
+export type HeritageDomain = 'MILITARY' | 'CIVIL' | 'COMBINED';
+
+export type MapViewMode = 'operations' | 'ww1' | 'ww2' | 'cold_war';
+
+export interface HeritageFeature {
+  id: string;
+  era: HeritageEra;
+  geometry: HeritageGeometry;
+  coordinates: [number, number] | [number, number][] | [number, number][][];
+  name: string;
+  description?: string | null;
+  presence: HeritagePresence;
+  domain?: HeritageDomain | null;
+  category?: string | null;
+  function?: string | null;
+  featureType?: string | null;
+  lineKind?: string | null;
+  ensemble?: string | null;
+  builder?: string | null;
+  historicalUser?: string | null;
+  accessibility?: string | null;
+  visibilityNote?: string | null;
+  isPublic: boolean;
+  visible: boolean;
+  color?: string | null;
+  size?: number | null;
+  createdBy?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

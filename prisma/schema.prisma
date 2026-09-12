@@ -389,6 +389,64 @@ enum MapMemoStatus {
   REJECTED
 }
 
+model HeritageFeature {
+  id              String                @id @default(cuid())
+  era             HeritageEra
+  geometry        HeritageGeometry
+  coordinates     Json
+  name            String
+  description     String?               @db.Text
+  presence        HeritagePresence      @default(UNKNOWN)
+  domain          HeritageDomain?
+  category        String?
+  function        String?               @map("featureFunction")
+  featureType     String?
+  lineKind        String?
+  ensemble        String?
+  builder         String?
+  historicalUser  String?
+  accessibility   String?
+  visibilityNote  String?
+  isPublic        Boolean               @default(true)
+  visible         Boolean               @default(true)
+  color           String?
+  size            Int?
+  createdBy       String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([era])
+  @@index([geometry])
+  @@index([visible, isPublic])
+}
+
+enum HeritageEra {
+  WW1
+  WW2
+  COLD_WAR
+}
+
+enum HeritageGeometry {
+  POINT
+  LINE
+  AREA
+}
+
+enum HeritagePresence {
+  PRESENT
+  POSSIBLE
+  ABSENT
+  REMNANT
+  GONE
+  UNKNOWN
+}
+
+enum HeritageDomain {
+  MILITARY
+  CIVIL
+  COMBINED
+}
+
 enum NotificationType {
   INFO
   WARNING

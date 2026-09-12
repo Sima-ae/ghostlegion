@@ -5,28 +5,29 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Globe, Loader2, MapPin, Search, Shapes, StickyNote, X } from 'lucide-react';
 import { emitMapFocus } from '../lib/map-focus';
 import type { SearchHit, SearchHitType } from '../lib/search';
+import { useI18n } from '../lib/i18n/I18nProvider';
 
 const TYPE_META: Record<
   SearchHitType,
-  { label: string; badge: string; Icon: typeof Globe }
+  { labelKey: string; badge: string; Icon: typeof Globe }
 > = {
   country: {
-    label: 'Countries',
+    labelKey: 'search.countries',
     badge: 'bg-sky-500/20 text-sky-300',
     Icon: Globe,
   },
   location: {
-    label: 'Locations',
+    labelKey: 'search.locations',
     badge: 'bg-emerald-500/20 text-emerald-300',
     Icon: MapPin,
   },
   memo: {
-    label: 'Memos',
+    labelKey: 'search.memos',
     badge: 'bg-amber-500/20 text-amber-300',
     Icon: StickyNote,
   },
   element: {
-    label: 'Map elements',
+    labelKey: 'search.elements',
     badge: 'bg-slate-500/20 text-slate-300',
     Icon: Shapes,
   },
@@ -50,6 +51,7 @@ export default function HeaderSearch({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useI18n();
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +91,7 @@ export default function HeaderSearch({
         const data = await response.json().catch(() => null);
         if (!response.ok) {
           setResults([]);
-          setError(data?.error || 'Search failed. Try again.');
+          setError(data?.error || t('search.failed'));
           return;
         }
         const hits = Array.isArray(data?.results) ? (data.results as SearchHit[]) : [];
@@ -99,7 +101,7 @@ export default function HeaderSearch({
       } catch (err) {
         if ((err as Error).name === 'AbortError') return;
         setResults([]);
-        setError('Search failed. Try again.');
+        setError(t('search.failed'));
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -201,7 +203,7 @@ export default function HeaderSearch({
           autoComplete="off"
           spellCheck={false}
           className="block w-full pl-8 sm:pl-10 pr-16 py-1.5 sm:py-2 text-sm border border-gray-600 rounded-md leading-5 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:placeholder-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 [&::-webkit-search-cancel-button]:hidden"
-          placeholder="Search countries, locations, memos..."
+          placeholder={t('search.placeholder')}
         />
         <div className="absolute inset-y-0 right-0 pr-2 flex items-center gap-1">
           {loading ? <Loader2 className="h-4 w-4 animate-spin text-gray-400" /> : null}
@@ -234,7 +236,7 @@ export default function HeaderSearch({
           ) : error ? (
             <p className="px-3 py-2.5 text-sm text-red-300">{error}</p>
           ) : loading && results.length === 0 ? (
-            <p className="px-3 py-2.5 text-sm text-gray-400">Searching…</p>
+            <p className="px-3 py-2.5 text-sm text-gray-400">{t('search.searching')}</p>
           ) : results.length === 0 ? (
             <p className="px-3 py-2.5 text-sm text-gray-400">No matches for “{trimmed}”.</p>
           ) : (
@@ -243,7 +245,7 @@ export default function HeaderSearch({
               return (
                 <div key={group.type} className="py-1">
                   <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
-                    {meta.label}
+                    {t(meta.labelKey)}
                   </div>
                   {group.hits.map((hit) => {
                     const index = activeOffset;

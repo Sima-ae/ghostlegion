@@ -27,6 +27,7 @@ import {
 import dynamic from 'next/dynamic';
 
 import AdminMapEditor from '../components/AdminMapEditorWrapper';
+import AdminHeritageEditor from '../components/AdminHeritageEditorWrapper';
 import PeopleManagement from '../components/PeopleManagement';
 import RoutesManagement from '../components/RoutesManagement';
 import ResourcesManagement from '../components/ResourcesManagement';
@@ -138,7 +139,7 @@ export default function AdminDashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'map' | 'locations' | 'people' | 'routes' | 'resources' | 'alerts' | 'notifications' | 'memos'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'map' | 'heritage' | 'locations' | 'people' | 'routes' | 'resources' | 'alerts' | 'notifications' | 'memos'>('overview');
   
   // Modal states
   const [viewModalOpen, setViewModalOpen] = useState(false);
@@ -555,6 +556,7 @@ export default function AdminDashboard() {
               {[
                 { id: 'overview', label: 'Overview', icon: BarChart3 },
                 { id: 'map', label: 'Map Editor', icon: Map },
+                { id: 'heritage', label: 'Heritage', icon: Layers },
                 { id: 'locations', label: 'Locations', icon: MapPin },
                 { id: 'people', label: 'People', icon: Users },
                 { id: 'routes', label: 'Routes', icon: Route },
@@ -825,6 +827,23 @@ export default function AdminDashboard() {
                   onLocationUpdate={handleLocationUpdate}
                   onLocationDelete={handleLocationDelete}
                 />
+              </ErrorBoundary>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'heritage' && (
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Heritage map features</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Create WW1, WW2 and Koude Oorlog points, lines, and areas for the public map modes.
+                Ghost Legion heritage features.
+              </p>
+            </div>
+            <div className="p-4 sm:p-6">
+              <ErrorBoundary>
+                <AdminHeritageEditor />
               </ErrorBoundary>
             </div>
           </div>

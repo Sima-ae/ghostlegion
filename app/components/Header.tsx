@@ -9,6 +9,8 @@ import NotificationPopup from './NotificationPopup';
 import NotificationSender from './NotificationSender';
 import PwaInstallButton from './pwa/PwaInstallButton';
 import HeaderSearch from './HeaderSearch';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useI18n } from '../lib/i18n/I18nProvider';
 
 interface Notification {
   id: string;
@@ -37,6 +39,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
+  const { t } = useI18n();
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Check if user is admin or super admin
@@ -113,7 +116,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                 type="button"
                 onClick={onMenuToggle}
                 className="lg:hidden p-2 mr-1 rounded-md text-gray-300 hover:text-white hover:bg-gray-800"
-                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                aria-label={menuOpen ? t('header.closeMenu') : t('header.openMenu')}
                 aria-expanded={menuOpen}
               >
                 {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -143,7 +146,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
               type="button"
               onClick={() => setMobileSearchOpen((open) => !open)}
               className="sm:hidden p-1.5 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
-              aria-label={mobileSearchOpen ? 'Close search' : 'Open search'}
+              aria-label={mobileSearchOpen ? t('header.closeSearch') : t('header.openSearch')}
               aria-expanded={mobileSearchOpen}
             >
               {mobileSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
@@ -154,7 +157,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
               <button 
                 onClick={() => setIsNotificationSenderOpen(true)}
                 className="p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
-                title="Send Notification"
+                title={t('header.sendNotification')}
               >
                 <Send className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
@@ -187,10 +190,12 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
               type="button"
               onClick={() => router.push(session ? '/settings' : '/auth/signin')}
               className="hidden md:inline-flex p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
-              title="Settings"
+              title={t('header.settings')}
             >
               <Settings className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
+
+            <LanguageSwitcher />
 
             {/* Login/Profile */}
             {session ? (
@@ -201,7 +206,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                   className="flex items-center space-x-1 sm:space-x-2 p-1.5 sm:p-2 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                 >
                   <User className="h-5 w-5 sm:h-6 sm:w-6" />
-                  <span className="hidden sm:inline text-sm truncate max-w-20">{session.user?.name || session.user?.email || 'User'}</span>
+                  <span className="hidden sm:inline text-sm truncate max-w-20">{session.user?.name || session.user?.email || t('header.user')}</span>
                 </button>
 
                 {isProfileOpen && (
@@ -211,14 +216,14 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                       onClick={() => goTo('/profile')}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Profile
+                      {t('header.profile')}
                     </button>
                     <button
                       type="button"
                       onClick={() => goTo('/settings')}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Settings
+                      {t('header.settings')}
                     </button>
                     {(session?.user?.role === 'ADMIN' || session?.user?.role === 'COMMANDER' || session?.user?.role === 'SUPER_ADMIN') && (
                       <>
@@ -229,7 +234,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                           className="flex items-center w-full px-4 py-2 text-sm text-blue-600 hover:bg-gray-100"
                         >
                           <Shield className="h-4 w-4 mr-2" />
-                          Admin Dashboard
+                          {t('header.admin')}
                         </button>
                       </>
                     )}
@@ -240,7 +245,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                       className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
-                      Sign Out
+                      {t('header.signOut')}
                     </button>
                   </div>
                 )}
@@ -250,8 +255,7 @@ export default function Header({ menuOpen = false, onMenuToggle }: HeaderProps) 
                 onClick={() => router.push('/auth/signin')}
                 className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap"
               >
-                <span className="hidden sm:inline">Login</span>
-                <span className="sm:hidden">Login</span>
+                {t('header.login')}
               </button>
             )}
           </div>

@@ -70,8 +70,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "nl_NL",
-    alternateLocale: ["nl_NL", "en_GB"],
+    locale: "en_GB",
+    alternateLocale: ["en_GB", "nl_NL"],
     url: siteUrl,
     siteName: SITE_NAME,
     title: defaultTitle,

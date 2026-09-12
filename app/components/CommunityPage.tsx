@@ -320,11 +320,11 @@ export default function CommunityPage() {
           </p>
         </div>
 
-        {/* Join Us Today Banner */}
+        {/* Join our community Banner */}
         <div className="mb-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4 sm:p-6 text-white">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
-              <h2 className="text-xl sm:text-2xl font-bold mb-2">Join Us Today</h2>
+              <h2 className="text-xl sm:text-2xl font-bold mb-2">Join our community</h2>
               <p className="text-blue-100 mb-4">
                 Become part of our community and help make a difference during crisis situations.
               </p>

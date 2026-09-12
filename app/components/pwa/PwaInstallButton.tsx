@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, Smartphone, X } from 'lucide-react';
 import { usePwa } from './PwaProvider';
+import { useI18n } from '../../lib/i18n/I18nProvider';
 
 type BrowserHint =
   | 'chrome'
@@ -78,6 +79,7 @@ function ManualSteps({ hint }: { hint: BrowserHint }) {
 }
 
 export default function PwaInstallButton() {
+  const { t } = useI18n();
   const {
     isStandalone,
     canUseNativePrompt,
@@ -140,7 +142,7 @@ export default function PwaInstallButton() {
       >
         <Download className="h-4 w-4 shrink-0" aria-hidden />
         <span className="hidden sm:inline">
-          {justInstalled ? 'Installed' : 'Install app'}
+          {justInstalled ? t('pwa.install') : t('pwa.install')}
         </span>
       </button>
 
