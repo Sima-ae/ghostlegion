@@ -165,7 +165,7 @@ body {
 
 @media (max-width: 640px) {
   .leaflet-control-zoom {
-    margin: 10px !important;
+    margin: 52px 0 0 10px !important;
   }
   .leaflet-control-attribution {
     font-size: 10px;

@@ -321,7 +321,7 @@ export default function MapMemos() {
         <>
           {canPlace ? (
             <div
-              className="gl-memo-ui absolute z-[1100] top-3 right-3 pointer-events-auto"
+              className="gl-memo-ui absolute z-[1100] top-3 right-2 sm:right-3 pointer-events-auto"
               onMouseDown={stopMapEvent}
               onClick={stopMapEvent}
               onDoubleClick={stopMapEvent}
@@ -334,14 +334,18 @@ export default function MapMemos() {
                   setError('');
                   setSubmittedNotice('');
                 }}
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium shadow-md border ${
+                className={`flex items-center justify-center gap-2 rounded-lg p-2 sm:px-3 sm:py-2 text-sm font-medium shadow-md border ${
                   placing
                     ? 'bg-green-600 text-white border-green-700'
                     : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
                 }`}
+                title={placing ? 'Click map to place' : 'Add memo'}
+                aria-label={placing ? 'Click map to place' : 'Add memo'}
               >
-                <StickyNote className="h-4 w-4" />
-                {placing ? 'Click map to place' : 'Add memo'}
+                <StickyNote className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">
+                  {placing ? 'Click map to place' : 'Add memo'}
+                </span>
               </button>
             </div>
           ) : null}
@@ -355,7 +359,7 @@ export default function MapMemos() {
           ) : null}
 
           {submittedNotice ? (
-            <div className="absolute z-[1100] left-1/2 -translate-x-1/2 top-3 pointer-events-auto max-w-md px-3">
+            <div className="absolute z-[1100] left-2 right-2 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 top-14 sm:top-3 pointer-events-auto sm:max-w-md px-0 sm:px-3">
               <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm px-3 py-2 rounded-md shadow flex items-start gap-2">
                 <p className="flex-1">{submittedNotice}</p>
                 <button

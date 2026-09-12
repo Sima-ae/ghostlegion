@@ -97,7 +97,7 @@ export default function MapLegendaPanel({
   );
 
   return (
-    <div className="absolute z-[1100] top-12 right-3 sm:top-14 sm:right-4 pointer-events-auto flex flex-row-reverse items-start gap-2 max-h-[min(88vh,48rem)]">
+    <div className="absolute z-[1100] top-[4.25rem] right-2 sm:top-14 sm:right-4 pointer-events-auto flex flex-row-reverse items-start gap-1.5 sm:gap-2 max-h-[min(75vh,48rem)]">
       <div className="flex flex-col gap-1 rounded-lg border border-gray-200 bg-white/95 shadow-md p-1">
         {railBtn('legend', BookOpen, t('legend.title'))}
         {railBtn('layers', Layers, t('legend.layers'))}
@@ -105,7 +105,7 @@ export default function MapLegendaPanel({
       </div>
 
       {open ? (
-        <div className="w-[min(25rem,calc(100vw-5.5rem))] rounded-lg border border-gray-200 bg-white/95 shadow-lg overflow-hidden flex flex-col max-h-[min(88vh,48rem)]">
+        <div className="w-[min(25rem,calc(100vw-4.25rem))] sm:w-[min(25rem,calc(100vw-5.5rem))] rounded-lg border border-gray-200 bg-white/95 shadow-lg overflow-hidden flex flex-col max-h-[min(70vh,48rem)] sm:max-h-[min(88vh,48rem)]">
           <div className="flex flex-row-reverse items-center justify-between px-3 py-2 border-b border-gray-100">
             <h3 className="text-sm font-semibold text-gray-900 text-right">
               {tab === 'legend'
