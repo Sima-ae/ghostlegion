@@ -128,6 +128,10 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
 
   const showOpsLocations = mode === 'operations';
   const showNonCountryElements = mode === 'operations';
+  const initialZoom =
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches
+      ? 7
+      : 8;
 
   return (
     <div className="gl-map-root relative">
@@ -152,7 +156,7 @@ export default function MapComponent({ locations, selectedLocation, onLocationSe
 
       <MapContainer
         center={[52.1326, 5.2913]}
-        zoom={8}
+        zoom={initialZoom}
         scrollWheelZoom
         style={{ height: '100%', width: '100%' }}
         className="gl-leaflet"
