@@ -1,7 +1,7 @@
 export type Locale = 'en' | 'nl';
 
 export const LOCALE_STORAGE_KEY = 'ghostlegion-locale';
-export const DEFAULT_LOCALE: Locale = 'en';
+export const DEFAULT_LOCALE: Locale = 'nl';
 
 export const LOCALE_META: Record<
   Locale,
@@ -133,6 +133,10 @@ const en: Messages = {
 
   'pwa.install': 'Install app',
   'map.loading': 'Map is loading...',
+  'memo.add': 'Add memo',
+  'memo.placing': 'Click map to place',
+  'memo.placingHint': 'Click the map to place a memo. Esc to cancel.',
+  'memo.dismiss': 'Dismiss',
   'search.countries': 'Countries',
   'search.locations': 'Locations',
   'search.memos': 'Memos',
@@ -261,6 +265,10 @@ const nl: Messages = {
 
   'pwa.install': 'App installeren',
   'map.loading': 'Kaart wordt geladen...',
+  'memo.add': 'Memo toevoegen',
+  'memo.placing': 'Klik op de kaart',
+  'memo.placingHint': 'Klik op de kaart om een memo te plaatsen. Esc om te annuleren.',
+  'memo.dismiss': 'Sluiten',
   'search.countries': 'Landen',
   'search.locations': 'Locaties',
   'search.memos': 'Memo’s',

@@ -9,6 +9,7 @@ import { StickyNote, X, AlertTriangle } from 'lucide-react';
 import { memoMarkerIcon } from '../lib/leaflet-icons';
 import { MapMemo, MAX_MEMO_BODY, ANONYMOUS_LABEL } from '../types';
 import { MAP_FOCUS_SETTLED_EVENT, type MapFocusTarget } from '../lib/map-focus';
+import { useI18n } from '../lib/i18n/I18nProvider';
 
 type Draft = {
   id?: string;
@@ -37,6 +38,7 @@ function expectedAnswerFromQuestion(question: string): number | null {
 
 export default function MapMemos() {
   const map = useMap();
+  const { t } = useI18n();
   const { data: session, status } = useSession();
   const icon = useMemo(() => memoMarkerIcon(), []);
   const isPublisher =
@@ -339,12 +341,12 @@ export default function MapMemos() {
                     ? 'bg-green-600 text-white border-green-700'
                     : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
                 }`}
-                title={placing ? 'Click map to place' : 'Add memo'}
-                aria-label={placing ? 'Click map to place' : 'Add memo'}
+                title={placing ? t('memo.placing') : t('memo.add')}
+                aria-label={placing ? t('memo.placing') : t('memo.add')}
               >
                 <StickyNote className="h-4 w-4 shrink-0" />
                 <span className="hidden sm:inline">
-                  {placing ? 'Click map to place' : 'Add memo'}
+                  {placing ? t('memo.placing') : t('memo.add')}
                 </span>
               </button>
             </div>
@@ -353,7 +355,7 @@ export default function MapMemos() {
           {placing ? (
             <div className="absolute z-[1100] left-1/2 -translate-x-1/2 bottom-8 pointer-events-none">
               <div className="bg-slate-900/90 text-white text-xs sm:text-sm px-3 py-2 rounded-md shadow">
-                Click the map to place a memo. Esc to cancel.
+                {t('memo.placingHint')}
               </div>
             </div>
           ) : null}
@@ -366,7 +368,7 @@ export default function MapMemos() {
                   type="button"
                   onClick={() => setSubmittedNotice('')}
                   className="text-amber-700 hover:text-amber-900"
-                  aria-label="Dismiss"
+                  aria-label={t('memo.dismiss')}
                 >
                   <X className="h-4 w-4" />
                 </button>

@@ -20,14 +20,14 @@ export default function MapModeSwitcher({
   const { t } = useI18n();
 
   return (
-    <div className="absolute z-[1100] top-3 left-2 right-12 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 pointer-events-auto max-w-none sm:max-w-[min(100vw-8rem,36rem)]">
-      <div className="flex divide-x divide-gray-300 rounded-lg border border-gray-300 bg-white/95 shadow-md overflow-x-auto overscroll-x-contain text-[11px] sm:text-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="absolute z-[1100] top-2.5 left-1/2 -translate-x-1/2 pointer-events-auto max-w-[min(17.5rem,calc(100vw-7.5rem))] sm:top-3 sm:max-w-[min(100vw-8rem,36rem)]">
+      <div className="mx-auto flex w-max max-w-full divide-x divide-gray-300 rounded-md sm:rounded-lg border border-gray-300 bg-white/95 shadow-md overflow-x-auto overscroll-x-contain text-[10px] leading-tight sm:text-sm [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {MODE_KEYS.map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => onChange(item.id)}
-            className={`shrink-0 px-2 sm:px-3 py-1.5 whitespace-nowrap transition-colors ${
+            className={`shrink-0 px-1.5 sm:px-3 py-1 sm:py-1.5 whitespace-nowrap transition-colors ${
               mode === item.id
                 ? 'bg-slate-800 text-white'
                 : 'bg-white/95 text-gray-700 hover:bg-slate-800 hover:text-white'

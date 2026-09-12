@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n/I18nProvider';
 import { LOCALE_META, type Locale } from '../lib/i18n/messages';
 
-const OPTIONS: Locale[] = ['en', 'nl'];
+const OPTIONS: Locale[] = ['nl', 'en'];
 
 export default function LanguageSwitcher() {
   const { locale, setLocale, t } = useI18n();

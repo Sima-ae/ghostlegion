@@ -70,8 +70,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "en_GB",
-    alternateLocale: ["en_GB", "nl_NL"],
+    locale: "nl_NL",
+    alternateLocale: ["nl_NL", "en_GB"],
     url: siteUrl,
     siteName: SITE_NAME,
     title: defaultTitle,
@@ -106,6 +106,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
     languages: {
+      "nl-NL": "/",
       "en-NL": "/",
       "x-default": "/",
     },
@@ -130,7 +131,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="nl" className="h-full">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
       >

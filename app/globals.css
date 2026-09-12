@@ -165,7 +165,13 @@ body {
 
 @media (max-width: 640px) {
   .leaflet-control-zoom {
-    margin: 52px 0 0 10px !important;
+    margin: 10px 0 0 8px !important;
+  }
+  .leaflet-control-zoom a {
+    width: 28px !important;
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 16px !important;
   }
   .leaflet-control-attribution {
     font-size: 10px;
